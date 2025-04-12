@@ -36,7 +36,7 @@ export interface ChapterServer {
 
 export interface HomeParams {
   type_slug: string;
-  filterCategory: any[];
+  filterCategory: Category[];
   sortField: string;
   pagination: Pagination;
   itemsUpdateInDay: number;
