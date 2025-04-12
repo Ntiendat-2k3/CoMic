@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: var(--font-geist-sans);
+}
+
+code,
+pre {
+  font-family: var(--font-geist-mono);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+input {
+  outline: none;
+  border: none;
+}
+
+.border-animation {
+  --border-angle: 0deg;
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  background: 
+    linear-gradient(var(--bg-primary-dark, #1a365d)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      #4f46e5,
+      #ec4899,
+      #eab308,
+      #4f46e5
+    ) border-box;
+  animation: border-spin 3s linear infinite;
+}
+
+@keyframes border-spin {
+  from { --border-angle: 0deg; }
+  to { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Tạo hiệu ứng chạy vô tạn không khoảng trống */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+  padding-left: 100%; /* Bắt đầu từ bên phải ngoài màn hình */
+  will-change: transform;
+}
+
+/* Tạo bản sao nội dung */
+.marquee-content::after {
+  content: attr(data-content);
+  display: inline-block;
+  padding-left: 50px; /* Khoảng cách giữa 2 bản sao */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%); /* Dịch chuyển đúng 100% chiều dài nội dung */
+  }
+}
+
+// Custom clerk
+.cl-userButtonPopoverActionButton__manageAccount.cl-button__manageAccount,
+.cl-internal-1hp5nqm, .cl-internal-1dauvpw {
+  display: none !important;
+}
+
+/* Tùy chỉnh scrollbar cho tất cả các phần tử trong trang */
+::-webkit-scrollbar {
+  width: 5px; /* Độ rộng thanh scrollbar */
+  height: 8px; /* Chiều cao thanh scrollbar (cho scrollbar ngang) */
+}
+
+/* Tùy chỉnh phần tay cầm của thanh scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: #8B008B; /* Màu tối cho tay cầm */
+  border-radius: 10px; /* Làm tròn tay cầm */
+}
+
+/* Tùy chỉnh thanh track (nền của thanh scrollbar) */
+::-webkit-scrollbar-track {
+  background-color: #444; /* Màu tối cho nền */
+  border-radius: 10px; /* Làm tròn nền */
+}
