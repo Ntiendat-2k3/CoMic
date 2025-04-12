@@ -2,9 +2,9 @@
 import { useEffect, useRef, memo } from "react";
 import Link from "next/link";
 import { debounce } from "lodash";
-import type { Comic } from "../types";
 import LoadingSkeletonSearch from "./loading/LoadingSkeletonSearch";
 import ImageFallback from "../utils/ImageFallback";
+import { Comic } from "../types/comic";
 
 interface SearchProps {
   searchResults: Comic[];

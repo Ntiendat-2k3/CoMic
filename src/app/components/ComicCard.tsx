@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Comic } from "../types";
+import { Comic } from "../types/comic";
 
 interface ComicCardProps {
   comic: Comic;
@@ -18,6 +18,9 @@ const ComicCard = ({ comic, baseImageUrl }: ComicCardProps) => {
             width={600}
             height={800}
             className="object-cover w-full h-full"
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+            loading="lazy"
           />
         </div>
         

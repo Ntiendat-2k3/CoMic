@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Category } from "../types";
+import { Category } from "../types/common";
 
 interface DropdownProps {
   categories: Category[]; 

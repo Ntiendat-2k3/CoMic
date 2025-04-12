@@ -1,10 +1,11 @@
 "use client";
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import type { Category, Comic } from "../types";
 import OTruyenService from "../services/otruyen.service";
 import Search from "./Search";
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
+import { Category } from "../types/common";
+import { Comic } from "../types/comic";
 
 const Dropdown = dynamic(() => import("./Dropdown"), {
   loading: () => <div className="w-40 h-6 bg-gray-100 animate-pulse" />,
@@ -19,7 +20,6 @@ const Navbar = ({ categories }: NavbarProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { isSignedIn, user } = useUser();
-  console.log("🚀 ~ Navbar ~ user:", user);
 
   const handleSearch = useCallback(async (keyword: string) => {
     if (keyword.trim().length === 0) {

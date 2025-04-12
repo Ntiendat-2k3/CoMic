@@ -1,11 +1,7 @@
 import { AxiosResponse } from "axios";
 import apiClient from "../lib/api-client";
-import { 
-  Category,
-  CategoryListResponse,
-  HomeResponse,
-  SearchResponse
-} from "../types";
+import { CategoryListResponse, HomeResponse, SearchResponse } from "../types/response";
+import { Category } from "../types/common";
 
 // type ComicListType =
 //   | "truyen-moi"
@@ -19,7 +15,6 @@ const OTruyenService = {
     const response = await apiClient.get<HomeResponse>("/home");
     return response.data;
   },
-
 
   // Danh sách truyện theo type
   // getComicList: async (
