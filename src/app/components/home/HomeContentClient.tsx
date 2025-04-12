@@ -1,4 +1,3 @@
-// components/home/HomeContentClient.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,70 +8,70 @@ import SkeletonComicGrid from './SkeletonComicGrid';
 import { Comic, ComicSEO } from '@/app/types/comic';
 import { HomeParams } from '@/app/types/common';
 
-// Định nghĩa kiểu cho dữ liệu cache
+// Định nghĩa kiểu dữ liệu
 type CachedData = {
-  data: HomeResponseData
-  timestamp: number
-}
+  data: HomeResponseData;
+  timestamp: number;
+};
 
-// Kiểu dữ liệu cho response từ API
 export interface HomeResponseData {
-  seoOnPage: ComicSEO
-  items: Comic[]
-  params?: HomeParams
+  seoOnPage?: ComicSEO;
+  items: Comic[];
+  params?: HomeParams;
 }
 
-const CACHE_KEY = 'home-data'
-const CACHE_DURATION = 60 * 60 * 1000 // 1 giờ
+const CACHE_KEY = 'home-data';
+const CACHE_DURATION = 60 * 60 * 1000; // 1 giờ
 
 export default function HomeContentClient() {
-  const [data, setData] = useState<HomeResponseData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState<HomeResponseData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
+    const checkCacheValidity = (cached: string | null): CachedData | null => {
+      if (!cached) return null;
       try {
-        // Kiểm tra cache
-        const cached = localStorage.getItem(CACHE_KEY)
-        if (cached) {
-          const parsed: CachedData = JSON.parse(cached)
-          if (Date.now() - parsed.timestamp < CACHE_DURATION) {
-            setData(parsed.data)
-            setIsLoading(false)
-          }
-        }
+        const parsed = JSON.parse(cached) as CachedData;
+        return Date.now() - parsed.timestamp < CACHE_DURATION ? parsed : null;
+      } catch (error) {
+        console.error('Invalid cache format:', error);
+        return null;
+      }
+    };
 
-        // Fetch dữ liệu mới
-        const response = await OTruyenService.getHomeData()
-        const newData: HomeResponseData = response.data 
-        
-        // Cập nhật state và cache
-        setData(newData)
+    const fetchData = async () => {
+      try {
+        const response = await OTruyenService.getHomeData();
+        const newData = response.data; 
+        setData(newData);
         localStorage.setItem(
           CACHE_KEY,
-          JSON.stringify({
-            data: newData,
-            timestamp: Date.now()
-          })
-        )
+          JSON.stringify({ data: newData, timestamp: Date.now() })
+        );
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error)
+        console.error('Fetch error:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
+    };
+
+    // Logic chính
+    const cached = checkCacheValidity(localStorage.getItem(CACHE_KEY));
+    if (cached) {
+      setData(cached.data);
+      setIsLoading(false);
+      fetchData(); // Background update
+    } else {
+      fetchData(); // Initial fetch
     }
+  }, []);
 
-    loadData()
-  }, [])
-
-  if (isLoading || !data) {
-    return <SkeletonComicGrid />
-  }
+  if (isLoading || !data) return <SkeletonComicGrid />;
 
   return (
     <>
       <ComicGrid comics={data.items} />
       <SEOMetadata seoData={data.seoOnPage} />
     </>
-  )
+  );
 }
