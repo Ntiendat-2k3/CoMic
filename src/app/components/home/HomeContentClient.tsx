@@ -7,6 +7,8 @@ import SEOMetadata from './SEOMetadata';
 import SkeletonComicGrid from './SkeletonComicGrid';
 import { Comic, ComicSEO } from '@/app/types/comic';
 import { HomeParams } from '@/app/types/common';
+import Pagination from '@/app/utils/Pagination';
+
 
 // Định nghĩa kiểu dữ liệu
 type CachedData = {
@@ -26,6 +28,8 @@ const CACHE_DURATION = 60 * 60 * 1000; // 1 giờ
 export default function HomeContentClient() {
   const [data, setData] = useState<HomeResponseData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const checkCacheValidity = (cached: string | null): CachedData | null => {
@@ -43,9 +47,16 @@ export default function HomeContentClient() {
       try {
         const response = await OTruyenService.getHomeData();
         const newData = response.data; 
+
         setData(newData);
+        setTotalPages(
+          response.data.params?.pagination?.totalItems
+            ? Math.ceil(response.data.params.pagination.totalItems / 15)
+            : 1
+        );
+
         localStorage.setItem(
-          CACHE_KEY,
+          `${CACHE_KEY}-page-${currentPage}`,
           JSON.stringify({ data: newData, timestamp: Date.now() })
         );
       } catch (error) {
@@ -60,11 +71,11 @@ export default function HomeContentClient() {
     if (cached) {
       setData(cached.data);
       setIsLoading(false);
-      fetchData(); // Background update
+      fetchData(); 
     } else {
       fetchData(); // Initial fetch
     }
-  }, []);
+  }, [currentPage]);
 
   if (isLoading || !data) return <SkeletonComicGrid />;
 
@@ -72,6 +83,12 @@ export default function HomeContentClient() {
     <>
       <ComicGrid comics={data.items} />
       <SEOMetadata seoData={data.seoOnPage} />
+
+      <Pagination
+        pageCount={totalPages}
+        currentPage={currentPage}
+        basePath="/"
+      />
     </>
   );
 }

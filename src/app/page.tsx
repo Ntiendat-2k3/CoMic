@@ -4,6 +4,8 @@ import SkeletonComicGrid from "./components/home/SkeletonComicGrid";
 import HomeContentClient from "./components/home/HomeContentClient";
 
 export default function Home() {
+
+  
   return (
     <LayoutMain>
       <div className="container mx-auto px-4 py-6">

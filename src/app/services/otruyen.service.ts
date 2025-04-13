@@ -11,8 +11,8 @@ import { Category } from "../types/common";
 
 const OTruyenService = {
   // Trang chủ
-  getHomeData: async (): Promise<HomeResponse> => {
-    const response = await apiClient.get<HomeResponse>("/home");
+  getHomeData: async (page: number = 1, limit: number = 15): Promise<HomeResponse> => {
+    const response = await apiClient.get<HomeResponse>(`/home?page=${page}&limit=${limit}`);
     return response.data;
   },
 
