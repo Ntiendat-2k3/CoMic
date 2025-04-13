@@ -12,7 +12,7 @@ import { Category } from "../types/common";
 const OTruyenService = {
   // Trang chủ
   getHomeData: async (page: number = 1, limit: number = 15): Promise<HomeResponse> => {
-    const response = await apiClient.get<HomeResponse>(`/home?page=${page}&limit=${limit}`);
+    const response = await apiClient.get<HomeResponse>(`/danh-sach/truyen-moi?page=${page}&limit=${limit}`);
     return response.data;
   },
 

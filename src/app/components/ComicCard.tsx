@@ -11,7 +11,7 @@ const ComicCard = ({ comic, baseImageUrl }: ComicCardProps) => {
   return (
     <div className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 duration-300">
       <Link href={`/truyen-tranh/${comic.slug}`}>
-        <div className="w-full h-[330px] relative">
+        <div className="w-full h-[400px] relative">
           <Image
             src={baseImageUrl}
             alt={comic.name}
