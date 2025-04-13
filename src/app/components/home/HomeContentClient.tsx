@@ -9,8 +9,6 @@ import { Comic, ComicSEO } from '@/app/types/comic';
 import { HomeParams } from '@/app/types/common';
 import Pagination from '@/app/utils/Pagination';
 
-
-// Định nghĩa kiểu dữ liệu
 type CachedData = {
   data: HomeResponseData;
   timestamp: number;
@@ -22,8 +20,9 @@ export interface HomeResponseData {
   params?: HomeParams;
 }
 
+const ITEMS_PER_PAGE = 15;
 const CACHE_KEY = 'home-data';
-const CACHE_DURATION = 60 * 60 * 1000; // 1 giờ
+const CACHE_DURATION = 60 * 60 * 1000;
 
 export default function HomeContentClient() {
   const [data, setData] = useState<HomeResponseData | null>(null);
@@ -43,20 +42,20 @@ export default function HomeContentClient() {
       }
     };
 
-    const fetchData = async () => {
+    const fetchData = async (page: number) => {
       try {
-        const response = await OTruyenService.getHomeData();
-        const newData = response.data; 
+        const response = await OTruyenService.getHomeData(page);
+        const newData = response.data;
 
         setData(newData);
         setTotalPages(
-          response.data.params?.pagination?.totalItems
-            ? Math.ceil(response.data.params.pagination.totalItems / 15)
+          newData.params?.pagination?.totalItems
+            ? Math.ceil(newData.params.pagination.totalItems / ITEMS_PER_PAGE)
             : 1
         );
 
         localStorage.setItem(
-          `${CACHE_KEY}-page-${currentPage}`,
+          `${CACHE_KEY}-page-${page}`,
           JSON.stringify({ data: newData, timestamp: Date.now() })
         );
       } catch (error) {
@@ -66,16 +65,19 @@ export default function HomeContentClient() {
       }
     };
 
-    // Logic chính
-    const cached = checkCacheValidity(localStorage.getItem(CACHE_KEY));
+    const cached = checkCacheValidity(localStorage.getItem(`${CACHE_KEY}-page-${currentPage}`));
     if (cached) {
       setData(cached.data);
       setIsLoading(false);
-      fetchData(); 
+      fetchData(currentPage); // Background update
     } else {
-      fetchData(); // Initial fetch
+      fetchData(currentPage); // Initial fetch
     }
   }, [currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   if (isLoading || !data) return <SkeletonComicGrid />;
 
@@ -83,11 +85,10 @@ export default function HomeContentClient() {
     <>
       <ComicGrid comics={data.items} />
       <SEOMetadata seoData={data.seoOnPage} />
-
       <Pagination
         pageCount={totalPages}
         currentPage={currentPage}
-        basePath="/"
+        onPageChange={handlePageChange}
       />
     </>
   );

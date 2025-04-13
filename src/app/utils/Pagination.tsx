@@ -7,6 +7,7 @@ import { PaginationProps } from '../types/common';
 const Pagination = ({
   pageCount,
   currentPage,
+  onPageChange,
   basePath = '/'
 }: PaginationProps) => {
   const router = useRouter();
@@ -14,6 +15,7 @@ const Pagination = ({
   const handlePageClick = (selectedItem: { selected: number }) => {
     const newPage = selectedItem.selected + 1;
     router.push(`${basePath}?page=${newPage}`);
+    onPageChange(newPage);
   };
 
   return (
