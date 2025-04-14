@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import ReactPaginate from 'react-paginate';
-import { useRouter } from 'next/navigation';
-import { PaginationProps } from '../types/common';
+import ReactPaginate from "react-paginate";
+import { useRouter } from "next/navigation";
+import { PaginationProps } from "../types/common";
 
 const Pagination = ({
   pageCount,
   currentPage,
   onPageChange,
-  basePath = '/'
+  basePath = "/",
 }: PaginationProps) => {
   const router = useRouter();
 
@@ -27,12 +27,16 @@ const Pagination = ({
       forcePage={currentPage - 1}
       onPageChange={handlePageClick}
       containerClassName="flex justify-center mt-8 space-x-2"
-      pageClassName="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-600 text-gray-200"
+      pageClassName="text-gray-200"
       activeClassName="bg-blue-500 text-white border-blue-500"
-      previousClassName="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-600 text-gray-200"
-      nextClassName="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-600 text-gray-200"
+      previousClassName="text-gray-200"
+      nextClassName="text-gray-200"
       disabledClassName="opacity-50 cursor-not-allowed"
       breakClassName="px-3 py-1"
+      // Thêm các class cho thẻ a
+      pageLinkClassName="block w-full h-full px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-600"
+      previousLinkClassName="block w-full h-full px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-600"
+      nextLinkClassName="block w-full h-full px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-600"
     />
   );
 };

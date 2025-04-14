@@ -27,10 +27,13 @@ export interface ComicSEO {
   og_type?: string;
   titleHead?: string;
   descriptionHead?: string;
-  og_image?: string[];
+  og_image?: string[] | undefined;
   updated_time?: number;
   og_url?: string;
   seoSchema?: SEOSchema;
+
+  cdnUrl?: string;
+  seoData: ComicSEO;
 }
 
 export interface ComicDetailParams {
