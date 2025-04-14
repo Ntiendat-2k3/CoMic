@@ -35,6 +35,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
       },
     };
   } catch (error) {
+    console.error("Error generating metadata:", error);
     return {
       title: "Không tìm thấy truyện",
       description: "Trang truyện không tồn tại hoặc đã bị xóa",
@@ -49,6 +50,7 @@ export async function generateStaticParams() {
       slug: comic.slug,
     }));
   } catch (error) {
+    console.error("Error generating static params:", error);
     return [];
   }
 }
