@@ -12,13 +12,11 @@ import {
 } from "@/app/components/comic-detail";
 
 interface PageProps {
-  params: {
-    slug: string;
-  };
-}
+    params: Promise<{ slug: string }>;
+  }
 
-export default async function ComicDetailPage({ params }: PageProps) {
-    const { slug } = params;
+export default async function ComicDetailPage(props : PageProps) {
+    const { slug } = await props.params;
   
     const response = await OTruyenService.getComicDetail(slug);
     
