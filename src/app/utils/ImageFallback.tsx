@@ -23,6 +23,9 @@ const ImageFallback = ({ src, alt, ...props }: ImageFallbackProps) => {
       src={src}
       alt={alt}
       onError={() => setError(true)}
+      placeholder="blur"
+      blurDataURL="data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAQAAAAfQ//73v/+BiOh/AAA="
+      loading="lazy"
     />
   );
 };
