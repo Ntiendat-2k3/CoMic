@@ -39,6 +39,7 @@ export default function SearchResults({
         setError('')
         setKeyword(currentKeyword)
       } catch (err) {
+        console.error(err)
         setError('Không thể cập nhật kết quả')
       } finally {
         setIsLoading(false)
@@ -68,8 +69,8 @@ export default function SearchResults({
 
         {!isLoading && comics.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Không tìm thấy truyện phù hợp với từ khóa "
-            <span className="text-primary">{keyword}</span>"
+            Không tìm thấy truyện phù hợp với từ khóa &ldquo;
+            <span className="text-primary">{keyword}</span>&rdquo;
           </div>
         )}
       </div>
