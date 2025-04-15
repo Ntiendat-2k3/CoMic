@@ -26,6 +26,7 @@ const ImageFallback = ({ src, alt, ...props }: ImageFallbackProps) => {
       placeholder="blur"
       blurDataURL="data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAQAAAAfQ//73v/+BiOh/AAA="
       loading="lazy"
+      decoding="async"
     />
   );
 };

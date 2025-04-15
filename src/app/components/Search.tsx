@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, memo, useState, useCallback } from "react";
+import {
+  useEffect,
+  useRef,
+  memo,
+  useState,
+  useCallback,
+  useMemo
+} from "react";
 import Link from "next/link";
 import { debounce } from "lodash";
 import ImageFallback from "../utils/ImageFallback";
@@ -10,7 +17,8 @@ import dynamic from "next/dynamic";
 const LoadingSkeletonSearch = dynamic(
   () => import("./loading/LoadingSkeletonSearch"),
   {
-    ssr: true,
+    ssr: false,
+    loading: () => <div className="p-3">Đang tải...</div>
   }
 );
 
@@ -35,6 +43,38 @@ const Search = memo(
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [inputValue, setInputValue] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
+    const debouncedSearchRef = useRef<ReturnType<typeof debounce> | null>(null);
+
+    // Xử lý submit form
+    const handleSubmit = useCallback(
+      (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit(inputValue);
+        setShowSuggestions(false);
+        inputRef.current?.blur();
+      },
+      [onSubmit, inputValue, setShowSuggestions]
+    );
+
+    // Xử lý thay đổi input với debounce
+    const handleInputChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+        debouncedSearchRef.current?.(e.target.value);
+      },
+      []
+    );
+
+    // Khởi tạo debounce
+    useEffect(() => {
+      debouncedSearchRef.current = debounce((keyword: string) => {
+        onSearch(keyword);
+      }, 500);
+
+      return () => {
+        debouncedSearchRef.current?.cancel();
+      };
+    }, [onSearch]);
 
     // Xử lý click outside
     useEffect(() => {
@@ -48,35 +88,19 @@ const Search = memo(
       };
 
       document.addEventListener("mousedown", handleClickOutside);
-      return () =>
+      return () => {
         document.removeEventListener("mousedown", handleClickOutside);
+      };
     }, [setShowSuggestions]);
 
-    // Debounce search
-    const debouncedSearch = useCallback(
-      debounce((keyword: string) => {
-        onSearch(keyword);
-      }, 500),
-      [onSearch] // Thêm dependency nếu cần
+    // Memoize danh sách kết quả
+    const renderResults = useMemo(
+      () =>
+        searchResults.map((comic) => (
+          <SearchResultItem key={comic.slug} comic={comic} />
+        )),
+      [searchResults]
     );
-
-    useEffect(() => {
-      return () => {
-        debouncedSearch.cancel();
-      };
-    }, [debouncedSearch]);
-
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      onSubmit(inputValue);
-      setShowSuggestions(false);
-      inputRef.current?.blur();
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setInputValue(e.target.value);
-      debouncedSearch(e.target.value);
-    };
 
     return (
       <div className="relative flex-1 max-w-xl" ref={wrapperRef}>
@@ -106,43 +130,14 @@ const Search = memo(
           </div>
         </form>
 
-        {/* Dropdown gợi ý */}
         {showSuggestions && (
           <div className="absolute top-full w-full lg:w-[400px] mt-2 bg-dark-gradient rounded-lg shadow-xl max-h-96 overflow-y-auto custom-scrollbar z-50">
             {isLoading ? (
               <LoadingSkeletonSearch />
             ) : searchResults.length > 0 ? (
-              searchResults.map((comic) => (
-                <Link
-                  key={comic.slug}
-                  href={`/truyen-tranh/${comic.slug}`}
-                  className="flex items-center gap-3 p-3 hover:bg-primary-light/10 transition-colors border-b border-primary-light/5"
-                >
-                  <ImageFallback
-                    src={`https://img.otruyenapi.com/uploads/comics/${comic.thumb_url}`}
-                    alt={comic.name}
-                    width={80}
-                    height={120}
-                    className="w-12 h-15 object-cover rounded-sm"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{comic.name}</div>
-                    <div className="mt-1 text-sm text-gray-300 flex flex-col">
-                      <span>
-                        Chap{" "}
-                        {comic.chaptersLatest?.[0]?.chapter_name || "mới nhất"}
-                      </span>
-                      <div className="line-clamp-1 text-gray-500">
-                        {comic.category.map((c) => c.name).join(", ")}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))
+              renderResults
             ) : (
-              !isLoading && (
-                <div className="p-4 text-gray-300">Không tìm thấy kết quả</div>
-              )
+              <div className="p-4 text-gray-300">Không tìm thấy kết quả</div>
             )}
           </div>
         )}
@@ -151,6 +146,43 @@ const Search = memo(
   }
 );
 
-Search.displayName = "Search";
+// Component con cho từng kết quả tìm kiếm
+const SearchResultItem = memo(({ comic }: { comic: Comic }) => (
+  <Link
+    href={`/truyen-tranh/${comic.slug}`}
+    className="flex items-center gap-3 p-3 hover:bg-primary-light/10 transition-colors border-b border-primary-light/5"
+    prefetch={false} // Tắt prefetch cho các item không quan trọng
+  >
+    <OptimizedImage
+      src={`https://img.otruyenapi.com/uploads/comics/${comic.thumb_url}`}
+      alt={comic.name}
+    />
+    <div className="flex-1 min-w-0">
+      <div className="font-medium truncate">{comic.name}</div>
+      <div className="mt-1 text-sm text-gray-300 flex flex-col">
+        <span>
+          Chap {comic.chaptersLatest?.[0]?.chapter_name || "mới nhất"}
+        </span>
+        <div className="line-clamp-1 text-gray-500">
+          {comic.category.map((c) => c.name).join(", ")}
+        </div>
+      </div>
+    </div>
+  </Link>
+));
 
+// Component hình ảnh được tối ưu
+const OptimizedImage = memo(
+  ({ src, alt }: { src: string; alt: string }) => (
+    <ImageFallback
+      src={src}
+      alt={alt}
+      width={80}
+      height={120}
+      className="w-12 h-15 object-cover rounded-sm"
+    />
+  )
+);
+
+Search.displayName = "Search";
 export default Search;
