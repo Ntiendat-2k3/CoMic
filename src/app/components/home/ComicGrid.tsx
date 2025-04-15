@@ -1,6 +1,10 @@
 import { Comic } from "@/app/types/comic";
 import ComicCard from "../ComicCard";
-import SkeletonComicGrid from "./SkeletonComicGrid";
+import dynamic from "next/dynamic";
+
+const SkeletonComicGrid = dynamic(() => import("./SkeletonComicGrid"),  {
+  ssr: false,
+});
 
 interface ComicGridProps {
   comics?: Comic[];
@@ -16,7 +20,7 @@ const ComicGrid = ({ comics, isLoading }: ComicGridProps) => {
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6">
       {comics.map((comic) => (
         <ComicCard
-          key={comic._id}
+          key={comic.slug}
           comic={comic}
           baseImageUrl={`https://img.otruyenapi.com/uploads/comics/${comic.thumb_url}`}
         />

@@ -1,7 +1,14 @@
 import { Suspense } from "react";
 import LayoutMain from "./layouts/LayoutMain";
-import SkeletonComicGrid from "./components/home/SkeletonComicGrid";
 import HomeContentClient from "./components/home/HomeContentClient";
+import dynamic from "next/dynamic";
+
+const SkeletonComicGrid = dynamic(
+  () => import("./components/home/SkeletonComicGrid"),
+  {
+    ssr: true,
+  }
+);
 
 export default function Home() {
   return (

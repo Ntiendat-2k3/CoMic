@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Comic } from "../types/comic";
+import ImageFallback from "../utils/ImageFallback";
 
 interface ComicCardProps {
   comic: Comic;
@@ -12,15 +12,12 @@ const ComicCard = ({ comic, baseImageUrl }: ComicCardProps) => {
     <div className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 duration-300">
       <Link href={`/truyen-tranh/${comic.slug}`}>
         <div className="w-full h-[400px] relative">
-          <Image
+          <ImageFallback
             src={baseImageUrl}
             alt={comic.name}
             width={600}
             height={800}
             className="object-cover w-full h-full"
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-            loading="lazy"
           />
         </div>
         

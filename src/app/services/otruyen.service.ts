@@ -47,7 +47,7 @@ const OTruyenService = {
   // Tìm kiếm
   searchComics: async (keyword: string): Promise<AxiosResponse<SearchResponse>> => {
     return apiClient.get<SearchResponse>(
-      `/tim-kiem?keyword=${encodeURIComponent(keyword)}&limit=10`
+      `/tim-kiem?keyword=${encodeURIComponent(keyword)}`
     );
   }
 };

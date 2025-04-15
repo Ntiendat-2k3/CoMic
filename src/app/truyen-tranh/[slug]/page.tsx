@@ -43,6 +43,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 }
 
+// Pre-render 50 item dể tăng tốc độ load trang chi tiết
 export async function generateStaticParams() {
   try {
     const { data } = await OTruyenService.getHomeData(1, 50);
@@ -54,6 +55,7 @@ export async function generateStaticParams() {
     return [];
   }
 }
+
 export default async function ComicDetailPage(props: PageProps) {
   const { slug } = await props.params;
 

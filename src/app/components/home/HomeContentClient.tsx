@@ -1,13 +1,17 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import OTruyenService from '../../services/otruyen.service';
-import ComicGrid from './ComicGrid';
-import SEOMetadata from './SEOMetadata';
-import SkeletonComicGrid from './SkeletonComicGrid';
-import { Comic, ComicSEO } from '@/app/types/comic';
-import { HomeParams } from '@/app/types/common';
-import Pagination from '@/app/utils/Pagination';
+import { useEffect, useState } from "react";
+import OTruyenService from "../../services/otruyen.service";
+import ComicGrid from "./ComicGrid";
+import SEOMetadata from "./SEOMetadata";
+import { Comic, ComicSEO } from "@/app/types/comic";
+import { HomeParams } from "@/app/types/common";
+import Pagination from "@/app/utils/Pagination";
+import dynamic from "next/dynamic";
+
+const SkeletonComicGrid = dynamic(() => import("./SkeletonComicGrid"), {
+  ssr: true,
+});
 
 type CachedData = {
   data: HomeResponseData;
@@ -21,7 +25,7 @@ export interface HomeResponseData {
 }
 
 const ITEMS_PER_PAGE = 15;
-const CACHE_KEY = 'home-data';
+const CACHE_KEY = "home-data";
 const CACHE_DURATION = 60 * 60 * 1000;
 
 export default function HomeContentClient() {
@@ -37,7 +41,7 @@ export default function HomeContentClient() {
         const parsed = JSON.parse(cached) as CachedData;
         return Date.now() - parsed.timestamp < CACHE_DURATION ? parsed : null;
       } catch (error) {
-        console.error('Invalid cache format:', error);
+        console.error("Invalid cache format:", error);
         return null;
       }
     };
@@ -59,13 +63,15 @@ export default function HomeContentClient() {
           JSON.stringify({ data: newData, timestamp: Date.now() })
         );
       } catch (error) {
-        console.error('Fetch error:', error);
+        console.error("Fetch error:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    const cached = checkCacheValidity(localStorage.getItem(`${CACHE_KEY}-page-${currentPage}`));
+    const cached = checkCacheValidity(
+      localStorage.getItem(`${CACHE_KEY}-page-${currentPage}`)
+    );
     if (cached) {
       setData(cached.data);
       setIsLoading(false);

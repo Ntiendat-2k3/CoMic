@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import OTruyenService from "../services/otruyen.service";
 import Search from "./Search";
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
@@ -21,6 +22,7 @@ const Navbar = ({ categories }: NavbarProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { isSignedIn, user } = useUser();
+  const router = useRouter();
 
   const handleSearch = useCallback(async (keyword: string) => {
     if (keyword.trim().length === 0) {
@@ -39,6 +41,11 @@ const Navbar = ({ categories }: NavbarProps) => {
       setIsLoading(false);
     }
   }, []);
+
+  const handleSearchSubmit = useCallback((keyword: string) => {
+    router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`);
+    setShowSuggestions(false);
+  }, [router]);
 
   return (
     <nav className="w-full bg-primary text-white shadow-md">
@@ -68,6 +75,7 @@ const Navbar = ({ categories }: NavbarProps) => {
             showSuggestions={showSuggestions}
             setShowSuggestions={setShowSuggestions}
             onSearch={handleSearch}
+            onSubmit={handleSearchSubmit}
           />
 
           <Dropdown categories={categories} />
