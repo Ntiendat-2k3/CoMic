@@ -54,7 +54,7 @@ export default function SearchResults({
       <div className="space-y-8">
         <h2 className="text-2xl font-bold text-center mb-8">
           Kết quả tìm kiếm cho:{" "}
-          <span className="text-primary">"{keyword}"</span>
+          <span className="text-primary">&ldquo;{keyword}&rdquo;</span>
         </h2>
 
         {isLoading && <SkeletonComicGrid />}
