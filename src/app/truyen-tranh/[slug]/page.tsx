@@ -21,7 +21,7 @@ interface PageProps {
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   try {
     const { slug } = await props.params;
-    const  { data }  = await OTruyenService.getComicDetail(slug);
+    const { data } = await OTruyenService.getComicDetail(slug);
 
     return {
       title: data.seoOnPage.titleHead,

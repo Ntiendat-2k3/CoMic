@@ -1,10 +1,8 @@
 import { Comic } from "@/app/types/comic";
 import ComicCard from "../ComicCard";
-import dynamic from "next/dynamic";
+import { lazy } from "react";
 
-const SkeletonComicGrid = dynamic(() => import("./SkeletonComicGrid"),  {
-  ssr: false,
-});
+const SkeletonComicGrid = lazy(() => import("./SkeletonComicGrid"));
 
 interface ComicGridProps {
   comics?: Comic[];

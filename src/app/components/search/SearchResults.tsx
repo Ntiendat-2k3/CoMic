@@ -5,10 +5,12 @@ import { useSearchParams } from 'next/navigation'
 import { Comic } from '../../types/comic'
 import ComicGrid from '../home/ComicGrid'
 import dynamic from 'next/dynamic'
+import HamsterLoading from '../loading/HamsterLoading'
 
 const SkeletonComicGrid = dynamic(() => import('../home/SkeletonComicGrid'), {
   ssr: true,
 })
+
 
 export default function SearchResults({
   keyword: initialKeyword,
@@ -51,10 +53,10 @@ export default function SearchResults({
 
   return (
     <div className="container">
-      <div className="space-y-8">
-        <h2 className="text-2xl font-bold text-center mb-8">
+      <div className="space-y-8 mt-8">
+        <h2 className="text-2xl font-bold mb-8 text-gray-400">
           Kết quả tìm kiếm cho:{" "}
-          <span className="text-primary">&ldquo;{keyword}&rdquo;</span>
+          <span className="text-white">&ldquo;{keyword}&rdquo;</span>
         </h2>
 
         {isLoading && <SkeletonComicGrid />}
@@ -70,7 +72,8 @@ export default function SearchResults({
         {!isLoading && comics.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             Không tìm thấy truyện phù hợp với từ khóa &ldquo;
-            <span className="text-primary">{keyword}</span>&rdquo;
+            <span className="text-white">{keyword}</span>&rdquo;
+            <HamsterLoading></HamsterLoading>
           </div>
         )}
       </div>

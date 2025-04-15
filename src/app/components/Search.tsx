@@ -6,20 +6,16 @@ import {
   memo,
   useState,
   useCallback,
-  useMemo
+  useMemo,
+  lazy,
 } from "react";
 import Link from "next/link";
 import { debounce } from "lodash";
 import ImageFallback from "../utils/ImageFallback";
 import { Comic } from "../types/comic";
-import dynamic from "next/dynamic";
 
-const LoadingSkeletonSearch = dynamic(
-  () => import("./loading/LoadingSkeletonSearch"),
-  {
-    ssr: false,
-    loading: () => <div className="p-3">Đang tải...</div>
-  }
+const LoadingSkeletonSearch = lazy(
+  () => import("./loading/LoadingSkeletonSearch")
 );
 
 interface SearchProps {
@@ -172,17 +168,15 @@ const SearchResultItem = memo(({ comic }: { comic: Comic }) => (
 ));
 
 // Component hình ảnh được tối ưu
-const OptimizedImage = memo(
-  ({ src, alt }: { src: string; alt: string }) => (
-    <ImageFallback
-      src={src}
-      alt={alt}
-      width={80}
-      height={120}
-      className="w-12 h-15 object-cover rounded-sm"
-    />
-  )
-);
+const OptimizedImage = memo(({ src, alt }: { src: string; alt: string }) => (
+  <ImageFallback
+    src={src}
+    alt={alt}
+    width={80}
+    height={120}
+    className="w-12 h-15 object-cover rounded-sm"
+  />
+));
 
 Search.displayName = "Search";
 SearchResultItem.displayName = "SearchResultItem";

@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import OTruyenService from "../../services/otruyen.service";
 import ComicGrid from "./ComicGrid";
 import SEOMetadata from "./SEOMetadata";
 import { Comic, ComicSEO } from "@/app/types/comic";
 import { HomeParams } from "@/app/types/common";
 import Pagination from "@/app/utils/Pagination";
-import dynamic from "next/dynamic";
 
-const SkeletonComicGrid = dynamic(() => import("./SkeletonComicGrid"), {
-  ssr: true,
-});
+const SkeletonComicGrid = lazy(() => import("./SkeletonComicGrid"));
 
 type CachedData = {
   data: HomeResponseData;

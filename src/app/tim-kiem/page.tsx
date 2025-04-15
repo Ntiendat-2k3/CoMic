@@ -1,14 +1,14 @@
 import LayoutMain from "../layouts/LayoutMain";
-import SearchResults from "../components/search/SearchResults";
 import OTruyenService from "../services/otruyen.service";
 import dynamic from "next/dynamic";
 
-const HamsterLoading = dynamic(() => import("../components/loading/HamsterLoading"), {
+const SearchClient = dynamic(() => import("../components/search/SearchClient"), {
   ssr: true,
+  loading: () => <div className="min-h-screen">Loading search...</div>,
 });
 
 interface PageProps {
-  searchParams: Promise<{ [key: string]: string | undefined }>;
+  searchParams: Promise<{ [keyword: string]: string | undefined }>;
 }
 
 async function getSearchResults(keyword: string) {
@@ -20,7 +20,7 @@ async function getSearchResults(keyword: string) {
       comics: response.data.data.items,
       error: "",
     };
-  } catch (err) { 
+  } catch (err) {
     console.error("Error fetching search results:", err);
     return {
       comics: [],
@@ -34,22 +34,13 @@ export default async function SearchPage(props: PageProps) {
   const keyword = searchParams.keyword || "";
   const { comics, error } = await getSearchResults(keyword);
 
-  if (!keyword) {
-    return (
-      <LayoutMain>
-        <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-gray-100 my-20">
-            Vui lòng nhập từ khóa tìm kiếm
-          </h2>
-          <HamsterLoading></HamsterLoading>
-        </div>
-      </LayoutMain>
-    );
-  }
-
   return (
     <LayoutMain>
-      <SearchResults keyword={keyword} comics={comics} error={error} />
+      <SearchClient
+        initialKeyword={keyword}
+        initialComics={comics}
+        initialError={error}
+      />
     </LayoutMain>
   );
 }
