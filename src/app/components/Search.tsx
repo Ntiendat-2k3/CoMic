@@ -185,4 +185,7 @@ const OptimizedImage = memo(
 );
 
 Search.displayName = "Search";
+SearchResultItem.displayName = "SearchResultItem";
+OptimizedImage.displayName = "OptimizedImage";
+
 export default Search;
