@@ -20,7 +20,8 @@ async function getSearchResults(keyword: string) {
       comics: response.data.data.items,
       error: "",
     };
-  } catch (err) {
+  } catch (err) { 
+    console.error("Error fetching search results:", err);
     return {
       comics: [],
       error: "Không thể tải kết quả tìm kiếm",

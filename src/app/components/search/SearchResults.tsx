@@ -46,7 +46,7 @@ export default function SearchResults({
     }
 
     updateResults()
-  }, [searchParams])
+  }, [searchParams, keyword])
 
   return (
     <div className="container">
