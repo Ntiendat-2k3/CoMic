@@ -19,6 +19,7 @@ async function getSearchResults(keyword: string) {
     return {
       comics: response.data.data.items,
       error: "",
+      revalidate: 3600  //1h
     };
   } catch (err) {
     console.error("Error fetching search results:", err);
@@ -29,10 +30,21 @@ async function getSearchResults(keyword: string) {
   }
 }
 
+export async function generateMetadata(props: PageProps) {
+  const searchParams = await props.searchParams;
+  const keyword = searchParams.keyword || "";
+  
+  return {
+    title: keyword ? `Tìm kiếm: "${keyword}"` : 'Tìm truyện',
+    description: `Kết quả tìm kiếm cho từ khóa "${keyword}"`,
+  };
+}
+
 export default async function SearchPage(props: PageProps) {
   const searchParams = await props.searchParams;
   const keyword = searchParams.keyword || "";
   const { comics, error } = await getSearchResults(keyword);
+  console.log("🚀 ~ SearchPage ~ comics:", comics)
 
   return (
     <LayoutMain>

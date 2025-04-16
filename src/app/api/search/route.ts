@@ -1,6 +1,7 @@
 import OTruyenService from '@/app/services/otruyen.service'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
   const keyword = searchParams.get('keyword') || ''

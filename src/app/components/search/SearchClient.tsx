@@ -1,9 +1,10 @@
 "use client";
 
-import { lazy, useEffect, useState } from "react";
+import { lazy, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Comic } from "../../types/comic";
 import ComicGrid from "../home/ComicGrid";
+import { debounce } from "lodash";
 
 const SkeletonComicGrid = lazy(() => import("../home/SkeletonComicGrid"));
 const HamsterLoading = lazy(() => import("../loading/HamsterLoading"));
@@ -25,8 +26,8 @@ export default function SearchClient({
   const [error, setError] = useState(initialError);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Client-side search handler
-  const handleSearch = async (searchKeyword: string) => {
+  // debounce cho API calls
+  const handleSearch = useCallback(debounce(async (searchKeyword: string) => {
     try {
       setIsLoading(true);
       const response = await fetch(
@@ -47,7 +48,7 @@ export default function SearchClient({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, 300), []);;
 
   // Sync with URL parameters
   useEffect(() => {
