@@ -13,8 +13,11 @@ export interface Pagination {
 export interface PaginationProps {
   pageCount: number;
   currentPage: number;
-  onPageChange: (page: number) => void;
+  onPageChange?: (selectedPage: number) => void;
   basePath?: string;
+  marginPagesDisplayed?: number;
+  pageRangeDisplayed?: number;
+  className?: string;
 }
 
 export interface Category {

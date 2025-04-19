@@ -1,10 +1,15 @@
-import { Comic, ComicDetailParams, ComicSEO, Comic as ComicType } from "./comic";
+import {
+  Comic,
+  ComicDetailParams,
+  ComicSEO,
+  Comic as ComicType,
+} from "./comic";
 import { BaseResponse, Category, HomeParams, Pagination } from "./common";
 
 export interface HomeResponse extends BaseResponse {
-  status: string
-  message: string
-  items?: Comic[]
+  status: string;
+  message: string;
+  items?: Comic[];
   data: {
     seoOnPage: ComicSEO;
     items: ComicType[];
@@ -65,6 +70,43 @@ export interface ApiListResponse extends BaseResponse {
       sortField: string;
       sortType: string;
       pagination: Pagination;
+    };
+    type_list: string;
+    APP_DOMAIN_FRONTEND: string;
+    APP_DOMAIN_CDN_IMAGE: string;
+  };
+}
+
+export interface CategoryPageResponse {
+  status: string;
+  message: string;
+  data: {
+    seoOnPage: {
+      og_type: string;
+      titleHead: string;
+      og_image: string[];
+      og_url: string;
+    };
+    breadCrumb: Array<{
+      name: string;
+      slug?: string;
+      isCurrent: boolean;
+      position: number;
+    }>;
+    titlePage: string;
+    items: Comic[];
+    params: {
+      type_slug: string;
+      slug: string;
+      filterCategory: string[];
+      sortField: string;
+      sortType: string;
+      pagination: {
+        totalItems: number;
+        totalItemsPerPage: number;
+        currentPage: number;
+        pageRanges: number;
+      };
     };
     type_list: string;
     APP_DOMAIN_FRONTEND: string;

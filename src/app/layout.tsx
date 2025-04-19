@@ -22,6 +22,11 @@ const loveYaLikeASister = Love_Ya_Like_A_Sister({
 export const metadata: Metadata = {
   title: "TruyenHay",
   description: "Đọc truyện tranh online",
+  icons: {
+    icon: "/logo.jpeg",
+    shortcut: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
 };
 
 export default function RootLayout({
@@ -30,9 +35,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    >
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} ${loveYaLikeASister.variable}`}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} ${loveYaLikeASister.variable}`}
+        >
           {children}
         </body>
       </html>
