@@ -60,7 +60,7 @@ const Navbar = ({ categories }: NavbarProps) => {
               height={60}
               className="h-15 w-16 object-contain"
             /> */}
-          <span className="font-love font-bold text-3xl animate-gradient bg-clip-text text-transparent bg-[length:200%] bg-[linear-gradient(90deg,#4f46e5,#ec4899,#4f46e5)]">
+          <span className="tracking-widest font-love font-bold text-3xl animate-gradient bg-clip-text text-transparent bg-[length:200%] bg-[linear-gradient(90deg,#4f46e5,#ec4899,#4f46e5)]">
             TruyenHay
           </span>
           </Link>

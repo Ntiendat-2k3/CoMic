@@ -44,7 +44,6 @@ export default async function SearchPage(props: PageProps) {
   const searchParams = await props.searchParams;
   const keyword = searchParams.keyword || "";
   const { comics, error } = await getSearchResults(keyword);
-  console.log("🚀 ~ SearchPage ~ comics:", comics)
 
   return (
     <LayoutMain>

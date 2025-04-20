@@ -44,7 +44,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const data = await getCachedData(slug, 1);
 
   return {
-    title: data.seoOnPage.titleHead,
+    title: `Truyện theo thể loại: ${data.seoOnPage.titleHead}`,
     description: `Danh sách truyện thể loại ${slug}`,
     openGraph: {
       images: data.seoOnPage.og_image.map(

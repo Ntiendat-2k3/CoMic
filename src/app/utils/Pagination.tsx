@@ -34,13 +34,13 @@ const Pagination = ({
   return (
     <ReactPaginate
       previousLabel={
-        <div className="flex items-center gap-1">
-          <FiChevronLeft className="text-lg" />
+        <div className="flex items-center">
+          <FiChevronLeft className="text-lg text-gray-200" />
         </div>
       }
       nextLabel={
-        <div className="flex items-center gap-1">
-          <FiChevronRight className="text-lg" />
+        <div className="flex items-center">
+          <FiChevronRight className="text-lg text-gray-200" />
         </div>
       }
       breakLabel="..."
