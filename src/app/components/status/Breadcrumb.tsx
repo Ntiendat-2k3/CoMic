@@ -8,12 +8,11 @@ interface BreadcrumbItem {
 
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
-  className?: string;
 }
 
-export default function Breadcrumb({ items, className }: BreadcrumbProps) {
+export default function Breadcrumb({ items }: BreadcrumbProps) {
   return (
-    <nav className={`text-sm text-gray-400 ${className}`}>
+    <nav className="mb-6 text-sm text-gray-400">
       {items.map((item, index) => (
         <span key={index}>
           {item.slug ? (

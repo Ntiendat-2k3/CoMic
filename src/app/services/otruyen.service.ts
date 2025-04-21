@@ -6,14 +6,15 @@ import {
   ComicDetailResponse,
   HomeResponse,
   SearchResponse,
+  StatusComicListResponse,
 } from "../types/response";
 import { Category } from "../types/common";
 
-// type ComicListType =
-//   | "truyen-moi"
-//   | "sap-ra-mat"
-//   | "dang-phat-hanh"
-//   | "hoan-thanh";
+export type ComicListStatus =
+  | "truyen-moi"
+  | "sap-ra-mat"
+  | "dang-phat-hanh"
+  | "hoan-thanh";
 
 const OTruyenService = {
   // Trang chủ
@@ -27,13 +28,16 @@ const OTruyenService = {
     return response.data;
   },
 
-  // Danh sách truyện theo type
-  // getComicList: async (
-  //   type: ComicListType = "truyen-moi",
-  //   page: number = 1
-  // ): Promise<ApiListResponse> => {
-  //   return apiClient.get<ApiListResponse>(`/danh-sach/${type}?page=${page}`);
-  // },
+  // Danh sách truyện theo status
+  getComicList: async (
+    type: ComicListStatus = "truyen-moi",
+    page: number = 1
+  ): Promise<StatusComicListResponse> => { 
+    const response: AxiosResponse<StatusComicListResponse> = await apiClient.get(
+      `/danh-sach/${type}?page=${page}`
+    );
+    return response.data;
+  },
 
   // Thể loại truyện
   getCategories: async (): Promise<Category[]> => {

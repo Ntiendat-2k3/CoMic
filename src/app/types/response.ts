@@ -1,9 +1,4 @@
-import {
-  Comic,
-  ComicDetailParams,
-  ComicSEO,
-  Comic as ComicType,
-} from "./comic";
+import { Comic, ComicDetailParams, ComicSEO } from "./comic";
 import { BaseResponse, Category, HomeParams, Pagination } from "./common";
 
 export interface HomeResponse extends BaseResponse {
@@ -12,7 +7,7 @@ export interface HomeResponse extends BaseResponse {
   items?: Comic[];
   data: {
     seoOnPage: ComicSEO;
-    items: ComicType[];
+    items: Comic[];
     params?: HomeParams;
   };
 }
@@ -42,7 +37,7 @@ export interface SearchResponse extends BaseResponse {
       position: number;
     }>;
     titlePage: string;
-    items: ComicType[];
+    items: Comic[];
   };
 }
 
@@ -55,25 +50,40 @@ export interface ComicDetailResponse extends BaseResponse {
       position: number;
       isCurrent?: boolean;
     }>;
-    item: ComicType;
+    item: Comic[];
     params: ComicDetailParams;
     APP_DOMAIN_CDN_IMAGE: string;
   };
 }
 
-export interface ApiListResponse extends BaseResponse {
+// Original type từ API response
+export interface StatusComicListResponse {
+  status: string;
+  message: string;
   data: {
-    items: ComicType[];
-    params: {
-      type_slug: string;
-      filterCategory: string[];
-      sortField: string;
-      sortType: string;
-      pagination: Pagination;
+    seoOnPage: {
+      og_type: string;
+      titleHead: string;
+      descriptionHead: string;
+      og_image: string[];
+      og_url: string;
     };
-    type_list: string;
-    APP_DOMAIN_FRONTEND: string;
-    APP_DOMAIN_CDN_IMAGE: string;
+    breadCrumb: Array<{
+      name: string;
+      slug?: string;
+      isCurrent: boolean;
+      position: number;
+    }>;
+    titlePage: string;
+    items: Comic[];
+    params: {
+      pagination: {
+        totalItems: number;
+        totalItemsPerPage: number;
+        currentPage: number;
+        pageRanges: number;
+      };
+    };
   };
 }
 

@@ -1,3 +1,4 @@
+import Breadcrumb from "@/app/components/category/Breadcrumb";
 import SkeletonComicGrid from "@/app/components/home/SkeletonComicGrid";
 import LayoutMain from "@/app/layouts/LayoutMain";
 import OTruyenService from "@/app/services/otruyen.service";
@@ -73,25 +74,20 @@ export default async function CategoryPage(props: PageProps) {
     <LayoutMain>
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <nav className="mb-6 text-sm text-gray-400">
-          {data.breadCrumb.map((item, index) => (
-            <span key={index}>
-              {item.slug ? (
-                <a href={item.slug} className="hover:text-primary">
-                  {item.name}
-                </a>
-              ) : (
-                <span>{item.name}</span>
-              )}
-              <span className="text-blue-500">
-                {index < data.breadCrumb.length - 1 && " / "}
-              </span>
-            </span>
-          ))}
-        </nav>
+        <Breadcrumb items={data.breadCrumb} className="mb-8" />
 
         {/* Title */}
-        <h1 className="text-3xl font-bold mb-8 text-white">{data.titlePage}</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-white">{data.titlePage}</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm">
+              Tổng số truyện: {totalItems}
+            </span>
+            <span className="text-gray-400 text-sm">
+              Trang {currentPage} / {pageCount}
+            </span>
+          </div>
+        </div>
 
         {/* Comic Grid */}
         <ComicGrid comics={data.items} />
