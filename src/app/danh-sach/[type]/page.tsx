@@ -25,11 +25,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   return {
     title: data.seoOnPage.titleHead,
     description: data.seoOnPage.descriptionHead,
+    alternates: {
+      canonical: `/danh-sach/${type}`,
+    },
     openGraph: {
       images: data.seoOnPage.og_image.map(
         (img) => `https://img.otruyenapi.com${img}`
       ),
-      url: `https://yourdomain.com/danh-sach/${type}`,
+      url: `https://otruyenapi.com/v1/api/danh-sach/${type}`,
       type: "website",
     },
   };
@@ -52,7 +55,12 @@ export default async function StatusListPage(props: PageProps) {
       <div className="container mx-auto px-4 py-8">
         <Breadcrumb items={data.breadCrumb} />
 
-        <h1 className="text-3xl font-bold mb-8 text-white">{data.titlePage}</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-white">{data.titlePage}</h1>
+          <div className="text-gray-400 mb-4">
+            {data.params.pagination.totalItems} truyện
+          </div>
+        </div>
 
         {data.items.length > 0 ? (
           <>

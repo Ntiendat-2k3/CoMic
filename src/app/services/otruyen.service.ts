@@ -9,6 +9,7 @@ import {
   StatusComicListResponse,
 } from "../types/response";
 import { Category } from "../types/common";
+import { unstable_cache } from "next/cache";
 
 export type ComicListStatus =
   | "truyen-moi"
@@ -29,14 +30,11 @@ const OTruyenService = {
   },
 
   // Danh sách truyện theo status
-  getComicList: async (
-    type: ComicListStatus = "truyen-moi",
-    page: number = 1
-  ): Promise<StatusComicListResponse> => { 
-    const response: AxiosResponse<StatusComicListResponse> = await apiClient.get(
+  getComicList: async (type: ComicListStatus, page: number = 1) => {
+    const { data } = await apiClient.get<StatusComicListResponse>(
       `/danh-sach/${type}?page=${page}`
     );
-    return response.data;
+    return data;
   },
 
   // Thể loại truyện

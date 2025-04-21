@@ -1,5 +1,5 @@
 import { Comic, ComicDetailParams, ComicSEO } from "./comic";
-import { BaseResponse, Category, HomeParams, Pagination } from "./common";
+import { BaseResponse, BreadCrumb, Category, HomeParams, Pagination } from "./common";
 
 export interface HomeResponse extends BaseResponse {
   status: string;
@@ -44,12 +44,7 @@ export interface SearchResponse extends BaseResponse {
 export interface ComicDetailResponse extends BaseResponse {
   data: {
     seoOnPage: ComicSEO;
-    breadCrumb: Array<{
-      name: string;
-      slug?: string;
-      position: number;
-      isCurrent?: boolean;
-    }>;
+    breadCrumb: BreadCrumb[];
     item: Comic;
     params: ComicDetailParams;
     APP_DOMAIN_CDN_IMAGE: string;
@@ -68,21 +63,11 @@ export interface StatusComicListResponse {
       og_image: string[];
       og_url: string;
     };
-    breadCrumb: Array<{
-      name: string;
-      slug?: string;
-      isCurrent: boolean;
-      position: number;
-    }>;
+    breadCrumb: BreadCrumb[];
     titlePage: string;
     items: Comic[];
     params: {
-      pagination: {
-        totalItems: number;
-        totalItemsPerPage: number;
-        currentPage: number;
-        pageRanges: number;
-      };
+      pagination: Pagination;
     };
   };
 }
