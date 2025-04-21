@@ -9,7 +9,6 @@ import {
   StatusComicListResponse,
 } from "../types/response";
 import { Category } from "../types/common";
-import { unstable_cache } from "next/cache";
 
 export type ComicListStatus =
   | "truyen-moi"
