@@ -50,7 +50,7 @@ export interface ComicDetailResponse extends BaseResponse {
       position: number;
       isCurrent?: boolean;
     }>;
-    item: Comic[];
+    item: Comic;
     params: ComicDetailParams;
     APP_DOMAIN_CDN_IMAGE: string;
   };
