@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, Bookmark, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import OTruyenService from "../services/otruyen.service";
@@ -51,7 +51,7 @@ export default function Navbar({ categories }: NavbarProps) {
       router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`);
       setShowSuggestions(false);
     },
-    [router],
+    [router]
   );
 
   /* ----------------------------- UI ---------------------------- */
@@ -81,7 +81,7 @@ export default function Navbar({ categories }: NavbarProps) {
         </div>
 
         {/* ===================== DESKTOP utilities ==================== */}
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-4 lg:gap-8 md:flex">
           {/* Search desktop */}
           <Search
             searchResults={searchResults}
@@ -92,8 +92,29 @@ export default function Navbar({ categories }: NavbarProps) {
             onSubmit={handleSearchSubmit}
           />
 
-          {/* Dropdown + Auth */}
+          {/* Dropdown */}
           <Dropdown categories={categories} />
+
+          {/* Lịch sử đọc */}
+          <Link
+            prefetch
+            href="/lich-su"
+            className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+          >
+            <Clock size={20} />
+            <span>Lịch sử</span>
+          </Link>
+
+          {/* Truyện đang theo dõi */}
+          <Link
+            href="/yeu-thich"
+            className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+          >
+            <Bookmark size={20} />
+            <span>Đang theo dõi</span>
+          </Link>
+
+          {/* Auth */}
           <AuthButtons />
         </div>
 
@@ -106,9 +127,8 @@ export default function Navbar({ categories }: NavbarProps) {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="flex w-full flex-col gap-4 md:hidden"
+              className="flex w-full flex-col gap-4 lg:gap-8 md:hidden"
             >
-
               {/* Sidebar nav items */}
               <div className="w-full">
                 {navItems.map(({ href, label, icon: Icon }) => (
@@ -126,8 +146,29 @@ export default function Navbar({ categories }: NavbarProps) {
                 ))}
               </div>
 
-              {/* Dropdown + Auth (mobile) */}
+              {/* Dropdown mobile */}
               <Dropdown categories={categories} />
+
+              {/* Lịch sử đọc  */}
+              <Link
+              prefetch 
+                href="/lich-su"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+              >
+                <Clock size={20} />
+                <span>Lịch sử</span>
+              </Link>
+
+              {/* Truyện đang theo dõi mobile */}
+              <Link
+                href="/yeu-thich"
+                className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Bookmark size={20} />
+                <span>Đang theo dõi</span>
+              </Link>
 
               {/* Search mobile */}
               <Search
@@ -138,6 +179,8 @@ export default function Navbar({ categories }: NavbarProps) {
                 onSearch={handleSearch}
                 onSubmit={handleSearchSubmit}
               />
+
+              {/* Auth mobile */}
               <AuthButtons />
             </motion.div>
           )}

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import LayoutMain from "@/app/layouts/LayoutMain";
 import OTruyenService from "@/app/services/otruyen.service";
 import ChapterNav from "@/app/components/ChapterNav";
@@ -39,8 +40,9 @@ function isChapterMeta(c: unknown): c is ChapterMeta {
   );
 }
 
-
-export async function generateMetadata(props: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps
+): Promise<Metadata> {
   try {
     const { slug, chapter } = await props.params;
     const { data } = await OTruyenService.getComicDetail(slug);
@@ -54,14 +56,12 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 async function getChapterImages(apiUrl: string): Promise<string[]> {
   try {
     const res = await OTruyenService.getChapterData(apiUrl);
-    const raw = (res.data?.data ?? res.data) as unknown as ChapterApiResponse;
+    const raw = (res.data?.data ?? res.data) as ChapterApiResponse;
 
-    // Format cũ: { images: string[] }
     if ("images" in raw) return raw.images;
 
-    // Format mới
     const { domain_cdn, item } = raw;
-    if (!item?.chapter_image?.length) return [];
+    if (!item.chapter_image.length) return [];
 
     return item.chapter_image
       .sort((a, b) => a.image_page - b.image_page)
@@ -73,33 +73,44 @@ async function getChapterImages(apiUrl: string): Promise<string[]> {
 }
 
 export default async function ChapterPage(props: PageProps) {
-  const { slug, chapter } = await props.params;
-  /* 1. Thông tin truyện + danh sách chương */
+  const { slug, chapter } =  await props.params;
+
+  /* 1. Lấy info truyện + danh sách chương */
   const { data } = await OTruyenService.getComicDetail(slug);
   const comic = data.item;
   if (!comic) return notFound();
 
-  // chunk raw chapters
-  const rawChaps = comic.chapters[0]?.server_data ?? [];
-  const serverData: ChapterMeta[] = rawChaps.filter(isChapterMeta);
-  const current = serverData.find((c) => c.chapter_name === chapter);
-  if (!current) return notFound();
+  /* tính chapter đầu tiên (smallest) */
+  const sorted = [...(comic.chapters[0]?.server_data ?? [])]
+    .filter(isChapterMeta)
+    .sort((a, b) => parseFloat(a.chapter_name) - parseFloat(b.chapter_name));
+  const firstChapterSlug = sorted[0]?.chapter_name ?? "";
 
-  /* 2. Xác định prev / next (mảng DESC) */
-  const idx = serverData.findIndex((c) => c.chapter_name === chapter);
-  const prev = serverData[idx - 1];
-  const next = serverData[idx + 1];
+  /* chuẩn bị prev/next */
+  const serverList = comic.chapters[0]?.server_data.filter(isChapterMeta) ?? [];
+  const idx = serverList.findIndex((c) => c.chapter_name === chapter);
+  const prev = serverList[idx - 1];
+  const next = serverList[idx + 1];
 
-  /* 3. Danh sách ảnh */
-  const chapterImages = await getChapterImages(current.chapter_api_data || "");
+  /* lấy ảnh */
+  const chapterImages = await getChapterImages(serverList[idx]?.chapter_api_data ?? "");
 
-  /* 4. Danh sách tất cả chapter (để render dropdown) */
-  const chapterNames: string[] = serverData.map((c) => c.chapter_name);
+  /* danh sách chapter cho dropdown */
+  const chapterNames = serverList.map((c) => c.chapter_name);
 
   return (
     <LayoutMain>
       <div className="mx-auto max-w-4xl px-4 py-6">
-        {/* nav top */}
+        {/* breadcrumb */}
+        <nav className="mb-4 text-sm text-white/70">
+          <Link href="/">Trang chủ</Link>
+          {' / '}
+          <Link href={`/truyen-tranh/${slug}`} className="text-[#38BDF8]">{comic.name}</Link>
+          {' / '}
+          <span>Chapter {chapter}</span>
+        </nav>
+
+        {/* nav trên */}
         <ChapterNav
           slug={slug}
           chapters={chapterNames}
@@ -108,14 +119,14 @@ export default async function ChapterPage(props: PageProps) {
           nextSlug={next?.chapter_name}
         />
 
-        {/* images */}
+        {/* ảnh */}
         <div className="space-y-0">
           {chapterImages.map((src, i) => (
             <ChapterImage key={i} src={src} index={i} />
           ))}
         </div>
 
-        {/* nav bottom */}
+        {/* nav dưới */}
         <ChapterNav
           slug={slug}
           chapters={chapterNames}

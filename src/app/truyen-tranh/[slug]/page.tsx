@@ -67,9 +67,13 @@ export default async function ComicDetailPage(props: PageProps) {
 
   if (!comic) return notFound();
 
-  /* slug chương đầu tiên (mảng server_data thường SORT DESC) */
-  const firstChapterSlug =
-    comic.chapters[0]?.server_data?.at(-1)?.chapter_name ?? "";
+  // ----- Tính slug của chapter đầu tiên (nhỏ nhất) -----
+  const rawChaps = comic.chapters[0]?.server_data ?? [];
+  // sort theo số (có thể parseFloat nếu là số, hoặc parseInt)
+  const sortedAsc = [...rawChaps].sort((a, b) =>
+    parseFloat(a.chapter_name ?? "0") - parseFloat(b.chapter_name ?? "0")
+  );
+  const firstChapterSlug = sortedAsc[0]?.chapter_name ?? "";
 
   return (
     <LayoutMain>

@@ -11,11 +11,18 @@ interface ChapterNavProps {
   nextSlug?: string;
 }
 
-export default function ChapterNav({ slug, chapters, current, prevSlug, nextSlug }: ChapterNavProps) {
+export default function ChapterNav({
+  slug,
+  chapters,
+  current,
+  prevSlug,
+  nextSlug,
+}: ChapterNavProps) {
   const router = useRouter();
 
   const storeLastRead = (chapter: string) =>
-    typeof window !== "undefined" && localStorage.setItem(`lastRead-${slug}`, chapter);
+    typeof window !== "undefined" &&
+    localStorage.setItem(`lastRead-${slug}`, chapter);
 
   const goToChapter = (chapterName: string) => {
     storeLastRead(chapterName);
@@ -44,8 +51,12 @@ export default function ChapterNav({ slug, chapters, current, prevSlug, nextSlug
         onChange={(e) => goToChapter(e.target.value)}
         className="rounded-md bg-gray-800 px-3 py-2 text-sm text-white hover:bg-gray-700 focus:outline-none"
       >
-        {chapters.map((name) => (
-          <option key={name} value={name} className="bg-gray-800 text-white">
+        {chapters.map((name, idx) => (
+          <option
+            key={`${name}-${idx}`}
+            value={name}
+            className="bg-gray-800 text-white"
+          >
             Chapter {name}
           </option>
         ))}
