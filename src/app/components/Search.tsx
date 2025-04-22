@@ -99,7 +99,7 @@ const Search = memo(
     );
 
     return (
-      <div className="relative flex-1 max-w-xl" ref={wrapperRef}>
+      <div className="relative flex-1 w-full" ref={wrapperRef}>
         <form onSubmit={handleSubmit}>
           <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-primary-light/20">
             <input

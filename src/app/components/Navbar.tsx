@@ -1,13 +1,16 @@
 "use client";
+
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Menu } from "lucide-react";
+
 import OTruyenService from "../services/otruyen.service";
-import Search from "./Search";
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { Category } from "../types/common";
 import { Comic } from "../types/comic";
-import Link from "next/link";
+import Search from "./Search";
+import AuthButtons from "./AuthButtons";
 
 const Dropdown = dynamic(() => import("./Dropdown"), {
   loading: () => <div className="w-40 h-6 bg-gray-100 animate-pulse" />,
@@ -17,58 +20,76 @@ interface NavbarProps {
   categories: Category[];
 }
 
-const Navbar = ({ categories }: NavbarProps) => {
+export default function Navbar({ categories }: NavbarProps) {
   const [searchResults, setSearchResults] = useState<Comic[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { isSignedIn, user } = useUser();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const router = useRouter();
 
+  /* ------------------------------ handlers ----------------------------- */
   const handleSearch = useCallback(async (keyword: string) => {
-    if (keyword.trim().length === 0) {
+    if (!keyword.trim()) {
       setSearchResults([]);
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await OTruyenService.searchComics(keyword);
-      setSearchResults(response.data.data.items);
+      const res = await OTruyenService.searchComics(keyword);
+      setSearchResults(res.data.data.items);
       setShowSuggestions(true);
-    } catch (error) {
-      console.error("Search error:", error);
+    } catch (err) {
+      console.error("Search error:", err);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const handleSearchSubmit = useCallback((keyword: string) => {
-    router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`);
-    setShowSuggestions(false);
-  }, [router]);
+  const handleSearchSubmit = useCallback(
+    (keyword: string) => {
+      router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`);
+      setShowSuggestions(false);
+    },
+    [router],
+  );
 
   return (
     <nav className="w-full bg-primary text-white shadow-md">
-      <div className="container px-4 py-2 flex items-center justify-between">
-        {/* Phần logo */}
-        <div className="flex items-center space-x-2 py-4">
-          <Link href="/">
-            {/* <Image
-              src="/assets/logo.png"
-              alt="Logo"
-              width={60}
-              height={60}
-              className="h-15 w-16 object-contain"
-            /> */}
-          <span className="tracking-widest font-love font-bold text-3xl animate-gradient bg-clip-text text-transparent bg-[length:200%] bg-[linear-gradient(90deg,#4f46e5,#ec4899,#4f46e5)]">
-            TruyenHay
-          </span>
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-y-3 px-4 py-3 md:flex-nowrap">
+        {/* ------------------------- Logo + hamburger ---------------------- */}
+        <div className="flex w-full items-center justify-between md:w-auto">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="font-love animate-gradient bg-[linear-gradient(90deg,#4f46e5,#ec4899,#4f46e5)] bg-[length:200%] bg-clip-text text-3xl font-bold tracking-widest text-transparent">
+              TruyenHay
+            </span>
           </Link>
+
+          <div className="flex items-center gap-2">
+            {/* Avatar mobile (thu gọn) */}
+            <div className="mt-1 block md:hidden lg:hidden">
+              <AuthButtons variant="mobile" />
+            </div>
+
+            {/* Hamburger */}
+            <button
+              type="button"
+              aria-label="Toggle navigation"
+              onClick={() => setMobileOpen((p) => !p)}
+              className="ml-3 inline-flex shrink-0 items-center rounded-md p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white md:hidden"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
         </div>
 
-        {/* Phần chức năng */}
-        <div className="flex items-center gap-6">
-          {/* tìm kiếm */}
+        {/* ------------------------------- Search -------------------------- */}
+        <div
+          className={`order-last w-full transition-[max-height] md:order-none md:w-auto ${
+            mobileOpen ? "max-h-[800px]" : "max-h-0 overflow-hidden md:max-h-fit"
+          }`}
+        >
           <Search
             searchResults={searchResults}
             isLoading={isLoading}
@@ -77,45 +98,20 @@ const Navbar = ({ categories }: NavbarProps) => {
             onSearch={handleSearch}
             onSubmit={handleSearchSubmit}
           />
+        </div>
 
+        {/* ------------------ Dropdown + Auth (cuối) ----------------------- */}
+        <div
+          className={`flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-center ${
+            mobileOpen ? "" : "hidden md:flex"
+          }`}
+        >
           <Dropdown categories={categories} />
 
-          {/* Các nút đăng nhập/đăng ký */}
-          <div className="flex items-center gap-4">
-            {isSignedIn ? (
-              <>
-                <span>Hi, {user?.fullName}</span>
-                <UserButton
-                  afterSignOutUrl="/"
-                  appearance={{
-                    elements: {
-                      userButtonBox: "flex-row-reverse",
-                      userButtonAvatarBox: "size-11",
-                      userButtonTrigger: "text-white hover:bg-white/10 size-10",
-                    },
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                <SignInButton mode="modal">
-                  <button className="hover:opacity-80 transition-opacity px-3 py-2 rounded hover:bg-white/10">
-                    Đăng nhập
-                  </button>
-                </SignInButton>
-
-                <SignUpButton mode="modal">
-                  <button className="bg-white text-primary px-4 py-2 rounded-md hover:bg-primary-light hover:text-white transition-colors">
-                    Đăng ký
-                  </button>
-                </SignUpButton>
-              </>
-            )}
-          </div>
+          {/* Auth buttons desktop */}
+          <AuthButtons />
         </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

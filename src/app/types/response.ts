@@ -31,11 +31,7 @@ export interface CategoryListResponse extends BaseResponse {
 export interface SearchResponse extends BaseResponse {
   data: {
     seoOnPage: ComicSEO & { og_url: string };
-    breadCrumb: Array<{
-      name: string;
-      isCurrent: boolean;
-      position: number;
-    }>;
+    breadCrumb: BreadCrumb[];
     titlePage: string;
     items: Comic[];
   };
@@ -51,7 +47,6 @@ export interface ComicDetailResponse extends BaseResponse {
   };
 }
 
-// Original type từ API response
 export interface StatusComicListResponse {
   status: string;
   message: string;
@@ -82,12 +77,7 @@ export interface CategoryPageResponse {
       og_image: string[];
       og_url: string;
     };
-    breadCrumb: Array<{
-      name: string;
-      slug?: string;
-      isCurrent: boolean;
-      position: number;
-    }>;
+    breadCrumb: BreadCrumb[];
     titlePage: string;
     items: Comic[];
     params: {
@@ -96,12 +86,7 @@ export interface CategoryPageResponse {
       filterCategory: string[];
       sortField: string;
       sortType: string;
-      pagination: {
-        totalItems: number;
-        totalItemsPerPage: number;
-        currentPage: number;
-        pageRanges: number;
-      };
+      pagination: Pagination;
     };
     type_list: string;
     APP_DOMAIN_FRONTEND: string;

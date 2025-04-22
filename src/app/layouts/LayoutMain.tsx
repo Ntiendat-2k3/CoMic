@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import OTruyenService from "../services/otruyen.service";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Sidebar from "../components/Sidebar";
 
 interface LayoutMainProps {
   children: ReactNode;
@@ -14,11 +15,14 @@ const LayoutMain = async ({ children }: LayoutMainProps) => {
   // console.log("🚀 ~ LayoutMain ~ categories:", categories)
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-700">
-      <Navbar categories={categories} />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
+    <>
+      <Sidebar />
+      <div className="min-h-screen flex flex-col bg-gray-700">
+        <Navbar categories={categories} />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </div>
+    </>
   );
 };
 

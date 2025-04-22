@@ -1,81 +1,87 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";            
 import { Category } from "../types/common";
 
 interface DropdownProps {
-  categories: Category[]; 
+  categories: Category[];
 }
 
-const Dropdown = ({ categories }: DropdownProps) => {
+export default function Dropdown({ categories }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [search, setSearch] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
 
-  // Xử lý click outside
+  /* -------------------- Đóng khi click ra ngoài ----------------------- */
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
+    const close = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  // Lọc thể loại
-  const filteredCategories = categories.filter(cat =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  /* ------------------------- Lọc thể loại ----------------------------- */
+  const filtered = categories.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={ref}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="hover:opacity-80 px-3 py-2 rounded hover:bg-white/10 transition-colors"
+        onClick={() => setIsOpen((o) => !o)}
+        className="flex items-center gap-1 rounded px-3 py-2 transition-colors hover:bg-white/10 hover:opacity-80"
       >
         Thể loại
+        {/* Icon mũi tên – xoay khi mở */}
+        <ChevronDown
+          size={18}
+          className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-[600px] bg-primary-dark text-white shadow-xl rounded-lg overflow-hidden z-50">
+        <div
+          className="absolute top-full left-0 mt-2 w-[90vw] max-w-none
+                     sm:left-auto sm:right-0 sm:w-72
+                     md:w-96 lg:w-[600px]
+                     rounded-lg bg-primary-dark text-white shadow-xl z-50"
+        >
           {/* Thanh tìm kiếm */}
-          <div className="p-3 border-b bg-primary-light text-gray-800">
+          <div className="border-b bg-primary-light p-3">
             <input
-              type="text"
-              placeholder="Tìm thể loại..."
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary outline-none"
-              value={searchQuery}
               autoFocus
-              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm thể loại..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded border px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
-          {/* Danh sách thể loại */}
-          <div className="max-h-[400px] overflow-y-auto">
-            <div className="grid grid-cols-3 gap-2 p-3">
-              {filteredCategories.map((cat) => (
+          {/* Danh sách */}
+          <div className="max-h-[60vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3">
+              {filtered.map((c) => (
                 <Link
-                  key={cat._id}
-                  href={`/the-loai/${cat.slug}`}
-                  className="px-3 py-2 text-sm hover:bg-gray-100 hover:text-primary rounded-md truncate"
+                  key={c._id}
+                  href={`/the-loai/${c.slug}`}
                   onClick={() => setIsOpen(false)}
+                  className="truncate rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 hover:text-primary"
                 >
-                  {cat.name}
+                  {c.name}
                 </Link>
               ))}
             </div>
           </div>
 
           {/* Thống kê */}
-          <div className="p-3 text-sm border-t bg-primary-light text-white">
-            Tổng số: {filteredCategories.length} thể loại
+          <div className="border-t bg-primary-light p-3 text-sm">
+            Tổng số: {filtered.length} thể loại
           </div>
         </div>
       )}
     </div>
   );
-};
-
-export default Dropdown;
+}
