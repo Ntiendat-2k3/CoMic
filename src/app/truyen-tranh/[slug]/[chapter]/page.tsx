@@ -35,9 +35,14 @@ interface ChapterMeta {
   chapter_api_data: string;
 }
 
-function isChapterMeta(c: any): c is ChapterMeta {
+function isChapterMeta(c: unknown): c is ChapterMeta {
   return (
-    c && typeof c.chapter_name === "string" && typeof c.chapter_api_data === "string"
+    typeof c === "object" &&
+    c !== null &&
+    "chapter_name" in c &&
+    "chapter_api_data" in c &&
+    typeof (c as any).chapter_name === "string" &&
+    typeof (c as any).chapter_api_data === "string"
   );
 }
 
