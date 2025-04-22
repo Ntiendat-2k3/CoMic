@@ -10,7 +10,6 @@ interface PageProps {
   params: Promise<{ slug: string; chapter: string }>;
 }
 
-/* ------------------- Types for Chapter API response ------------------- */
 interface ChapterApiLegacy {
   images: string[];
 }
@@ -22,15 +21,12 @@ interface ChapterApiNew {
     chapter_path: string;
   };
 }
-
 type ChapterApiResponse = ChapterApiLegacy | ChapterApiNew;
 
-/* ------------------- Types for chapter metadata ------------------- */
 interface ChapterMeta {
   chapter_name: string;
   chapter_api_data: string;
 }
-
 function isChapterMeta(c: unknown): c is ChapterMeta {
   if (typeof c !== "object" || c === null) return false;
   const obj = c as Record<string, unknown>;
@@ -52,17 +48,14 @@ export async function generateMetadata(
   }
 }
 
-/* ---------------- Helper: lấy danh sách ảnh ---------------- */
 async function getChapterImages(apiUrl: string): Promise<string[]> {
   try {
     const res = await OTruyenService.getChapterData(apiUrl);
     const raw = (res.data?.data ?? res.data) as ChapterApiResponse;
-
     if ("images" in raw) return raw.images;
 
     const { domain_cdn, item } = raw;
     if (!item.chapter_image.length) return [];
-
     return item.chapter_image
       .sort((a, b) => a.image_page - b.image_page)
       .map((img) => `${domain_cdn}/${item.chapter_path}/${img.image_file}`);
@@ -73,23 +66,27 @@ async function getChapterImages(apiUrl: string): Promise<string[]> {
 }
 
 export default async function ChapterPage(props: PageProps) {
-  const { slug, chapter } =  await props.params;
+  const { slug, chapter } = await props.params;
 
-  /* 1. Lấy info truyện + danh sách chương */
+  // 1. Lấy info truyện + danh sách chương
   const { data } = await OTruyenService.getComicDetail(slug);
   const comic = data.item;
   if (!comic) return notFound();
 
-  /* chuẩn bị prev/next */
-  const serverList = comic.chapters[0]?.server_data.filter(isChapterMeta) ?? [];
+  // 2. Build serverList + prev/next
+  const serverList =
+    comic.chapters[0]?.server_data.filter(isChapterMeta) ?? [];
   const idx = serverList.findIndex((c) => c.chapter_name === chapter);
+  if (idx < 0) return notFound();
   const prev = serverList[idx - 1];
   const next = serverList[idx + 1];
 
-  /* lấy ảnh */
-  const chapterImages = await getChapterImages(serverList[idx]?.chapter_api_data ?? "");
+  // 3. Lấy ảnh
+  const chapterImages = await getChapterImages(
+    serverList[idx].chapter_api_data
+  );
 
-  /* danh sách chapter cho dropdown */
+  // 4. Danh sách chapter cho dropdown
   const chapterNames = serverList.map((c) => c.chapter_name);
 
   return (
@@ -98,9 +95,14 @@ export default async function ChapterPage(props: PageProps) {
         {/* breadcrumb */}
         <nav className="mb-4 text-sm text-white/70">
           <Link href="/">Trang chủ</Link>
-          {' / '}
-          <Link href={`/truyen-tranh/${slug}`} className="text-[#38BDF8]">{comic.name}</Link>
-          {' / '}
+          {" / "}
+          <Link
+            href={`/truyen-tranh/${slug}`}
+            className="text-[#38BDF8]"
+          >
+            {comic.name}
+          </Link>
+          {" / "}
           <span>Chapter {chapter}</span>
         </nav>
 

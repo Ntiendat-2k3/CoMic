@@ -1,72 +1,43 @@
 // /// <reference lib="webworker" />
+// /* eslint-disable no-restricted-globals */
+// /* @ts-nocheck */
 
-// const CACHE_VERSION = "v1";
-// const STATIC_CACHE_NAME = `static-${CACHE_VERSION}`;
-
-// const PUBLIC_FILES = [
-//   "/",
-//   "/global.css",
-//   "/favicon.ico",
-//   "/logo.png",
-//   "/manifest.webmanifest",
-// ];
-
-// const cacheFirst = async (request: Request): Promise<Response> => {
-//   const cache = await caches.open(STATIC_CACHE_NAME);
-//   const cachedResponse = await cache.match(request);
-//   return cachedResponse || fetch(request);
-// };
-
-// const staleWhileRevalidate = async (request: Request): Promise<Response> => {
-//   const cache = await caches.open(STATIC_CACHE_NAME);
-//   const cachedResponse = await cache.match(request);
-//   const fetchPromise = fetch(request).then(async (response) => {
-//     await cache.put(request, response.clone());
-//     return response;
-//   });
-//   return cachedResponse || fetchPromise;
-// };
+// const CACHE_NAME = "comic-pages-v1";
 
 // self.addEventListener("install", (event) => {
-//   event.waitUntil(
-//     caches.open(STATIC_CACHE_NAME).then((cache) => {
-//       return cache.addAll([
-//         ...PUBLIC_FILES,
-//         ...self.__WB_MANIFEST.map(({ url }) => url),
-//       ]);
-//     })
-//   );
+//   self.skipWaiting();
 // });
 
 // self.addEventListener("activate", (event) => {
 //   event.waitUntil(
-//     caches.keys().then((keys) => {
-//       return Promise.all(
+//     caches.keys().then((keys) =>
+//       Promise.all(
 //         keys
-//           .filter((key) => key !== STATIC_CACHE_NAME)
+//           .filter((key) => key !== CACHE_NAME)
 //           .map((key) => caches.delete(key))
-//       );
-//     })
+//       )
+//     )
 //   );
+//   self.clients.claim();
 // });
 
 // self.addEventListener("fetch", (event) => {
-//   const { request } = event;
-//   const url = new URL(request.url);
-
-//   if (PUBLIC_FILES.some((file) => url.pathname.endsWith(file))) {
-//     event.respondWith(cacheFirst(request));
-//     return;
+//   const url = new URL(event.request.url);
+//   if (
+//     url.hostname === "sv1.otruyencdn.com" ||
+//     url.pathname.includes("/chapter_")
+//   ) {
+//     event.respondWith(
+//       caches.open(CACHE_NAME).then((cache) =>
+//         cache.match(event.request).then((cached) =>
+//           cached
+//             ? cached
+//             : fetch(event.request).then((response) => {
+//                 cache.put(event.request, response.clone());
+//                 return response;
+//               })
+//         )
+//       )
+//     );
 //   }
-
-//   if (url.pathname.startsWith("/_next/static/css")) {
-//     event.respondWith(staleWhileRevalidate(request));
-//     return;
-//   }
-
-//   event.respondWith(fetch(request));
 // });
-
-// declare var self: ServiceWorkerGlobalScope & {
-//   __WB_MANIFEST: Array<{ url: string; revision: string }>;
-// };

@@ -13,6 +13,7 @@ export default function ChapterImage({ src, index }: Props) {
 
   return (
     <div className="w-full">
+      {/* Skeleton giữ chỗ */}
       {!loaded && (
         <div className="aspect-[2/3] w-full animate-pulse rounded bg-gray-800/30" />
       )}
@@ -23,10 +24,12 @@ export default function ChapterImage({ src, index }: Props) {
         width={800}
         height={1200}
         sizes="(max-width: 768px) 100vw, 800px"
-        className={`h-auto w-full object-contain ${loaded ? "" : "hidden"}`}
-        priority={index < 2} // ưu tiên 2 ảnh đầu
+        priority={index < 2}
         loading={index < 2 ? "eager" : "lazy"}
         onLoad={() => setLoaded(true)}
+        className={`h-auto w-full object-contain ${
+          loaded ? "" : "opacity-0"
+        }`}
       />
     </div>
   );
