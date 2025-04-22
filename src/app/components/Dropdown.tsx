@@ -77,7 +77,7 @@ export default function Dropdown({ categories }: DropdownProps) {
           </div>
 
           {/* Thống kê */}
-          <div className="border-t bg-primary-light p-3 text-sm">
+          <div className="border-t bg-primary-light p-3 text-sm hidden lg:block md:block">
             Tổng số: {filtered.length} thể loại
           </div>
         </div>

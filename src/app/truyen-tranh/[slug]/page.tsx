@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import OTruyenService from "@/app/services/otruyen.service";
 import LayoutMain from "@/app/layouts/LayoutMain";
 import {
+  ActionButtons,
   Breadcrumb,
   CategoriesList,
   ChapterServer,
@@ -14,29 +15,27 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import { ComicDetailSkeleton } from "@/app/components/loading/ComicDetailSkeleton";
 
-
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+/* ------------------- SEO ------------------- */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   try {
     const { slug } = await props.params;
     const { data } = await OTruyenService.getComicDetail(slug);
-
     return {
       title: data.seoOnPage.titleHead,
       description: data.seoOnPage.descriptionHead,
       openGraph: {
-        images: data.seoOnPage.og_image?.map((img) => ({
-          url: `${data.APP_DOMAIN_CDN_IMAGE}${img}`,
+        images: data.seoOnPage.og_image?.map((i) => ({
+          url: `${data.APP_DOMAIN_CDN_IMAGE}${i}`,
           width: 800,
           height: 600,
         })),
       },
     };
-  } catch (error) {
-    console.error("Error generating metadata:", error);
+  } catch {
     return {
       title: "Không tìm thấy truyện",
       description: "Trang truyện không tồn tại hoặc đã bị xóa",
@@ -44,68 +43,81 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 }
 
-// Pre-render 50 item dể tăng tốc độ load trang chi tiết
+/* ------------- ISR danh sách 50 truyện hot ------------- */
 export async function generateStaticParams() {
   try {
     const { data } = await OTruyenService.getHomeData(1, 50);
-    return data.items.map((comic) => ({
-      slug: comic.slug,
-    }));
-  } catch (error) {
-    console.error("Error generating static params:", error);
+    return data.items.map((c) => ({ slug: c.slug }));
+  } catch {
     return [];
   }
 }
 
+/* ------------------- PAGE ------------------- */
 export default async function ComicDetailPage(props: PageProps) {
   const { slug } = await props.params;
-
-  const response = await OTruyenService.getComicDetail(slug);
+  const { data } = await OTruyenService.getComicDetail(slug);
 
   const {
     item: comic,
     APP_DOMAIN_CDN_IMAGE: cdnUrl,
     breadCrumb,
     seoOnPage,
-  } = response.data;
+  } = data;
 
   if (!comic) return notFound();
+
+  /* slug chương đầu tiên (mảng server_data thường SORT DESC) */
+  const firstChapterSlug =
+    comic.chapters[0]?.server_data?.at(-1)?.chapter_name ?? "";
 
   return (
     <LayoutMain>
       <Suspense fallback={<ComicDetailSkeleton />}>
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          {/* SEO hidden tags */}
           <SEOComic seoData={seoOnPage} cdnUrl={cdnUrl} />
 
           <Breadcrumb items={breadCrumb} />
 
-          {/* Thumbnail */}
-          <div className="flex flex-col lg:flex-row gap-8 mb-12">
+          {/* ---------------- THUMB + INFO ---------------- */}
+          <div className="mt-6 grid gap-8 lg:grid-cols-[250px_1fr] 2xl:grid-cols-[350px_1fr]">
             <Thumbnail
               src={`${cdnUrl}/uploads/comics/${comic.thumb_url}`}
               alt={comic.name}
             />
 
-            {/* Content */}
-            <div className="lg:w-2/3 w-full space-y-6">
+            <div className="flex flex-col space-y-6">
               <ComicMetadata comic={comic} />
               <CategoriesList categories={comic.category} />
+              <ActionButtons
+                comicSlug={comic.slug}
+                firstChapterSlug={firstChapterSlug}
+              />
               <Description content={comic.content} />
             </div>
+
+            {/* Chạy quảng cáo  div cha: xl:grid-cols-[280px_1fr_240px] */}
+            {/* <div className="hidden 2xl:block" /> */}
           </div>
 
-          {/* Chapter */}
-          <div className="bg-gray-900 p-6 rounded-xl shadow-xl border border-gray-800">
-            <h3 className="text-2xl font-bold text-white mb-6">
+          {/* ---------------- CHAPTER LIST ---------------- */}
+          <div className="mt-10 rounded-xl border border-gray-800 bg-gray-900 shadow-xl">
+            <h3 className="border-b border-gray-700 px-4 py-3 text-lg font-bold text-white sm:text-2xl">
               Danh sách chương
             </h3>
-            {comic.chapters.map((server, serverIndex) => (
-              <ChapterServer
-                key={`server-${serverIndex}-${server.server_name}`}
-                server={server}
-                comicSlug={comic.slug}
-                serverIndex={serverIndex}
-              />
+
+            {comic.chapters.map((server, idx) => (
+              <div
+                key={server.server_name}
+                className="overflow-x-auto px-2 lg:px-4"
+              >
+                <ChapterServer
+                  server={server}
+                  comicSlug={comic.slug}
+                  serverIndex={idx}
+                />
+              </div>
             ))}
           </div>
         </div>

@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'img.otruyenapi.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'sv1.otruyencdn.com',
+      },
+      
     ],
   },
   

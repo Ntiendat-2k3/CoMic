@@ -6,3 +6,4 @@ export { default as ComicMetadata } from "./ComicMetadata";
 export { default as Description } from "./Description";
 export { default as Thumbnail } from "./Thumbnail";
 export { default as SEOComic } from "./SEOComic";
+export { default as ActionButtons } from "./ActionButtons";

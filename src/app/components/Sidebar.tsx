@@ -9,7 +9,7 @@ interface NavItem {
   icon: React.ComponentType<{ size?: number }>;
 }
 
-const navItems: NavItem[] = [
+export const navItems: NavItem[] = [
   { href: "/truyen-moi", label: "Truyện mới", icon: BookOpen },
   { href: "/hoan-thanh", label: "Hoàn thành", icon: CheckCircle },
   { href: "/sap-ra-mat", label: "Sắp ra mắt", icon: AlarmClock },
@@ -21,6 +21,7 @@ const Sidebar = () => {
       <nav className="flex flex-col gap-3">
         {navItems.map(({ href, label, icon: Icon }) => (
           <Link
+            scroll={false}
             key={href}
             href={`/danh-sach${href}`}
             className="group relative flex w-12 items-center overflow-hidden rounded-r-xl bg-gray-800 shadow-lg transition-[width,background] duration-300 hover:w-40 hover:bg-primary-light hover:border-r-2 hover:border-gray-300"

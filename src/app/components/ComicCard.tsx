@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Comic } from "../types/comic";
 import ImageFallback from "../utils/ImageFallback";
@@ -7,38 +9,41 @@ interface ComicCardProps {
   baseImageUrl: string;
 }
 
-const ComicCard = ({ comic, baseImageUrl }: ComicCardProps) => {
+export default function ComicCard({ comic, baseImageUrl }: ComicCardProps) {  
   return (
-    <div className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 duration-300">
+    <div className="group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-2xl">
       <Link href={`/truyen-tranh/${comic.slug}`}>
-        <div className="w-full h-[400px] relative">
+        {/* tỉ lệ 3:4 trên mobile */}
+        <div className="relative w-full aspect-[3/4]">
           <ImageFallback
             src={baseImageUrl}
             alt={comic.name}
-            width={600}
-            height={800}
-            className="object-cover w-full h-full"
+            fill
+            sizes="(max-width: 640px) 50vw, 25vw"
+            className="object-cover"
           />
         </div>
-        
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        
+
+        {/* overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+
+        {/* info */}
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 className="font-bold text-lg truncate">{comic.name}</h3>
-          
-          <div className="flex flex-wrap gap-2 mt-2">
+          <h3 className="truncate font-bold text-lg sm:text-xl">{comic.name}</h3>
+
+          <div className="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
             {comic.category.map((cat) => (
-              <span 
+              <span
                 key={cat.slug}
-                className="px-2 py-1 bg-primary/80 text-xs rounded-full"
+                className="rounded-full bg-primary/80 px-2 py-0.5 text-[11px] sm:text-[15px]"
               >
                 {cat.name}
               </span>
             ))}
           </div>
 
-          {comic.chaptersLatest && comic.chaptersLatest.length > 0 && (
-            <div className="mt-2 text-sm">
+          {comic.chaptersLatest?.length && (
+            <div className="mt-1 text-xs sm:text-sm">
               Chapter {comic.chaptersLatest[0].chapter_name}
             </div>
           )}
@@ -46,6 +51,4 @@ const ComicCard = ({ comic, baseImageUrl }: ComicCardProps) => {
       </Link>
     </div>
   );
-};
-
-export default ComicCard;
+}

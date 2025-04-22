@@ -9,12 +9,18 @@ import {
   StatusComicListResponse,
 } from "../types/response";
 import { Category } from "../types/common";
+import { LRUCache } from "lru-cache";
 
 export type ComicListStatus =
   | "truyen-moi"
   | "sap-ra-mat"
   | "dang-phat-hanh"
   | "hoan-thanh";
+
+const lru: LRUCache<string, Category[]> =
+  (globalThis as any)._catCache ??
+  new LRUCache({ max: 1, ttl: 1000 * 60 * 60 }); // 1 giờ
+(globalThis as any)._catCache = lru;
 
 const OTruyenService = {
   // Trang chủ
@@ -38,8 +44,17 @@ const OTruyenService = {
 
   // Thể loại truyện
   getCategories: async (): Promise<Category[]> => {
-    const response = await apiClient.get<CategoryListResponse>("/the-loai");
-    return response.data.data.items;
+    const key = "categories";
+    const cached = lru.get(key);
+
+    // console.log("🚀  getCategories – cache", cached ? "HIT" : "MISS / expired");
+
+    if (cached) return cached;
+
+    const res = await apiClient.get<CategoryListResponse>("/the-loai");
+    const items = res.data.data.items;
+    lru.set(key, items);
+    return items;
   },
 
   // Truyện theo thể loại
@@ -68,6 +83,13 @@ const OTruyenService = {
     return apiClient.get<SearchResponse>(
       `/tim-kiem?keyword=${encodeURIComponent(keyword)}&nocache=${Date.now()}`
     );
+  },
+
+  async getChapterData(chapterApiUrl: string) {
+    return apiClient.get<{
+      data: { images: string[] };
+      images: string[];
+    }>(chapterApiUrl);
   },
 };
 

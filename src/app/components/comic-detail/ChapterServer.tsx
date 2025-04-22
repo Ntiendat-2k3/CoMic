@@ -17,7 +17,7 @@ const ChapterServer = ({
       key={`server-${serverIndex}-${server.server_name}-${comicSlug}`}
       className="mb-8 last:mb-0"
     >
-      <h4 className="text-lg font-semibold text-gray-300 mb-4">
+      <h4 className="text-lg font-semibold text-gray-300 my-4">
         {server.server_name}
       </h4>
       <div className="max-h-[600px] overflow-y-auto thin-scrollbar pr-4">
