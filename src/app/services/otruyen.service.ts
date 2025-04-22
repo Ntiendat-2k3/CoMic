@@ -17,10 +17,13 @@ export type ComicListStatus =
   | "dang-phat-hanh"
   | "hoan-thanh";
 
-const lru: LRUCache<string, Category[]> =
-  (globalThis as any)._catCache ??
-  new LRUCache({ max: 1, ttl: 1000 * 60 * 60 }); // 1 giờ
-(globalThis as any)._catCache = lru;
+declare global {
+  var _catCache: LRUCache<string, Category[]> | undefined;
+}
+const lru =
+  globalThis._catCache ??
+  new LRUCache<string, Category[]>({ max: 1, ttl: 3600_000 });
+globalThis._catCache = lru;
 
 const OTruyenService = {
   // Trang chủ

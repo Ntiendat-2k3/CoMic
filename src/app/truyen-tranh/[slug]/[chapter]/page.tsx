@@ -31,7 +31,6 @@ interface ChapterMeta {
 }
 
 function isChapterMeta(c: unknown): c is ChapterMeta {
-  // Narrow unknown to object with string properties without using 'any'
   if (typeof c !== "object" || c === null) return false;
   const obj = c as Record<string, unknown>;
   return (
