@@ -9,42 +9,37 @@ interface PageProps {
   params: Promise<{ slug: string; chapter: string }>;
 }
 
-interface ImageInfo {
-  image_page: number;
-  image_file: string;
-}
-
-interface ChapterItem {
-  chapter_image: ImageInfo[];
-  chapter_path: string;
-}
-
+/* ------------------- Types for Chapter API response ------------------- */
 interface ChapterApiLegacy {
-  images: string[];               // format cũ
+  images: string[];
 }
 
 interface ChapterApiNew {
   domain_cdn: string;
-  item: ChapterItem;              // format mới
+  item: {
+    chapter_image: Array<{ image_page: number; image_file: string }>;
+    chapter_path: string;
+  };
 }
 
 type ChapterApiResponse = ChapterApiLegacy | ChapterApiNew;
 
+/* ------------------- Types for chapter metadata ------------------- */
 interface ChapterMeta {
   chapter_name: string;
   chapter_api_data: string;
 }
 
 function isChapterMeta(c: unknown): c is ChapterMeta {
+  // Narrow unknown to object with string properties without using 'any'
+  if (typeof c !== "object" || c === null) return false;
+  const obj = c as Record<string, unknown>;
   return (
-    typeof c === "object" &&
-    c !== null &&
-    "chapter_name" in c &&
-    "chapter_api_data" in c &&
-    typeof (c as any).chapter_name === "string" &&
-    typeof (c as any).chapter_api_data === "string"
+    typeof obj.chapter_name === "string" &&
+    typeof obj.chapter_api_data === "string"
   );
 }
+
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   try {
@@ -56,6 +51,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 }
 
+/* ---------------- Helper: lấy danh sách ảnh ---------------- */
 async function getChapterImages(apiUrl: string): Promise<string[]> {
   try {
     const res = await OTruyenService.getChapterData(apiUrl);
