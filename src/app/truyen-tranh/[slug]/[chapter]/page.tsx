@@ -80,12 +80,6 @@ export default async function ChapterPage(props: PageProps) {
   const comic = data.item;
   if (!comic) return notFound();
 
-  /* tính chapter đầu tiên (smallest) */
-  const sorted = [...(comic.chapters[0]?.server_data ?? [])]
-    .filter(isChapterMeta)
-    .sort((a, b) => parseFloat(a.chapter_name) - parseFloat(b.chapter_name));
-  const firstChapterSlug = sorted[0]?.chapter_name ?? "";
-
   /* chuẩn bị prev/next */
   const serverList = comic.chapters[0]?.server_data.filter(isChapterMeta) ?? [];
   const idx = serverList.findIndex((c) => c.chapter_name === chapter);
