@@ -17,10 +17,11 @@ export type ComicListStatus =
   | "dang-phat-hanh"
   | "hoan-thanh";
 
+/* eslint-disable no-var */
 declare global {
   var _catCache: LRUCache<string, Category[]> | undefined;
 }
-const lru =
+const lru = 
   globalThis._catCache ??
   new LRUCache<string, Category[]>({ max: 1, ttl: 3600_000 });
 globalThis._catCache = lru;
