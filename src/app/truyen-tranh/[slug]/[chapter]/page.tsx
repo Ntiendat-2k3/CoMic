@@ -9,6 +9,38 @@ interface PageProps {
   params: Promise<{ slug: string; chapter: string }>;
 }
 
+interface ImageInfo {
+  image_page: number;
+  image_file: string;
+}
+
+interface ChapterItem {
+  chapter_image: ImageInfo[];
+  chapter_path: string;
+}
+
+interface ChapterApiLegacy {
+  images: string[];               // format cũ
+}
+
+interface ChapterApiNew {
+  domain_cdn: string;
+  item: ChapterItem;              // format mới
+}
+
+type ChapterApiResponse = ChapterApiLegacy | ChapterApiNew;
+
+interface ChapterMeta {
+  chapter_name: string;
+  chapter_api_data: string;
+}
+
+function isChapterMeta(c: any): c is ChapterMeta {
+  return (
+    c && typeof c.chapter_name === "string" && typeof c.chapter_api_data === "string"
+  );
+}
+
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   try {
     const { slug, chapter } = await props.params;
@@ -22,16 +54,13 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 async function getChapterImages(apiUrl: string): Promise<string[]> {
   try {
     const res = await OTruyenService.getChapterData(apiUrl);
-    const raw: any = res.data?.data ?? res.data;
+    const raw = (res.data?.data ?? res.data) as unknown as ChapterApiResponse;
 
     // Format cũ: { images: string[] }
-    if (Array.isArray(raw?.images)) return raw.images;
+    if ("images" in raw) return raw.images;
 
     // Format mới
-    const { domain_cdn, item } = raw as {
-      domain_cdn: string;
-      item: { chapter_image: { image_page: number; image_file: string }[]; chapter_path: string };
-    };
+    const { domain_cdn, item } = raw;
     if (!item?.chapter_image?.length) return [];
 
     return item.chapter_image
@@ -50,12 +79,14 @@ export default async function ChapterPage(props: PageProps) {
   const comic = data.item;
   if (!comic) return notFound();
 
-  const serverData = comic.chapters[0]?.server_data;
-  const current = serverData?.find((c: any) => c.chapter_name === chapter);
+  // chunk raw chapters
+  const rawChaps = comic.chapters[0]?.server_data ?? [];
+  const serverData: ChapterMeta[] = rawChaps.filter(isChapterMeta);
+  const current = serverData.find((c) => c.chapter_name === chapter);
   if (!current) return notFound();
 
   /* 2. Xác định prev / next (mảng DESC) */
-  const idx = serverData.findIndex((c: any) => c.chapter_name === chapter);
+  const idx = serverData.findIndex((c) => c.chapter_name === chapter);
   const prev = serverData[idx - 1];
   const next = serverData[idx + 1];
 
@@ -63,7 +94,7 @@ export default async function ChapterPage(props: PageProps) {
   const chapterImages = await getChapterImages(current.chapter_api_data || "");
 
   /* 4. Danh sách tất cả chapter (để render dropdown) */
-  const chapterNames: string[] = serverData.map((c: any) => c.chapter_name);
+  const chapterNames: string[] = serverData.map((c) => c.chapter_name);
 
   return (
     <LayoutMain>
