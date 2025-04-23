@@ -15,7 +15,6 @@ const UserBtn = dynamic(() => import("@clerk/nextjs").then(m => m.UserButton), {
 });
 
 interface Props {
-  /** Mặc định "desktop". Dùng "mobile" cho avatar thu gọn trên màn hình nhỏ */
   variant?: "mobile" | "desktop";
 }
 
