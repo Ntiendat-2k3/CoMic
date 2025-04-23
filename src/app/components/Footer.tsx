@@ -1,5 +1,6 @@
 import React from 'react'
 import { Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Footer() {
   return (
@@ -20,24 +21,24 @@ export default function Footer() {
             <h3 className="text-xl font-semibold mb-4">Điều hướng</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/" className="hover:underline">
+                <Link href="/" className="hover:underline">
                   Trang chủ
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/lich-su" className="hover:underline">
+                <Link href="/lich-su" className="hover:underline">
                   Lịch sử đọc
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/yeu-thich" className="hover:underline">
+                <Link href="/yeu-thich" className="hover:underline">
                   Yêu thích
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/the-loai" className="hover:underline">
+                <Link href="/the-loai" className="hover:underline">
                   Thể loại
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -47,24 +48,24 @@ export default function Footer() {
             <h3 className="text-xl font-semibold mb-4">Hỗ trợ</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/terms" className="hover:underline">
+                <Link href="/terms" className="hover:underline">
                   Điều khoản sử dụng
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/privacy" className="hover:underline">
+                <Link href="/privacy" className="hover:underline">
                   Chính sách bảo mật
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/contact" className="hover:underline">
+                <Link href="/contact" className="hover:underline">
                   Liên hệ
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/faq" className="hover:underline">
+                <Link href="/faq" className="hover:underline">
                   FAQ
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
