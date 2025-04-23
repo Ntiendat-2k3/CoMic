@@ -72,9 +72,9 @@ export default async function CategoryPage(props: PageProps) {
 
   return (
     <LayoutMain>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto lg:px-4 lg:py-8 px-2 py-4">
         {/* Breadcrumb */}
-        <Breadcrumb items={data.breadCrumb} className="mb-8" />
+        <Breadcrumb items={data.breadCrumb} className="mb-3 lg:mb-8" />
 
         {/* Title */}
         <div className="flex items-center justify-between mb-8">

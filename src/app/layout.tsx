@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   title: "TruyenHay",
   description: "Đọc truyện tranh online",
   icons: {
-    icon: "/logo.jpeg",
-    shortcut: "/logo.jpeg",
-    apple: "/logo.jpeg",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 

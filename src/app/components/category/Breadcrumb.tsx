@@ -13,18 +13,21 @@ interface BreadcrumbProps {
 
 export default function Breadcrumb({ items, className }: BreadcrumbProps) {
   return (
-    <nav className={`text-sm text-gray-400 ${className}`}>
+    <nav className={`text-[15px] text-gray-400 ${className}`}>
       {items.map((item, index) => (
         <span key={index}>
           {item.slug ? (
+            <>
+            <Link href="/">Trang chủ / </Link>
             <Link
               href={item.slug}
               className="hover:text-primary transition-colors"
             >
               {item.name}
             </Link>
+            </>
           ) : (
-            <span className={item.isCurrent ? "text-primary" : ""}>
+            <span className={item.isCurrent ? "text-blue-500" : ""}>
               {item.name}
             </span>
           )}

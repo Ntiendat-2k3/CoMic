@@ -6,7 +6,6 @@ import { Bookmark, BookmarkCheck, Book, ArrowRight } from "lucide-react";
 
 interface ActionButtonsProps {
   comicSlug: string;
-  /** slug của chương đầu tiên (thường nhỏ nhất) */
   firstChapterSlug: string;
 }
 

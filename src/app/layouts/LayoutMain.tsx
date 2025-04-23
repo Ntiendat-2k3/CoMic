@@ -17,7 +17,7 @@ const LayoutMain = async ({ children }: LayoutMainProps) => {
   return (
     <>
       <Sidebar />
-      <div className="min-h-screen flex flex-col bg-gray-700">
+      <div className="flex flex-col justify-between bg-gray-700">
         <Navbar categories={categories} />
         <main className="flex-1">{children}</main>
         <Footer />

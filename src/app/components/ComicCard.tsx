@@ -11,7 +11,7 @@ interface ComicCardProps {
 
 export default function ComicCard({ comic, baseImageUrl }: ComicCardProps) {  
   return (
-    <div className="group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-2xl">
+    <div className="group relative overflow-hidden rounded-lg shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-2xl">
       <Link href={`/truyen-tranh/${comic.slug}`}>
         {/* tỉ lệ 3:4 trên mobile */}
         <div className="relative w-full aspect-[3/4]">

@@ -27,9 +27,7 @@ export default function ChapterImage({ src, index }: Props) {
         priority={index < 2}
         loading={index < 2 ? "eager" : "lazy"}
         onLoad={() => setLoaded(true)}
-        className={`h-auto w-full object-contain ${
-          loaded ? "" : "opacity-0"
-        }`}
+        className={`h-auto w-full object-contain ${loaded ? "" : "opacity-0"}`}
       />
     </div>
   );
