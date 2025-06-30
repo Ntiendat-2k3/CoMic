@@ -91,9 +91,9 @@ export default async function ChapterPage(props: PageProps) {
 
   return (
     <LayoutMain>
-      <div className="mx-auto max-w-4xl px-4 py-6">
+      <div className="mx-auto max-w-4xl lg:px-4 lg:py-6">
         {/* breadcrumb */}
-        <nav className="mb-4 text-sm text-white/70">
+        <nav className="mb-4 text-sm text-white/70 p-4 lg:p-0">
           <Link href="/">Trang chủ</Link>
           {" / "}
           <Link
