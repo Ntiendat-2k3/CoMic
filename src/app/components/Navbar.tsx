@@ -97,7 +97,7 @@ export default function Navbar({ categories }: NavbarProps) {
   }
 
   return (
-    <nav className="w-full nav-glass sticky top-0 z-50 border-b border-pink-glow">
+    <nav className="w-full nav-glass top-0 z-50 border-b border-pink-glow">
       {/* Pink Glow Line */}
       <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-pink-500 to-pink-300 opacity-60"></div>
 
