@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -27,8 +27,30 @@ export default function Navbar({ categories }: NavbarProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (!isClient) return
+
+    if (mobileOpen && typeof window !== "undefined") {
+      document.body.style.overflow = "hidden"
+    } else if (typeof window !== "undefined") {
+      document.body.style.overflow = "unset"
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        document.body.style.overflow = "unset"
+      }
+    }
+  }, [mobileOpen, isClient])
 
   const handleSearch = useCallback(async (keyword: string) => {
     if (!keyword.trim()) return setSearchResults([])
@@ -85,6 +107,7 @@ export default function Navbar({ categories }: NavbarProps) {
               aria-label="Toggle navigation"
               onClick={() => setMobileOpen((o) => !o)}
               className="glass-button p-3 rounded-2xl md:hidden pulse-pink touch-manipulation"
+              suppressHydrationWarning
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -106,7 +129,7 @@ export default function Navbar({ categories }: NavbarProps) {
           </div>
 
           {/* Navigation Links */}
-          <Dropdown categories={categories} />
+          {isClient && <Dropdown categories={categories} />}
 
           <Link
             prefetch
@@ -130,7 +153,7 @@ export default function Navbar({ categories }: NavbarProps) {
         </div>
 
         {/* Mobile Menu */}
-        {mobileOpen && (
+        {mobileOpen && isClient && (
           <div className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
             <div className="flex h-full flex-col overflow-y-auto">
               <div className="flex-1 p-4 space-y-4">

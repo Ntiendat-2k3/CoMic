@@ -1,7 +1,16 @@
+"use client"
+
 import { Facebook, Twitter, Instagram, Linkedin, Mail } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 export default function Footer() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   return (
     <footer className="glass-dark text-white mt-12 py-10 border-t border-pink-glow">
       <div className="container mx-auto px-6 lg:px-8">
@@ -75,18 +84,30 @@ export default function Footer() {
             <form className="flex flex-col sm:flex-row items-center gap-2 mb-4">
               <div className="flex items-center w-full sm:flex-1 glass-input rounded-lg overflow-hidden">
                 <Mail className="w-5 h-5 mx-3 text-pink-400" />
-                <input
-                  type="email"
-                  placeholder="Email của bạn"
-                  className="flex-1 px-3 py-2 bg-transparent text-white focus:outline-none placeholder-gray-400"
-                />
+                {isClient ? (
+                  <input
+                    type="email"
+                    placeholder="Email của bạn"
+                    className="flex-1 px-3 py-2 bg-transparent text-white focus:outline-none placeholder-gray-400"
+                    suppressHydrationWarning
+                  />
+                ) : (
+                  <div className="flex-1 px-3 py-2 bg-transparent text-gray-400">Email của bạn</div>
+                )}
               </div>
-              <button
-                type="submit"
-                className="glass-button px-5 py-2 rounded-lg font-medium hover:bg-pink-500/20 whitespace-nowrap transition-colors"
-              >
-                Đăng ký
-              </button>
+              {isClient ? (
+                <button
+                  type="submit"
+                  className="glass-button px-5 py-2 rounded-lg font-medium hover:bg-pink-500/20 whitespace-nowrap transition-colors"
+                  suppressHydrationWarning
+                >
+                  Đăng ký
+                </button>
+              ) : (
+                <div className="glass-button px-5 py-2 rounded-lg font-medium hover:bg-pink-500/20 whitespace-nowrap transition-colors">
+                  Đăng ký
+                </div>
+              )}
             </form>
             <div className="flex space-x-4">
               <a href="#" aria-label="Facebook" className="text-glass-muted hover:text-pink-400 transition-colors">
