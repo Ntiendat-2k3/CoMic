@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Menu, Bookmark, Clock, Heart, X } from "lucide-react"
+import { Menu, Bookmark, Clock, Heart, X, ChevronDown } from "lucide-react"
 
 import OTruyenService from "../services/otruyen.service"
 import type { Category } from "../types/common"
@@ -27,6 +27,7 @@ export default function Navbar({ categories }: NavbarProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
@@ -77,6 +78,11 @@ export default function Navbar({ categories }: NavbarProps) {
 
   const closeMobileMenu = useCallback(() => {
     setMobileOpen(false)
+    setMobileCategoriesOpen(false)
+  }, [])
+
+  const toggleMobileCategories = useCallback(() => {
+    setMobileCategoriesOpen((prev) => !prev)
   }, [])
 
   return (
@@ -154,87 +160,99 @@ export default function Navbar({ categories }: NavbarProps) {
 
         {/* Mobile Menu */}
         {mobileOpen && isClient && (
-          <div className="fixed inset-0 top-[88px] h-[60%] z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
-            <div className="flex h-full flex-col overflow-y-auto">
-              <div className="flex-1 p-4 space-y-4">
-                {/* Search mobile */}
-                <div className="w-full mb-6">
-                  <Search
-                    searchResults={searchResults}
-                    isLoading={isLoading}
-                    showSuggestions={showSuggestions}
-                    setShowSuggestions={setShowSuggestions}
-                    onSearch={handleSearch}
-                    onSubmit={handleSearchSubmit}
-                  />
-                </div>
-
-                {/* Sidebar nav items */}
-                <div className="space-y-3">
-                  {navItems.map(({ href, label, icon: Icon }) => (
-                    <Link
-                      key={href}
-                      href={`/danh-sach${href}`}
-                      className="glass-button flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95"
-                      onClick={closeMobileMenu}
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 glow-pink">
-                        <Icon size={20} />
-                      </div>
-                      <span className="group-hover:gradient-text transition-all duration-300">{label}</span>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Categories - Simple List for Mobile */}
-                <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-white px-2">Thể loại</h3>
-                  <div className="max-h-60 overflow-y-auto">
-                    <div className="grid grid-cols-2 gap-2">
-                      {categories.slice(0, 20).map((category) => (
-                        <Link
-                          key={category._id}
-                          href={`/the-loai/${category.slug}`}
-                          onClick={closeMobileMenu}
-                          className="glass-button p-3 rounded-xl text-center text-sm font-medium transition-all duration-300 text-glass-muted hover:text-white hover:bg-pink-500/10 touch-manipulation active:scale-95"
-                        >
-                          <div className="truncate">{category.name}</div>
-                        </Link>
-                      ))}
-                    </div>
+          <div className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
+            <div className="h-full flex flex-col">
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-4 space-y-4">
+                  {/* Search mobile */}
+                  <div className="w-full mb-6">
+                    <Search
+                      searchResults={searchResults}
+                      isLoading={isLoading}
+                      showSuggestions={showSuggestions}
+                      setShowSuggestions={setShowSuggestions}
+                      onSearch={handleSearch}
+                      onSubmit={handleSearchSubmit}
+                    />
                   </div>
-                  {categories.length > 20 && (
-                    <Link
-                      href="/the-loai"
-                      onClick={closeMobileMenu}
-                      className="glass-button block text-center p-3 rounded-xl text-sm font-medium text-pink-400 hover:text-white hover:bg-pink-500/10 touch-manipulation"
+
+                  {/* Sidebar nav items */}
+                  <div className="space-y-3">
+                    {navItems.map(({ href, label, icon: Icon }) => (
+                      <Link
+                        key={href}
+                        href={`/danh-sach${href}`}
+                        className="glass-button flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95"
+                        onClick={closeMobileMenu}
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 glow-pink">
+                          <Icon size={20} />
+                        </div>
+                        <span className="group-hover:gradient-text transition-all duration-300">{label}</span>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Categories Dropdown Button for Mobile */}
+                  <div className="space-y-3">
+                    <button
+                      onClick={toggleMobileCategories}
+                      className="glass-button flex w-full items-center justify-between gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95"
+                      suppressHydrationWarning
                     >
-                      Xem tất cả {categories.length} thể loại →
-                    </Link>
-                  )}
-                </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 glow-pink">
+                          <Heart size={20} />
+                        </div>
+                        <span className="group-hover:gradient-text transition-all duration-300">Thể loại</span>
+                      </div>
+                      <ChevronDown
+                        size={18}
+                        className={`transition-transform duration-200 ${mobileCategoriesOpen ? "rotate-180" : ""} group-hover:text-pink-400`}
+                      />
+                    </button>
 
-                <Link
-                  prefetch
-                  href="/lich-su"
-                  onClick={closeMobileMenu}
-                  className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group touch-manipulation active:scale-95"
-                >
-                  <Clock size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
-                  <span className="group-hover:gradient-text transition-all duration-300">Lịch sử</span>
-                </Link>
+                    {/* Categories List - Collapsible */}
+                    {mobileCategoriesOpen && (
+                      <div className="bg-gray-800/50 rounded-2xl p-4 max-h-60 overflow-y-auto">
+                        <div className="grid grid-cols-2 gap-2">
+                          {categories.map((category) => (
+                            <Link
+                              key={category._id}
+                              href={`/the-loai/${category.slug}`}
+                              onClick={closeMobileMenu}
+                              className="glass-button p-3 rounded-xl text-center text-sm font-medium transition-all duration-300 text-glass-muted hover:text-white hover:bg-pink-500/10 touch-manipulation active:scale-95"
+                            >
+                              <div className="truncate">{category.name}</div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                <Link
-                  href="/yeu-thich"
-                  className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group glow-pink touch-manipulation active:scale-95"
-                  onClick={closeMobileMenu}
-                >
-                  <Bookmark size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
-                  <span className="group-hover:gradient-text-accent transition-all duration-300">Yêu thích</span>
-                </Link>
+                  <Link
+                    prefetch
+                    href="/lich-su"
+                    onClick={closeMobileMenu}
+                    className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group touch-manipulation active:scale-95"
+                  >
+                    <Clock size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
+                    <span className="group-hover:gradient-text transition-all duration-300">Lịch sử</span>
+                  </Link>
 
-                <div className="pt-4">
-                  <AuthButtons />
+                  <Link
+                    href="/yeu-thich"
+                    className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group glow-pink touch-manipulation active:scale-95"
+                    onClick={closeMobileMenu}
+                  >
+                    <Bookmark size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
+                    <span className="group-hover:gradient-text-accent transition-all duration-300">Yêu thích</span>
+                  </Link>
+
+                  <div className="pt-4">
+                    <AuthButtons />
+                  </div>
                 </div>
               </div>
             </div>
