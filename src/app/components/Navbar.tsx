@@ -1,124 +1,131 @@
-"use client";
+"use client"
 
-import { useState, useCallback } from "react";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Menu, Bookmark, Clock } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback } from "react"
+import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Menu, Bookmark, Clock, Heart } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
-import OTruyenService from "../services/otruyen.service";
-import { Category } from "../types/common";
-import { Comic } from "../types/comic";
-import Search from "./Search";
-import AuthButtons from "./AuthButtons";
-import { navItems } from "./Sidebar";
+import OTruyenService from "../services/otruyen.service"
+import type { Category } from "../types/common"
+import type { Comic } from "../types/comic"
+import Search from "./Search"
+import AuthButtons from "./AuthButtons"
+import { navItems } from "./Sidebar"
 
 const Dropdown = dynamic(() => import("./Dropdown"), {
-  loading: () => <div className="w-40 h-6 bg-gray-100 animate-pulse" />,
-});
+  loading: () => <div className="w-40 h-6 glass-purple rounded-xl animate-pulse shimmer-purple" />,
+})
 
 interface NavbarProps {
-  categories: Category[];
+  categories: Category[]
 }
 
 export default function Navbar({ categories }: NavbarProps) {
-  const [searchResults, setSearchResults] = useState<Comic[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<Comic[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  const router = useRouter();
+  const router = useRouter()
 
-  /* -------------------------- handlers -------------------------- */
   const handleSearch = useCallback(async (keyword: string) => {
-    if (!keyword.trim()) return setSearchResults([]);
+    if (!keyword.trim()) return setSearchResults([])
 
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const res = await OTruyenService.searchComics(keyword);
-      setSearchResults(res.data.data.items);
-      setShowSuggestions(true);
+      const res = await OTruyenService.searchComics(keyword)
+      setSearchResults(res.data.data.items)
+      setShowSuggestions(true)
     } catch (err) {
-      console.error("Search error:", err);
+      console.error("Search error:", err)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, []);
+  }, [])
 
   const handleSearchSubmit = useCallback(
     (keyword: string) => {
-      router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`);
-      setShowSuggestions(false);
+      router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`)
+      setShowSuggestions(false)
     },
-    [router]
-  );
+    [router],
+  )
 
-  /* ----------------------------- UI ---------------------------- */
   return (
-    <nav className="w-full bg-primary text-white shadow-md">
-      <div className="mx-auto flex-col lg:flex max-w-7xl flex-wrap items-center justify-between gap-y-3 px-4 py-3 md:flex-nowrap">
-        {/* ------------------- Logo + hamburger ------------------- */}
+    <nav className="w-full nav-glass sticky top-0 z-50 border-b border-purple-glow">
+      {/* Purple Glow Line */}
+      <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-primary opacity-60"></div>
+
+      <div className="mx-auto flex-col lg:flex max-w-7xl flex-wrap items-center justify-between gap-y-4 px-4 py-5 md:flex-nowrap">
+        {/* Logo + hamburger */}
         <div className="flex w-full items-center justify-between md:w-auto">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="font-love animate-gradient bg-[linear-gradient(90deg,#4f46e5,#ec4899,#4f46e5)] bg-[length:200%] bg-clip-text text-3xl font-bold tracking-widest text-transparent">
+          <Link href="/" className="flex items-center space-x-4 group">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300 glow-purple">
+                <Heart className="w-6 h-6 text-white fill-current" />
+              </div>
+              <div className="absolute inset-0 w-12 h-12 rounded-2xl bg-gradient-primary opacity-30 blur-lg group-hover:opacity-60 transition-opacity duration-300" />
+            </div>
+            <span className="text-3xl font-bold gradient-text group-hover:scale-105 transition-transform duration-300">
               TruyenHay
             </span>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="block md:hidden">
               <AuthButtons variant="mobile" />
             </div>
             <button
               aria-label="Toggle navigation"
               onClick={() => setMobileOpen((o) => !o)}
-              className="ml-2 inline-flex shrink-0 items-center rounded-md p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white md:hidden"
+              className="glass-button p-3 rounded-2xl md:hidden pulse-purple"
             >
-              <Menu size={24} />
+              <Menu size={22} />
             </button>
           </div>
         </div>
 
-        {/* ===================== DESKTOP utilities ==================== */}
-        <div className="hidden items-center gap-4 lg:gap-8 md:flex">
+        {/* Desktop utilities */}
+        <div className="hidden items-center gap-8 lg:gap-10 md:flex">
           {/* Search desktop */}
-          <Search
-            searchResults={searchResults}
-            isLoading={isLoading}
-            showSuggestions={showSuggestions}
-            setShowSuggestions={setShowSuggestions}
-            onSearch={handleSearch}
-            onSubmit={handleSearchSubmit}
-          />
+          <div className="flex-1 max-w-lg">
+            <Search
+              searchResults={searchResults}
+              isLoading={isLoading}
+              showSuggestions={showSuggestions}
+              setShowSuggestions={setShowSuggestions}
+              onSearch={handleSearch}
+              onSubmit={handleSearchSubmit}
+            />
+          </div>
 
-          {/* Dropdown */}
+          {/* Navigation Links */}
           <Dropdown categories={categories} />
 
-          {/* Lịch sử đọc */}
           <Link
             prefetch
             href="/lich-su"
-            className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+            className="glass-button flex items-center gap-3 px-6 py-3 rounded-2xl text-sm font-semibold group"
           >
-            <Clock size={20} />
-            <span>Lịch sử</span>
+            <Clock size={18} className="group-hover:text-purple-light transition-colors duration-300" />
+            <span className="group-hover:gradient-text transition-all duration-300">Lịch sử</span>
           </Link>
 
-          {/* Truyện đang theo dõi */}
           <Link
             href="/yeu-thich"
-            className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+            className="glass-button flex items-center gap-3 px-6 py-3 rounded-2xl text-sm font-semibold group glow-pink"
           >
-            <Bookmark size={20} />
-            <span>Đang theo dõi</span>
+            <Bookmark size={18} className="group-hover:text-accent transition-colors duration-300" />
+            <span className="group-hover:gradient-text-accent transition-all duration-300">Yêu thích</span>
           </Link>
 
           {/* Auth */}
           <AuthButtons />
         </div>
 
-        {/* ===================== MOBILE (collapse) ==================== */}
+        {/* Mobile Menu */}
         <AnimatePresence initial={false}>
           {mobileOpen && (
             <motion.div
@@ -126,66 +133,67 @@ export default function Navbar({ categories }: NavbarProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="flex w-full flex-col gap-4 lg:gap-8 md:hidden"
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="flex w-full flex-col gap-6 lg:gap-8 md:hidden glass-purple rounded-3xl p-6 mt-6 border-gradient-purple"
             >
               {/* Sidebar nav items */}
-              <div className="w-full">
+              <div className="w-full space-y-4">
                 {navItems.map(({ href, label, icon: Icon }) => (
                   <Link
                     key={href}
                     href={`/danh-sach${href}`}
-                    className="flex w-full items-center gap-2 rounded-md border-b border-gray-200 py-3 font-medium"
+                    className="glass-button flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center">
-                      <Icon size={20} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary glow-purple">
+                      <Icon size={20}/>
                     </div>
-                    {label}
+                    <span className="group-hover:gradient-text transition-all duration-300">{label}</span>
                   </Link>
                 ))}
               </div>
 
-              {/* Dropdown mobile */}
               <Dropdown categories={categories} />
 
-              {/* Lịch sử đọc  */}
               <Link
-              prefetch 
+                prefetch
                 href="/lich-su"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+                className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group"
               >
-                <Clock size={20} />
-                <span>Lịch sử</span>
+                <Clock size={20} className="group-hover:text-purple-light transition-colors duration-300" />
+                <span className="group-hover:gradient-text transition-all duration-300">Lịch sử</span>
               </Link>
 
-              {/* Truyện đang theo dõi mobile */}
               <Link
                 href="/yeu-thich"
-                className="flex items-center gap-1 rounded px-3 py-2 hover:bg-white/10 transition"
+                className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group glow-pink"
                 onClick={() => setMobileOpen(false)}
               >
-                <Bookmark size={20} />
-                <span>Đang theo dõi</span>
+                <Bookmark size={20} className="group-hover:text-accent transition-colors duration-300" />
+                <span className="group-hover:gradient-text-accent transition-all duration-300">Yêu thích</span>
               </Link>
 
               {/* Search mobile */}
-              <Search
-                searchResults={searchResults}
-                isLoading={isLoading}
-                showSuggestions={showSuggestions}
-                setShowSuggestions={setShowSuggestions}
-                onSearch={handleSearch}
-                onSubmit={handleSearchSubmit}
-              />
+              <div className="w-full">
+                <Search
+                  searchResults={searchResults}
+                  isLoading={isLoading}
+                  showSuggestions={showSuggestions}
+                  setShowSuggestions={setShowSuggestions}
+                  onSearch={handleSearch}
+                  onSubmit={handleSearchSubmit}
+                />
+              </div>
 
-              {/* Auth mobile */}
               <AuthButtons />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Bottom Purple Glow Line */}
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-accent opacity-40"></div>
     </nav>
-  );
+  )
 }

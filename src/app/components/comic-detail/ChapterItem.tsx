@@ -1,35 +1,33 @@
-import { Chapter } from "@/app/types/common";
-import Link from "next/link";
+import type { Chapter } from "@/app/types/common"
+import Link from "next/link"
 
 interface ChapterItemProps {
-  chapter: Chapter;
-  comicSlug: string;
+  chapter: Chapter
+  comicSlug: string
 }
 
 const ChapterItem = ({ chapter, comicSlug }: ChapterItemProps) => {
   return (
     <Link
-      key={`chapter-item-${comicSlug}-${chapter.chapter_name}-${chapter.chapter_api_data}`}
       href={`/truyen-tranh/${comicSlug}/${chapter.chapter_name}`}
-      className="group flex items-center justify-between p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 border border-gray-700 hover:border-primary-accent"
+      className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors border border-gray-600 hover:border-gray-500"
     >
-      <div className="flex-1 min-w-0">
-        <span className="text-base font-medium text-white truncate">
-          Chương {chapter.chapter_name}
-        </span>
-        {chapter.chapter_title && (
-          <span className="text-gray-400 text-sm ml-2 truncate">
-            - {chapter.chapter_title}
-          </span>
-        )}
-      </div>
-      <div className="ml-4 flex-shrink-0">
-        <span className="text-primary-accent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          Đọc ngay →
-        </span>
+      <div className="flex items-center justify-between">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3">
+            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded font-medium">{chapter.chapter_name}</span>
+            <span className="text-white font-medium">Chương {chapter.chapter_name}</span>
+          </div>
+          {chapter.chapter_title && (
+            <p className="text-gray-400 text-sm mt-1 ml-12 truncate">{chapter.chapter_title}</p>
+          )}
+        </div>
+        <div className="ml-4 flex-shrink-0">
+          <span className="text-blue-400 text-sm">→</span>
+        </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export default ChapterItem;
+export default ChapterItem

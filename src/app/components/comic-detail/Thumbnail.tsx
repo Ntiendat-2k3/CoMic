@@ -1,21 +1,22 @@
-import ImageFallback from "@/app/utils/ImageFallback";
+import ImageFallback from "@/app/utils/ImageFallback"
 
 interface ThumbnailProps {
-  src: string;
-  alt: string;
+  src: string
+  alt: string
 }
 
 const Thumbnail = ({ src, alt }: ThumbnailProps) => (
-  <div className="lg:w-1/3 w-full">
-    <div className="mx-auto relative aspect-[2/3] rounded-xl overflow-hidden border-2 border-primary-dark shadow-xl h-[500px]">
+  <div className="w-full">
+    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-700 border border-gray-600">
       <ImageFallback
-        src={src}
+        src={src || "/placeholder.svg"}
         alt={alt}
         fill
-        className="w-full object-cover hover:scale-105 transition-transform duration-300"
-        sizes="(max-width: 768px) 100vw, 33vw"
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 400px"
       />
     </div>
   </div>
-);
-export default Thumbnail;
+)
+
+export default Thumbnail
