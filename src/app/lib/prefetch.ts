@@ -54,23 +54,23 @@ export class PrefetchManager {
     this.isProcessing = false
   }
 
-  private static prefetchAPI(url: string) {
+  private static prefetchAPI(url: string): Promise<unknown> {
     return fetch(url, {
       method: "GET",
       priority: "low" as RequestPriority,
     }).then((response) => response.json())
   }
 
-  private static prefetchImage(url: string) {
+  private static prefetchImage(url: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const img = new Image()
-      img.onload = resolve
-      img.onerror = reject
+      img.onload = () => resolve()
+      img.onerror = () => reject(new Error(`Failed to load image: ${url}`))
       img.src = url
     })
   }
 
-  private static prefetchPage(url: string) {
+  private static prefetchPage(url: string): Promise<void> {
     const link = document.createElement("link")
     link.rel = "prefetch"
     link.href = url

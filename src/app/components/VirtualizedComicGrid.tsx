@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useCallback } from "react"
-import { FixedSizeGrid as Grid } from "react-window"
+import { FixedSizeGrid as Grid, type GridChildComponentProps } from "react-window"
 import type { Comic } from "@/app/types/comic"
 import ComicCard from "./ComicCard"
 
@@ -12,13 +12,17 @@ interface VirtualizedComicGridProps {
   columnCount?: number
 }
 
+interface CellProps extends GridChildComponentProps {
+  data: Comic[]
+}
+
 const VirtualizedComicGrid = memo(({ comics, width, height, columnCount = 4 }: VirtualizedComicGridProps) => {
   const rowCount = Math.ceil(comics.length / columnCount)
   const columnWidth = width / columnCount
   const rowHeight = 400 // Approximate card height
 
   const Cell = useCallback(
-    ({ columnIndex, rowIndex, style }: any) => {
+    ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
       const index = rowIndex * columnCount + columnIndex
       const comic = comics[index]
 
@@ -47,6 +51,7 @@ const VirtualizedComicGrid = memo(({ comics, width, height, columnCount = 4 }: V
       width={width}
       overscanRowCount={2}
       overscanColumnCount={1}
+      itemData={comics}
     >
       {Cell}
     </Grid>
