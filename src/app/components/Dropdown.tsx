@@ -152,16 +152,16 @@ export default function Dropdown({ categories }: DropdownProps) {
                 animate="visible"
                 exit="exit"
                 variants={mobileVariants}
-                className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+                className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm"
                 style={{ willChange: "transform, opacity" }}
               >
                 <div className="flex h-full flex-col">
                   {/* Mobile Header */}
-                  <div className="flex items-center justify-between p-4 bg-gray-900/90 backdrop-blur-md border-b border-pink-glow/30">
+                  <div className="flex items-center justify-between p-4 bg-gray-900/95 backdrop-blur-md border-b border-pink-glow/30 safe-area-top">
                     <h2 className="text-lg font-semibold text-white">Chọn thể loại</h2>
                     <button
                       onClick={handleClose}
-                      className="glass-button p-2 rounded-full touch-manipulation"
+                      className="glass-button p-2 rounded-full touch-manipulation active:scale-95"
                       aria-label="Đóng"
                     >
                       <X size={20} />
@@ -169,7 +169,7 @@ export default function Dropdown({ categories }: DropdownProps) {
                   </div>
 
                   {/* Mobile Search */}
-                  <div className="p-4 bg-gray-900/90 backdrop-blur-md border-b border-white/10">
+                  <div className="p-4 bg-gray-900/95 backdrop-blur-md border-b border-white/10">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                       <input
@@ -192,8 +192,8 @@ export default function Dropdown({ categories }: DropdownProps) {
                             href={`/the-loai/${c.slug}`}
                             onClick={handleCategoryClick}
                             className="glass-button p-4 rounded-xl text-center font-medium transition-all duration-300
-                                     text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30
-                                     border border-transparent touch-manipulation active:scale-95"
+                         text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30
+                         border border-transparent touch-manipulation active:scale-95"
                           >
                             <div className="truncate">{c.name}</div>
                           </Link>
@@ -202,7 +202,7 @@ export default function Dropdown({ categories }: DropdownProps) {
                     </div>
 
                     {/* Mobile Stats */}
-                    <div className="p-4 border-t border-white/10 bg-gray-800/50">
+                    <div className="p-4 border-t border-white/10 bg-gray-800/50 safe-area-bottom">
                       <div className="text-center text-sm text-glass-muted">
                         Hiển thị <span className="text-pink-400 font-semibold">{filtered.length}</span> /{" "}
                         {categories.length} thể loại
@@ -219,9 +219,9 @@ export default function Dropdown({ categories }: DropdownProps) {
                 exit="exit"
                 variants={desktopVariants}
                 className="absolute top-full left-0 mt-2 w-[90vw] max-w-none
-                         sm:left-auto sm:right-0 sm:w-72
-                         md:w-96 lg:w-[600px]
-                         rounded-2xl glass-dark text-white shadow-xl z-50 border border-pink-glow/30"
+             sm:left-auto sm:right-0 sm:w-72
+             md:w-96 lg:w-[600px]
+             rounded-2xl glass-dark text-white shadow-xl z-[100] border border-pink-glow/30"
                 style={{ willChange: "transform, opacity" }}
               >
                 {/* Desktop Search */}
@@ -247,8 +247,8 @@ export default function Dropdown({ categories }: DropdownProps) {
                         href={`/the-loai/${c.slug}`}
                         onClick={handleCategoryClick}
                         className="truncate rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300
-                                 text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30
-                                 border border-transparent"
+                     text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30
+                     border border-transparent"
                       >
                         {c.name}
                       </Link>
