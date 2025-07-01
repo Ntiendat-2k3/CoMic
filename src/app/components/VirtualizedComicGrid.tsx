@@ -12,10 +12,6 @@ interface VirtualizedComicGridProps {
   columnCount?: number
 }
 
-interface CellProps extends GridChildComponentProps {
-  data: Comic[]
-}
-
 const VirtualizedComicGrid = memo(({ comics, width, height, columnCount = 4 }: VirtualizedComicGridProps) => {
   const rowCount = Math.ceil(comics.length / columnCount)
   const columnWidth = width / columnCount
