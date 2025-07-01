@@ -41,8 +41,48 @@ export default function Home() {
           <div className="particle" style={{ left: "90%", animationDelay: "4.5s" }}></div>
         </div>
 
-        {/* Hero Section */}
-        <div className="relative">
+        {/* MOBILE HERO - Compact */}
+        <div className="block md:hidden relative">
+          <div className="container mx-auto px-4 py-8">
+            {/* Mobile Title - Compact */}
+            <div className="text-center mb-6">
+              <div className="floating mb-4">
+                <h1 className="text-4xl font-bold gradient-text mb-3 tracking-tight">TruyenHay</h1>
+                <p className="text-sm text-glass-muted font-light leading-relaxed">
+                  Khám phá thế giới truyện tranh huyền bí
+                </p>
+              </div>
+
+              {/* Mobile Stats - Single Row */}
+              <div className="glass-pink rounded-2xl p-4 mb-6 border-gradient-pink">
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div>
+                    <div className="text-2xl font-bold gradient-text mb-1">10K+</div>
+                    <div className="text-glass-muted text-xs">Truyện</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold gradient-text-accent mb-1">24/7</div>
+                    <div className="text-glass-muted text-xs">Cập nhật</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold gradient-text-secondary mb-1">∞</div>
+                    <div className="text-glass-muted text-xs">Miễn phí</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile CTA - Compact */}
+              <div className="space-y-3">
+                <button className="glass-button w-full px-6 py-3 rounded-full font-semibold pulse-pink">
+                  🌸 Khám phá ngay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* DESKTOP HERO - Full */}
+        <div className="hidden md:block relative">
           <div className="container mx-auto px-4 py-20">
             {/* Main Title */}
             <div className="text-center mb-20">
@@ -83,7 +123,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Dark Glass Feature Cards */}
+            {/* Dark Glass Feature Cards - Desktop Only */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
               <div className="glass-card rounded-3xl p-8 floating group">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 glow-pink">
@@ -128,7 +168,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Dark Pink CTA Section */}
+            {/* Dark Pink CTA Section - Desktop */}
             <div className="text-center mb-20">
               <div className="glass-pink rounded-3xl p-12 max-w-4xl mx-auto border-gradient-pink">
                 <h2 className="text-4xl md:text-5xl font-bold gradient-text mb-6">Bắt đầu cuộc phiêu lưu huyền bí</h2>
@@ -149,11 +189,16 @@ export default function Home() {
         </div>
 
         {/* Comics Grid Section */}
-        <div className="container mx-auto px-4 py-12">
-          <div className="glass-pink rounded-3xl p-10 mb-12 text-center border-gradient-pink">
-            <h2 className="text-4xl md:text-5xl font-bold gradient-text mb-6">Truyện mới cập nhật</h2>
-            <p className="text-glass-muted text-xl mb-6">Những câu chuyện mới nhất được cập nhật hàng ngày</p>
-            <div className="w-32 h-1 bg-gradient-to-r from-pink-500 to-pink-300 rounded-full mx-auto"></div>
+        <div className="container mx-auto px-4 py-6 md:py-12">
+          {/* Section Header - Mobile Optimized */}
+          <div className="glass-pink rounded-2xl md:rounded-3xl p-4 md:p-10 mb-6 md:mb-12 text-center border-gradient-pink">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold gradient-text mb-3 md:mb-6">
+              Truyện mới cập nhật
+            </h2>
+            <p className="text-glass-muted text-sm md:text-xl mb-3 md:mb-6">
+              Những câu chuyện mới nhất được cập nhật hàng ngày
+            </p>
+            <div className="w-16 md:w-32 h-0.5 md:h-1 bg-gradient-to-r from-pink-500 to-pink-300 rounded-full mx-auto"></div>
           </div>
 
           <Suspense fallback={<SkeletonComicGrid />}>
@@ -161,8 +206,8 @@ export default function Home() {
           </Suspense>
         </div>
 
-        {/* Dark Pink Newsletter Section */}
-        <div className="container mx-auto px-4 py-20">
+        {/* Newsletter Section - Desktop Only */}
+        <div className="hidden md:block container mx-auto px-4 py-20">
           <div className="glass-pink rounded-3xl p-16 text-center max-w-5xl mx-auto border-gradient-pink">
             <div className="floating">
               <h2 className="text-4xl md:text-5xl font-bold gradient-text-accent mb-6">
@@ -181,6 +226,17 @@ export default function Home() {
                   🌸 Đăng ký
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Quick Actions - Sticky Bottom */}
+        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
+          <div className="glass-dark rounded-2xl p-3 border-gradient-pink">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <button className="glass-button py-2 rounded-lg text-xs font-medium">📚 Lịch sử</button>
+              <button className="glass-button py-2 rounded-lg text-xs font-medium">❤️ Yêu thích</button>
+              <button className="glass-button py-2 rounded-lg text-xs font-medium">🔍 Tìm kiếm</button>
             </div>
           </div>
         </div>

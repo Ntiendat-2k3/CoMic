@@ -138,74 +138,91 @@
   }
 }
 
-/* ⚡ LOGO LIGHTING ANIMATION */
+/* ⚡ NEW LOGO ANIMATION - Glow Pulse Effect */
 .logo-lighting {
   position: relative;
   background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #ffffff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  background-size: 200% 100%;
-  animation: logo-lighting-sweep 3s ease-in-out infinite;
+  animation: logo-glow-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.5));
 }
 
-.logo-lighting::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.8) 20%,
-    rgba(244, 114, 182, 0.9) 50%,
-    rgba(255, 255, 255, 0.8) 80%,
-    transparent 100%
-  );
-  animation: logo-lighting-flash 3s ease-in-out infinite;
-  z-index: 1;
-  mix-blend-mode: overlay;
-  border-radius: 8px;
+.logo-glow-pulse {
+  position: relative;
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logo-glow-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.5));
 }
 
-@keyframes logo-lighting-sweep {
+@keyframes logo-glow-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.5)) brightness(1);
+    transform: scale(1);
+  }
+  25% {
+    filter: drop-shadow(0 0 15px rgba(244, 114, 182, 0.7)) brightness(1.1);
+    transform: scale(1.02);
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(236, 72, 153, 0.9)) brightness(1.2);
+    transform: scale(1.05);
+  }
+  75% {
+    filter: drop-shadow(0 0 20px rgba(219, 39, 119, 0.8)) brightness(1.1);
+    transform: scale(1.02);
+  }
+}
+
+/* Alternative: Subtle Color Shift Animation */
+.logo-color-shift {
+  background: linear-gradient(135deg, #ec4899, #f472b6, #db2777, #ec4899);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logo-color-wave 4s ease-in-out infinite;
+}
+
+@keyframes logo-color-wave {
   0%,
   100% {
     background-position: 0% 50%;
-    filter: brightness(1) saturate(1);
   }
   25% {
-    background-position: 50% 50%;
-    filter: brightness(1.3) saturate(1.2);
+    background-position: 50% 0%;
   }
   50% {
     background-position: 100% 50%;
-    filter: brightness(1.5) saturate(1.4);
-    text-shadow: 0 0 20px rgba(244, 114, 182, 0.8), 0 0 40px rgba(236, 72, 153, 0.6);
   }
   75% {
-    background-position: 150% 50%;
-    filter: brightness(1.3) saturate(1.2);
+    background-position: 50% 100%;
   }
 }
 
-@keyframes logo-lighting-flash {
+/* Alternative: Breathing Effect */
+.logo-breathing {
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logo-breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes logo-breathe {
   0%,
   100% {
-    left: -100%;
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.3;
+    transform: scale(1);
+    opacity: 0.9;
   }
   50% {
-    left: 100%;
+    transform: scale(1.03);
     opacity: 1;
-  }
-  90% {
-    opacity: 0.3;
   }
 }
 
@@ -653,6 +670,29 @@
   }
 }
 
+/* ✨ ENHANCED SHIMMER ANIMATION */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
 /* Particle Effects - Dark */
 .particles {
   position: fixed;
@@ -790,6 +830,33 @@
   box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
 }
 
+/* 📖 READING MODE SPECIFIC STYLES */
+.reading-mode {
+  /* Hide scrollbar for cleaner reading experience */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.reading-mode::-webkit-scrollbar {
+  display: none;
+}
+
+/* Floating controls for reading mode */
+.reading-controls {
+  position: fixed;
+  z-index: 50;
+  transition: opacity 0.3s ease;
+}
+
+.reading-controls:hover {
+  opacity: 1;
+}
+
+/* Auto-hide controls after inactivity */
+.reading-mode.inactive .reading-controls {
+  opacity: 0.3;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .glass,
@@ -814,9 +881,26 @@
     background: rgba(0, 0, 0, 0.9);
   }
 
-  /* ⚡ MOBILE LOGO LIGHTING */
+  /* ⚡ MOBILE LOGO ANIMATIONS - Reduced */
   .logo-lighting {
     animation-duration: 4s; /* Slower on mobile */
+  }
+
+  .logo-glow-pulse {
+    animation-duration: 4s;
+  }
+
+  .logo-color-shift {
+    animation-duration: 5s;
+  }
+
+  .logo-breathing {
+    animation-duration: 3s;
+  }
+
+  /* 📖 MOBILE READING OPTIMIZATIONS */
+  .reading-controls {
+    font-size: 0.875rem;
   }
 }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Bookmark, BookmarkCheck, Book, ArrowRight, Play, Heart } from "lucide-react"
+import { Bookmark, BookmarkCheck, Book, Play } from "lucide-react"
 
 interface ActionButtonsProps {
   comicSlug: string
@@ -33,46 +33,54 @@ export default function ActionButtons({ comicSlug, firstChapterSlug }: ActionBut
   const handleRead = (slug: string) => () => localStorage.setItem(`lastRead-${comicSlug}`, slug)
 
   return (
-    <div className="flex flex-wrap gap-3">
-      {/* ---------- Theo dõi ---------- */}
-      <button
-        onClick={toggleFollow}
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-          following ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-600 hover:bg-gray-500 text-white"
-        }`}
-      >
-        {following ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-        <span>{following ? "Đang theo dõi" : "Theo dõi"}</span>
-      </button>
-
-      {/* ---------- Đọc từ đầu ---------- */}
-      <Link
-        href={`/truyen-tranh/${comicSlug}/${firstChapterSlug}`}
-        onClick={handleRead(firstChapterSlug)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium bg-green-600 hover:bg-green-700 text-white transition-colors"
-      >
-        <Book size={18} />
-        <span>Đọc từ đầu</span>
-      </Link>
-
-      {/* ---------- Đọc tiếp (nếu đã có) ---------- */}
-      {continueSlug && (
+    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      {/* Primary action - Đọc từ đầu hoặc Đọc tiếp */}
+      {continueSlug ? (
         <Link
           href={`/truyen-tranh/${comicSlug}/${continueSlug}`}
           onClick={handleRead(continueSlug)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium bg-orange-600 hover:bg-orange-700 text-white transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium bg-orange-600 hover:bg-orange-700 text-white transition-colors flex-1 sm:flex-none"
         >
           <Play size={18} />
           <span>Đọc tiếp</span>
-          <ArrowRight size={18} />
+          <span className="hidden sm:inline">({continueSlug})</span>
+        </Link>
+      ) : (
+        <Link
+          href={`/truyen-tranh/${comicSlug}/${firstChapterSlug}`}
+          onClick={handleRead(firstChapterSlug)}
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium bg-green-600 hover:bg-green-700 text-white transition-colors flex-1 sm:flex-none"
+        >
+          <Book size={18} />
+          <span>Đọc từ đầu</span>
         </Link>
       )}
 
-      {/* ---------- Yêu thích ---------- */}
-      <button className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium bg-red-600 hover:bg-red-700 text-white transition-colors">
-        <Heart size={18} />
-        <span>Yêu thích</span>
-      </button>
+      {/* Secondary actions */}
+      <div className="flex gap-2">
+        {/* Theo dõi */}
+        <button
+          onClick={toggleFollow}
+          className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-lg font-medium transition-colors flex-1 sm:flex-none ${
+            following ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-600 hover:bg-gray-500 text-white"
+          }`}
+        >
+          {following ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+          <span className="hidden sm:inline">{following ? "Đã theo dõi" : "Theo dõi"}</span>
+        </button>
+
+        {/* Đọc từ đầu (nếu đang có đọc tiếp) */}
+        {continueSlug && (
+          <Link
+            href={`/truyen-tranh/${comicSlug}/${firstChapterSlug}`}
+            onClick={handleRead(firstChapterSlug)}
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-3 rounded-lg font-medium bg-gray-600 hover:bg-gray-500 text-white transition-colors"
+          >
+            <Book size={18} />
+            <span className="hidden sm:inline">Từ đầu</span>
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
