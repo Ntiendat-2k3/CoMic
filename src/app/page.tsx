@@ -229,17 +229,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* Mobile Quick Actions - Sticky Bottom */}
-        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
-          <div className="glass-dark rounded-2xl p-3 border-gradient-pink">
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <button className="glass-button py-2 rounded-lg text-xs font-medium">📚 Lịch sử</button>
-              <button className="glass-button py-2 rounded-lg text-xs font-medium">❤️ Yêu thích</button>
-              <button className="glass-button py-2 rounded-lg text-xs font-medium">🔍 Tìm kiếm</button>
-            </div>
-          </div>
-        </div>
       </div>
     </LayoutMain>
   )

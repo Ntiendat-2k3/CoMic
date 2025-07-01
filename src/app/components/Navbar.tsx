@@ -5,7 +5,6 @@ import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Menu, Bookmark, Clock, Heart, X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
 
 import OTruyenService from "../services/otruyen.service"
 import type { Category } from "../types/common"
@@ -16,6 +15,7 @@ import { navItems } from "./Sidebar"
 
 const Dropdown = dynamic(() => import("./Dropdown"), {
   loading: () => <div className="w-20 md:w-40 h-6 glass-dark rounded-xl animate-pulse shimmer-pink" />,
+  ssr: false,
 })
 
 interface NavbarProps {
@@ -29,17 +29,6 @@ export default function Navbar({ categories }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const router = useRouter()
-
-  // Prevent body scroll when mobile menu is open
-  useState(() => {
-    if (typeof window !== "undefined") {
-      if (mobileOpen) {
-        document.body.style.overflow = "hidden"
-      } else {
-        document.body.style.overflow = "unset"
-      }
-    }
-  })
 
   const handleSearch = useCallback(async (keyword: string) => {
     if (!keyword.trim()) return setSearchResults([])
@@ -68,36 +57,8 @@ export default function Navbar({ categories }: NavbarProps) {
     setMobileOpen(false)
   }, [])
 
-  // Mobile menu animations
-  const mobileMenuVariants = {
-    hidden: {
-      opacity: 0,
-      y: -20,
-      scale: 0.95,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 300,
-        duration: 0.3,
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      scale: 0.95,
-      transition: {
-        duration: 0.2,
-      },
-    },
-  }
-
   return (
-    <nav className="w-full nav-glass top-0 z-50 border-b border-pink-glow">
+    <nav className="w-full nav-glass top-0 z-40 border-b border-pink-glow">
       {/* Pink Glow Line */}
       <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-pink-500 to-pink-300 opacity-60"></div>
 
@@ -111,7 +72,6 @@ export default function Navbar({ categories }: NavbarProps) {
               </div>
               <div className="absolute inset-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 opacity-30 blur-lg group-hover:opacity-60 transition-opacity duration-300" />
             </div>
-            {/* Updated Logo with new animation */}
             <span className="text-2xl md:text-3xl font-bold text-white group-hover:scale-105 transition-transform duration-300 logo-glow-pulse">
               TruyenHay
             </span>
@@ -170,77 +130,93 @@ export default function Navbar({ categories }: NavbarProps) {
         </div>
 
         {/* Mobile Menu */}
-        <AnimatePresence mode="wait">
-          {mobileOpen && (
-            <motion.div
-              key="mobileMenu"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={mobileMenuVariants}
-              className="fixed inset-0 top-[88px] z-40 bg-gray-900/95 backdrop-blur-md md:hidden"
-              style={{ willChange: "transform, opacity" }}
-            >
-              <div className="flex h-full flex-col overflow-y-auto">
-                <div className="flex-1 p-4 space-y-4">
-                  {/* Search mobile */}
-                  <div className="w-full mb-6">
-                    <Search
-                      searchResults={searchResults}
-                      isLoading={isLoading}
-                      showSuggestions={showSuggestions}
-                      setShowSuggestions={setShowSuggestions}
-                      onSearch={handleSearch}
-                      onSubmit={handleSearchSubmit}
-                    />
+        {mobileOpen && (
+          <div className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
+            <div className="flex h-full flex-col overflow-y-auto">
+              <div className="flex-1 p-4 space-y-4">
+                {/* Search mobile */}
+                <div className="w-full mb-6">
+                  <Search
+                    searchResults={searchResults}
+                    isLoading={isLoading}
+                    showSuggestions={showSuggestions}
+                    setShowSuggestions={setShowSuggestions}
+                    onSearch={handleSearch}
+                    onSubmit={handleSearchSubmit}
+                  />
+                </div>
+
+                {/* Sidebar nav items */}
+                <div className="space-y-3">
+                  {navItems.map(({ href, label, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={`/danh-sach${href}`}
+                      className="glass-button flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95"
+                      onClick={closeMobileMenu}
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 glow-pink">
+                        <Icon size={20} />
+                      </div>
+                      <span className="group-hover:gradient-text transition-all duration-300">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Categories - Simple List for Mobile */}
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-white px-2">Thể loại</h3>
+                  <div className="max-h-60 overflow-y-auto">
+                    <div className="grid grid-cols-2 gap-2">
+                      {categories.slice(0, 20).map((category) => (
+                        <Link
+                          key={category._id}
+                          href={`/the-loai/${category.slug}`}
+                          onClick={closeMobileMenu}
+                          className="glass-button p-3 rounded-xl text-center text-sm font-medium transition-all duration-300 text-glass-muted hover:text-white hover:bg-pink-500/10 touch-manipulation active:scale-95"
+                        >
+                          <div className="truncate">{category.name}</div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
+                  {categories.length > 20 && (
+                    <Link
+                      href="/the-loai"
+                      onClick={closeMobileMenu}
+                      className="glass-button block text-center p-3 rounded-xl text-sm font-medium text-pink-400 hover:text-white hover:bg-pink-500/10 touch-manipulation"
+                    >
+                      Xem tất cả {categories.length} thể loại →
+                    </Link>
+                  )}
+                </div>
 
-                  {/* Sidebar nav items */}
-                  <div className="space-y-3">
-                    {navItems.map(({ href, label, icon: Icon }) => (
-                      <Link
-                        key={href}
-                        href={`/danh-sach${href}`}
-                        className="glass-button flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95"
-                        onClick={closeMobileMenu}
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 glow-pink">
-                          <Icon size={20}/>
-                        </div>
-                        <span className="group-hover:gradient-text transition-all duration-300">{label}</span>
-                      </Link>
-                    ))}
-                  </div>
+                <Link
+                  prefetch
+                  href="/lich-su"
+                  onClick={closeMobileMenu}
+                  className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group touch-manipulation active:scale-95"
+                >
+                  <Clock size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
+                  <span className="group-hover:gradient-text transition-all duration-300">Lịch sử</span>
+                </Link>
 
-                  <Dropdown categories={categories} />
+                <Link
+                  href="/yeu-thich"
+                  className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group glow-pink touch-manipulation active:scale-95"
+                  onClick={closeMobileMenu}
+                >
+                  <Bookmark size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
+                  <span className="group-hover:gradient-text-accent transition-all duration-300">Yêu thích</span>
+                </Link>
 
-                  <Link
-                    prefetch
-                    href="/lich-su"
-                    onClick={closeMobileMenu}
-                    className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group touch-manipulation active:scale-95"
-                  >
-                    <Clock size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
-                    <span className="group-hover:gradient-text transition-all duration-300">Lịch sử</span>
-                  </Link>
-
-                  <Link
-                    href="/yeu-thich"
-                    className="glass-button flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold group glow-pink touch-manipulation active:scale-95"
-                    onClick={closeMobileMenu}
-                  >
-                    <Bookmark size={20} className="group-hover:text-pink-400 transition-colors duration-300" />
-                    <span className="group-hover:gradient-text-accent transition-all duration-300">Yêu thích</span>
-                  </Link>
-
-                  <div className="pt-4">
-                    <AuthButtons />
-                  </div>
+                <div className="pt-4">
+                  <AuthButtons />
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Pink Glow Line */}
