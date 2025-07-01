@@ -11,37 +11,8 @@ const SkeletonComicGrid = dynamic(() => import("./components/home/SkeletonComicG
 export default function Home() {
   return (
     <LayoutMain>
-      {/* 🖤 DARK MYSTICAL BACKGROUND */}
-      <div className="geometric-bg">
-        <div className="geometric-shape"></div>
-        <div className="geometric-shape"></div>
-        <div className="geometric-shape"></div>
-        <div className="geometric-shape"></div>
-        <div className="geometric-shape"></div>
-      </div>
-
-      <div className="geometric-bg">
-        <div className="orb orb-1"></div>
-        <div className="orb orb-2"></div>
-        <div className="orb orb-3"></div>
-      </div>
-
-      <div className="wave-pattern"></div>
-      <div className="grid-overlay"></div>
-
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Dark Pink Floating Particles */}
-        <div className="particles">
-          <div className="particle" style={{ left: "10%", animationDelay: "0s" }}></div>
-          <div className="particle" style={{ left: "20%", animationDelay: "2s" }}></div>
-          <div className="particle" style={{ left: "30%", animationDelay: "4s" }}></div>
-          <div className="particle" style={{ left: "40%", animationDelay: "1s" }}></div>
-          <div className="particle" style={{ left: "60%", animationDelay: "3s" }}></div>
-          <div className="particle" style={{ left: "70%", animationDelay: "5s" }}></div>
-          <div className="particle" style={{ left: "80%", animationDelay: "2.5s" }}></div>
-          <div className="particle" style={{ left: "90%", animationDelay: "4.5s" }}></div>
-        </div>
-
+      {/* Simplified background effects for better performance */}
+      <div className="min-h-screen relative">
         {/* Hero Section - Client Component */}
         <HomeHeroClient />
 
@@ -63,15 +34,13 @@ export default function Home() {
           </Suspense>
         </div>
 
-        {/* Newsletter Section - Client Component */}
-        <div className="hidden md:block container mx-auto px-4 py-20">
+        {/* Newsletter Section - Desktop only để giảm tải mobile */}
+        <div className="hidden lg:block container mx-auto px-4 py-20">
           <div className="glass-pink rounded-3xl p-16 text-center max-w-5xl mx-auto border-gradient-pink">
             <div className="floating">
-              <h2 className="text-4xl md:text-5xl font-bold gradient-text-accent mb-6">
-                Đăng ký nhận thông báo huyền bí
-              </h2>
+              <h2 className="text-4xl md:text-5xl font-bold gradient-text-accent mb-6">Đăng ký nhận thông báo</h2>
               <p className="text-glass-muted mb-12 text-xl leading-relaxed max-w-2xl mx-auto">
-                Nhận thông báo về truyện mới và cập nhật từ các tác giả yêu thích trong thế giới đen huyền bí
+                Nhận thông báo về truyện mới và cập nhật từ các tác giả yêu thích
               </p>
               <NewsletterForm />
             </div>

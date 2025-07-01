@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import type React from "react"
+
+import { useEffect, useRef, useState, useCallback, useMemo, memo } from "react"
 import Link from "next/link"
 import { ChevronDown, X, Search } from "lucide-react"
 import type { Category } from "../types/common"
@@ -9,7 +11,21 @@ interface DropdownProps {
   categories: Category[]
 }
 
-export default function Dropdown({ categories }: DropdownProps) {
+// Memoized Category Item
+const CategoryItem = memo(({ category, onClick }: { category: Category; onClick: () => void }) => (
+  <Link
+    key={category._id}
+    href={`/the-loai/${category.slug}`}
+    onClick={onClick}
+    className="truncate rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30 border border-transparent"
+  >
+    {category.name}
+  </Link>
+))
+
+CategoryItem.displayName = "CategoryItem"
+
+const Dropdown = memo(({ categories }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [isClient, setIsClient] = useState(false)
@@ -18,6 +34,27 @@ export default function Dropdown({ categories }: DropdownProps) {
   // Ensure we're on client side before rendering interactive elements
   useEffect(() => {
     setIsClient(true)
+  }, [])
+
+  // Memoized filtered categories
+  const filteredCategories = useMemo(
+    () => categories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase())),
+    [categories, search],
+  )
+
+  // Memoized event handlers
+  const handleToggle = useCallback(() => {
+    if (!isClient) return
+    setIsOpen((prev) => !prev)
+  }, [isClient])
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false)
+    setSearch("")
+  }, [])
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value)
   }, [])
 
   useEffect(() => {
@@ -53,21 +90,14 @@ export default function Dropdown({ categories }: DropdownProps) {
     }
   }, [isOpen, isClient])
 
-  const filteredCategories = categories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase()))
-
-  const handleToggle = () => {
-    if (!isClient) return
-    setIsOpen(!isOpen)
-  }
-
-  const handleClose = () => {
-    setIsOpen(false)
-    setSearch("")
-  }
-
-  const handleCategoryClick = () => {
-    handleClose()
-  }
+  // Memoized category items
+  const categoryItems = useMemo(
+    () =>
+      filteredCategories.map((category) => (
+        <CategoryItem key={category._id} category={category} onClick={handleClose} />
+      )),
+    [filteredCategories, handleClose],
+  )
 
   // Show static version during SSR and initial hydration
   if (!isClient) {
@@ -85,12 +115,12 @@ export default function Dropdown({ categories }: DropdownProps) {
         <button
           type="button"
           onClick={handleToggle}
-          className="glass-button flex items-center gap-2 rounded-2xl px-4 md:px-6 py-3 font-semibold transition-all duration-300 group touch-manipulation"
+          className="glass-button flex items-center gap-2 rounded-2xl px-4 md:px-6 py-3 font-semibold transition-all duration-200 group touch-manipulation"
           aria-expanded={isOpen}
           aria-haspopup="true"
           suppressHydrationWarning
         >
-          <span className="group-hover:gradient-text transition-all duration-300">Thể loại</span>
+          <span className="group-hover:gradient-text transition-all duration-200">Thể loại</span>
           <ChevronDown
             size={18}
             className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""} group-hover:text-pink-400`}
@@ -108,7 +138,7 @@ export default function Dropdown({ categories }: DropdownProps) {
                   type="text"
                   placeholder="Tìm thể loại..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={handleSearchChange}
                   className="w-full pl-9 pr-4 py-3 rounded-xl glass-input text-white focus:outline-none focus:border-pink-400/50 placeholder-gray-400"
                   autoComplete="off"
                   suppressHydrationWarning
@@ -118,18 +148,7 @@ export default function Dropdown({ categories }: DropdownProps) {
 
             {/* Categories */}
             <div className="max-h-[60vh] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-2 p-4 lg:grid-cols-3">
-                {filteredCategories.map((category) => (
-                  <Link
-                    key={category._id}
-                    href={`/the-loai/${category.slug}`}
-                    onClick={handleCategoryClick}
-                    className="truncate rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30 border border-transparent"
-                  >
-                    {category.name}
-                  </Link>
-                ))}
-              </div>
+              <div className="grid grid-cols-2 gap-2 p-4 lg:grid-cols-3">{categoryItems}</div>
             </div>
 
             {/* Stats */}
@@ -152,7 +171,7 @@ export default function Dropdown({ categories }: DropdownProps) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="glass-button p-2 rounded-full touch-manipulation"
+                className="glass-button p-2 rounded-full touch-manipulation active:scale-95 transition-transform duration-150"
                 aria-label="Đóng"
                 suppressHydrationWarning
               >
@@ -168,7 +187,7 @@ export default function Dropdown({ categories }: DropdownProps) {
                   type="text"
                   placeholder="Tìm thể loại..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={handleSearchChange}
                   className="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-white focus:outline-none focus:border-pink-400/50 placeholder-gray-400"
                   autoComplete="off"
                   suppressHydrationWarning
@@ -184,8 +203,8 @@ export default function Dropdown({ categories }: DropdownProps) {
                     <Link
                       key={category._id}
                       href={`/the-loai/${category.slug}`}
-                      onClick={handleCategoryClick}
-                      className="glass-button p-4 rounded-xl text-center font-medium transition-all duration-300 text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30 border border-transparent touch-manipulation active:scale-95"
+                      onClick={handleClose}
+                      className="glass-button p-4 rounded-xl text-center font-medium transition-all duration-200 text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30 border border-transparent touch-manipulation active:scale-95"
                       suppressHydrationWarning
                     >
                       <div className="truncate">{category.name}</div>
@@ -207,4 +226,8 @@ export default function Dropdown({ categories }: DropdownProps) {
       )}
     </>
   )
-}
+})
+
+Dropdown.displayName = "Dropdown"
+
+export default Dropdown
