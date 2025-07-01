@@ -160,7 +160,7 @@ export default function Navbar({ categories }: NavbarProps) {
 
         {/* Mobile Menu */}
         {mobileOpen && isClient && (
-          <div className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
+          <div className="fixed inset-0 top-[88px] h-screen z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
             <div className="h-full flex flex-col">
               <div className="flex-1 overflow-y-auto">
                 <div className="p-4 space-y-4">
