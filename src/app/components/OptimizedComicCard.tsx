@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { memo, useState, useCallback, useRef, useEffect } from "react"
 import type { Comic } from "../types/comic"
 import { ImageOptimizer, PerformanceOptimizer } from "../lib/performance-optimizer"
@@ -9,14 +10,11 @@ interface OptimizedComicCardProps {
   comic: Comic
   baseImageUrl: string
   priority?: boolean
-  index: number
 }
 
-const OptimizedComicCard = memo(({ comic, baseImageUrl, priority = false, index }: OptimizedComicCardProps) => {
+const OptimizedComicCard = memo(({ comic, baseImageUrl, priority = false }: OptimizedComicCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
-  const imgRef = useRef<HTMLImageElement>(null)
 
   // Memoize static values to prevent recalculation
   const staticValues = useRef({
@@ -27,16 +25,17 @@ const OptimizedComicCard = memo(({ comic, baseImageUrl, priority = false, index 
 
   // Intersection Observer for lazy loading
   useEffect(() => {
-    if (!cardRef.current) return
+    const currentCardRef = cardRef.current
+    if (!currentCardRef) return
 
     const observer = PerformanceOptimizer.getInstance().createLazyLoader(0.1)
     if (observer) {
-      observer.observe(cardRef.current)
+      observer.observe(currentCardRef)
     }
 
     return () => {
-      if (observer && cardRef.current) {
-        observer.unobserve(cardRef.current)
+      if (observer && currentCardRef) {
+        observer.unobserve(currentCardRef)
       }
     }
   }, [])
@@ -44,7 +43,6 @@ const OptimizedComicCard = memo(({ comic, baseImageUrl, priority = false, index 
   // Optimized image loading
   const handleImageLoad = useCallback(() => {
     setImageLoaded(true)
-    setIsVisible(true)
   }, [])
 
   const handleImageError = useCallback(() => {
@@ -87,21 +85,19 @@ const OptimizedComicCard = memo(({ comic, baseImageUrl, priority = false, index 
               </div>
             )}
 
-            {/* Optimized Image with lazy loading */}
-            <img
-              ref={imgRef}
-              src={priority ? optimizedImageUrl : undefined}
-              data-src={!priority ? optimizedImageUrl : undefined}
-              srcSet={priority ? srcSet : undefined}
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+            {/* Optimized Image with Next.js Image component */}
+            <Image
+              src={optimizedImageUrl || "/placeholder.svg"}
               alt={comic.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+              priority={priority}
               loading={priority ? "eager" : "lazy"}
-              decoding="async"
               onLoad={handleImageLoad}
               onError={handleImageError}
-              className={`w-full h-full object-cover transition-all duration-300 will-change-transform ${
+              className={`object-cover transition-all duration-300 will-change-transform ${
                 imageLoaded ? "opacity-100" : "opacity-0"
-              } md:group-hover:scale-105 ${!priority ? "lazy-loading" : ""}`}
+              } md:group-hover:scale-105`}
               style={{
                 transform: "translateZ(0)", // Force GPU acceleration
               }}

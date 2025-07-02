@@ -13,16 +13,20 @@ interface VirtualizedComicGridProps {
   containerHeight?: number
 }
 
+interface VisibleRange {
+  start: number
+  end: number
+}
+
 const VirtualizedComicGrid = memo(
   ({ comics, itemsPerRow = 4, itemHeight = 400, containerHeight = 600 }: VirtualizedComicGridProps) => {
-    const [visibleRange, setVisibleRange] = useState({ start: 0, end: 0 })
-    const [scrollTop, setScrollTop] = useState(0)
+    const [visibleRange, setVisibleRange] = useState<VisibleRange>({ start: 0, end: 0 })
     const containerRef = useRef<HTMLDivElement>(null)
     const scrollingRef = useRef(false)
 
     // Calculate visible items based on scroll position
     const calculateVisibleRange = useCallback(
-      (scrollTop: number) => {
+      (scrollTop: number): VisibleRange => {
         const rowHeight = itemHeight + 24 // Include gap
         const startRow = Math.floor(scrollTop / rowHeight)
         const endRow = Math.min(
@@ -41,13 +45,12 @@ const VirtualizedComicGrid = memo(
     // Optimized scroll handler with RAF
     const handleScroll = useCallback(
       (e: React.UIEvent<HTMLDivElement>) => {
-        const scrollTop = e.currentTarget.scrollTop
-        setScrollTop(scrollTop)
+        const currentScrollTop = e.currentTarget.scrollTop
 
         if (!scrollingRef.current) {
           scrollingRef.current = true
           requestAnimationFrame(() => {
-            const newRange = calculateVisibleRange(scrollTop)
+            const newRange = calculateVisibleRange(currentScrollTop)
             setVisibleRange(newRange)
             scrollingRef.current = false
           })
@@ -95,7 +98,6 @@ const VirtualizedComicGrid = memo(
                   comic={comic}
                   baseImageUrl={`https://img.otruyenapi.com/uploads/comics/${comic.thumb_url}`}
                   priority={visibleRange.start + index < 8}
-                  index={visibleRange.start + index}
                 />
               ))}
             </div>

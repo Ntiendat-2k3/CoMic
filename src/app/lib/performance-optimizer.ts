@@ -1,4 +1,20 @@
 // Advanced Performance Optimization System
+interface CacheItem {
+  data: unknown
+  timestamp: number
+  ttl: number
+}
+
+interface MemoryInfo {
+  usedJSHeapSize: number
+  totalJSHeapSize: number
+  jsHeapSizeLimit: number
+}
+
+interface PerformanceWithMemory extends Performance {
+  memory?: MemoryInfo
+}
+
 export class PerformanceOptimizer {
   private static instance: PerformanceOptimizer
   private observers: Map<string, IntersectionObserver> = new Map()
@@ -93,7 +109,7 @@ export class PerformanceOptimizer {
   private loadComponent(componentName: string) {
     // Dynamic import based on component name
     import(`../components/${componentName}`)
-      .then((module) => {
+      .then(() => {
         console.log(`Component ${componentName} loaded`)
       })
       .catch((error) => {
@@ -152,19 +168,19 @@ export const ImageOptimizer = {
 }
 
 // Virtual scrolling for large lists
-export class VirtualScroller {
+export class VirtualScroller<T = unknown> {
   private container: HTMLElement
-  private items: any[]
+  private items: T[]
   private itemHeight: number
   private visibleCount: number
   private scrollTop = 0
-  private renderCallback: (items: any[], startIndex: number) => void
+  private renderCallback: (items: T[], startIndex: number) => void
 
   constructor(
     container: HTMLElement,
-    items: any[],
+    items: T[],
     itemHeight: number,
-    renderCallback: (items: any[], startIndex: number) => void,
+    renderCallback: (items: T[], startIndex: number) => void,
   ) {
     this.container = container
     this.items = items
@@ -203,7 +219,7 @@ export class VirtualScroller {
     this.renderCallback(visibleItems, startIndex)
   }
 
-  updateItems(newItems: any[]) {
+  updateItems(newItems: T[]) {
     this.items = newItems
     this.render()
   }
@@ -232,9 +248,12 @@ export const BundleAnalyzer = {
 
   // Memory usage tracking
   trackMemoryUsage() {
-    if (typeof window === "undefined" || !("memory" in performance)) return
+    if (typeof window === "undefined") return
 
-    const memory = (performance as any).memory
+    const perf = performance as PerformanceWithMemory
+    if (!perf.memory) return
+
+    const memory = perf.memory
     console.log("Memory Usage:", {
       used: `${(memory.usedJSHeapSize / 1048576).toFixed(2)} MB`,
       total: `${(memory.totalJSHeapSize / 1048576).toFixed(2)} MB`,
