@@ -273,7 +273,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
         {/* Optimized Mobile Menu - Simplified */}
         {mobileOpen && isClient && (
           <div
-            className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 md:hidden"
+            className="fixed inset-0 top-[88px] h-fit z-30 bg-gray-900/95 md:hidden"
             style={{
               willChange: "transform",
               transform: "translate3d(0, 0, 0)",
