@@ -1,10 +1,4 @@
 // Advanced Performance Optimization System
-interface CacheItem {
-  data: unknown
-  timestamp: number
-  ttl: number
-}
-
 interface MemoryInfo {
   usedJSHeapSize: number
   totalJSHeapSize: number

@@ -56,9 +56,8 @@ const OptimizedComicCard = memo(({ comic, baseImageUrl, priority = false }: Opti
     }
   }, [comic.slug])
 
-  // Generate optimized image URLs
+  // Generate optimized image URL
   const optimizedImageUrl = ImageOptimizer.getOptimizedUrl(baseImageUrl, 300, 80)
-  const srcSet = ImageOptimizer.generateSrcSet(baseImageUrl, [150, 300, 450])
 
   return (
     <div

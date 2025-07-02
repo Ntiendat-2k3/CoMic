@@ -1,7 +1,20 @@
 // Advanced caching system
+interface CacheItem<T = unknown> {
+  data: T
+  timestamp: number
+  ttl: number
+}
+
+interface IndexedDBCacheItem<T = unknown> {
+  key: string
+  data: T
+  timestamp: number
+  ttl: number
+}
+
 export class AdvancedCacheManager {
   private static instance: AdvancedCacheManager
-  private memoryCache = new Map<string, { data: any; timestamp: number; ttl: number }>()
+  private memoryCache = new Map<string, CacheItem>()
   private readonly MAX_MEMORY_ITEMS = 100
   private readonly DEFAULT_TTL = 5 * 60 * 1000 // 5 minutes
 
@@ -46,7 +59,7 @@ export class AdvancedCacheManager {
       return null
     }
 
-    return item.data
+    return item.data as T
   }
 
   private setInMemory<T>(key: string, data: T, ttl: number) {
@@ -72,7 +85,7 @@ export class AdvancedCacheManager {
       const db = await this.openDB()
       const transaction = db.transaction(["cache"], "readonly")
       const store = transaction.objectStore("cache")
-      const result = await this.promisifyRequest(store.get(key))
+      const result = await this.promisifyRequest<IndexedDBCacheItem<T>>(store.get(key))
 
       if (!result) return null
 
