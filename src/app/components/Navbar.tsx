@@ -13,19 +13,19 @@ import type { Category } from "../types/common"
 import type { Comic } from "../types/comic"
 import { navItems } from "./Sidebar"
 
-// Lazy load heavy components
+// Lazy load heavy components with better loading states
 const Search = dynamic(() => import("./Search"), {
-  loading: () => <div className="w-full max-w-lg h-10 glass-dark rounded-lg animate-pulse" />,
+  loading: () => <div className="w-full max-w-lg h-10 bg-gray-800/30 rounded-lg" />,
   ssr: false,
 })
 
 const AuthButtons = dynamic(() => import("./AuthButtons"), {
-  loading: () => <div className="w-20 h-8 glass-dark rounded-lg animate-pulse" />,
+  loading: () => <div className="w-20 h-8 bg-gray-800/30 rounded-lg" />,
   ssr: false,
 })
 
 const Dropdown = dynamic(() => import("./Dropdown"), {
-  loading: () => <div className="w-20 md:w-32 h-8 glass-dark rounded-xl animate-pulse" />,
+  loading: () => <div className="w-20 md:w-32 h-8 bg-gray-800/30 rounded-xl" />,
   ssr: false,
 })
 
@@ -33,16 +33,15 @@ interface NavbarProps {
   categories: Category[]
 }
 
-// Memoized Logo Component
+// Optimized Logo Component with reduced effects
 const Logo = memo(() => (
   <Link href="/" className="flex items-center space-x-4 group">
     <div className="relative">
-      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center md:group-hover:scale-105 transition-transform duration-200 will-change-transform">
+      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center transform-gpu transition-transform duration-200 md:group-hover:scale-105">
         <Heart className="w-6 h-6 text-white fill-current" />
       </div>
-      <div className="absolute inset-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 opacity-20 blur-lg md:group-hover:opacity-40 transition-opacity duration-200" />
     </div>
-    <span className="text-2xl md:text-3xl font-bold text-white md:group-hover:scale-105 transition-transform duration-200 will-change-transform logo-glow-pulse">
+    <span className="text-2xl md:text-3xl font-bold text-white transform-gpu transition-transform duration-200 md:group-hover:scale-105">
       TruyenHay
     </span>
   </Link>
@@ -50,7 +49,7 @@ const Logo = memo(() => (
 
 Logo.displayName = "Logo"
 
-// Memoized Navigation Link Component
+// Optimized Navigation Link Component
 const NavLink = memo(
   ({
     href,
@@ -67,19 +66,19 @@ const NavLink = memo(
   }) => (
     <Link
       href={href}
-      className={`glass-button flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold group transition-all duration-200 ${className}`}
+      className={`bg-gray-800/40 border border-gray-700/50 flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold group transition-all duration-200 transform-gpu md:hover:bg-gray-700/50 md:hover:border-pink-500/30 ${className}`}
       onClick={onClick}
       prefetch={false}
     >
       <Icon size={18} className="md:group-hover:text-pink-400 transition-colors duration-200" />
-      <span className="md:group-hover:gradient-text transition-all duration-200">{label}</span>
+      <span className="md:group-hover:text-pink-300 transition-colors duration-200">{label}</span>
     </Link>
   ),
 )
 
 NavLink.displayName = "NavLink"
 
-// Memoized Mobile Menu Item
+// Simplified Mobile Menu Item
 const MobileMenuItem = memo(
   ({
     href,
@@ -94,20 +93,20 @@ const MobileMenuItem = memo(
   }) => (
     <Link
       href={href}
-      className="glass-button flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95 transition-transform duration-150"
+      className="bg-gray-800/40 border border-gray-700/50 flex w-full items-center gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95 transition-transform duration-150 md:hover:bg-gray-700/50"
       onClick={onClick}
     >
       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600">
         <Icon size={20} />
       </div>
-      <span className="md:group-hover:gradient-text transition-all duration-200">{label}</span>
+      <span className="md:group-hover:text-pink-300 transition-colors duration-200">{label}</span>
     </Link>
   ),
 )
 
 MobileMenuItem.displayName = "MobileMenuItem"
 
-// Main Navbar Component
+// Main Navbar Component - Heavily Optimized
 const Navbar = memo(({ categories }: NavbarProps) => {
   const [searchResults, setSearchResults] = useState<Comic[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -122,24 +121,28 @@ const Navbar = memo(({ categories }: NavbarProps) => {
     setIsClient(true)
   }, [])
 
-  // Prevent body scroll when mobile menu is open
+  // Prevent body scroll when mobile menu is open - optimized
   useEffect(() => {
     if (!isClient) return
 
-    if (mobileOpen && typeof window !== "undefined") {
+    if (mobileOpen) {
       document.body.style.overflow = "hidden"
-    } else if (typeof window !== "undefined") {
-      document.body.style.overflow = "unset"
+      document.body.style.position = "fixed"
+      document.body.style.width = "100%"
+    } else {
+      document.body.style.overflow = ""
+      document.body.style.position = ""
+      document.body.style.width = ""
     }
 
     return () => {
-      if (typeof window !== "undefined") {
-        document.body.style.overflow = "unset"
-      }
+      document.body.style.overflow = ""
+      document.body.style.position = ""
+      document.body.style.width = ""
     }
   }, [mobileOpen, isClient])
 
-  // Memoized search handler
+  // Debounced search handler
   const handleSearch = useCallback(async (keyword: string) => {
     if (!keyword.trim()) {
       setSearchResults([])
@@ -159,7 +162,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
     }
   }, [])
 
-  // Memoized search submit handler
+  // Optimized search submit handler
   const handleSearchSubmit = useCallback(
     (keyword: string) => {
       router.push(`/tim-kiem?keyword=${encodeURIComponent(keyword)}`)
@@ -168,7 +171,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
     [router],
   )
 
-  // Memoized mobile menu handlers
+  // Optimized mobile menu handlers
   const closeMobileMenu = useCallback(() => {
     setMobileOpen(false)
     setMobileCategoriesOpen(false)
@@ -191,28 +194,32 @@ const Navbar = memo(({ categories }: NavbarProps) => {
     [closeMobileMenu],
   )
 
-  // Memoized categories grid
-  const categoriesGrid = useMemo(
-    () => (
+  // Simplified categories grid - only render when open
+  const categoriesGrid = useMemo(() => {
+    if (!mobileCategoriesOpen) return null
+
+    return (
       <div className="grid grid-cols-2 gap-2">
-        {categories.map((category) => (
+        {categories.slice(0, 20).map((category) => (
           <Link
             key={category._id}
             href={`/the-loai/${category.slug}`}
             onClick={closeMobileMenu}
-            className="glass-button p-3 rounded-xl text-center text-sm font-medium transition-all duration-200 text-glass-muted md:hover:text-white md:hover:bg-pink-500/10 touch-manipulation active:scale-95"
+            className="bg-gray-800/40 border border-gray-700/50 p-3 rounded-xl text-center text-sm font-medium transition-all duration-200 text-gray-300 md:hover:text-white md:hover:bg-gray-700/50 touch-manipulation active:scale-95"
           >
             <div className="truncate">{category.name}</div>
           </Link>
         ))}
       </div>
-    ),
-    [categories, closeMobileMenu],
-  )
+    )
+  }, [categories, closeMobileMenu, mobileCategoriesOpen])
 
   return (
-    <nav className="w-full nav-glass top-0 z-40 border-b border-pink-glow">
-      {/* Pink Glow Line */}
+    <nav
+      className="w-full sticky top-0 z-40 bg-gray-900/80 border-b border-pink-500/20"
+      style={{ willChange: "transform" }}
+    >
+      {/* Simplified Pink Glow Line */}
       <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-pink-500 to-pink-300 opacity-60"></div>
 
       <div className="mx-auto flex-col lg:flex max-w-7xl flex-wrap items-center justify-between gap-y-4 px-4 py-5 md:flex-nowrap">
@@ -229,7 +236,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
             <button
               aria-label="Toggle navigation"
               onClick={toggleMobileMenu}
-              className="glass-button p-3 rounded-2xl md:hidden touch-manipulation transition-transform duration-150 active:scale-95"
+              className="bg-gray-800/40 border border-gray-700/50 p-3 rounded-2xl md:hidden touch-manipulation transition-transform duration-150 active:scale-95 transform-gpu"
               suppressHydrationWarning
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -257,16 +264,22 @@ const Navbar = memo(({ categories }: NavbarProps) => {
           {isClient && <Dropdown categories={categories} />}
 
           <NavLink href="/lich-su" icon={Clock} label="Lịch sử" />
-          <NavLink href="/yeu-thich" icon={Bookmark} label="Yêu thích" className="glow-pink" />
+          <NavLink href="/yeu-thich" icon={Bookmark} label="Yêu thích" className="border-pink-500/30 bg-pink-500/10" />
 
           {/* Auth */}
           {isClient && <AuthButtons />}
         </div>
 
-        {/* Mobile Menu */}
+        {/* Optimized Mobile Menu - Simplified */}
         {mobileOpen && isClient && (
-          <div className="fixed inset-0 top-[88px] h-fit z-30 bg-gray-900/95 backdrop-blur-md md:hidden">
-            <div className="h-full flex flex-col">
+          <div
+            className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 md:hidden"
+            style={{
+              willChange: "transform",
+              transform: "translate3d(0, 0, 0)",
+            }}
+          >
+            <div className="h-full flex flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto">
                 <div className="p-4 space-y-4">
                   {/* Search mobile */}
@@ -288,14 +301,14 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                   <div className="space-y-3">
                     <button
                       onClick={toggleMobileCategories}
-                      className="glass-button flex w-full items-center justify-between gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95 transition-transform duration-150"
+                      className="bg-gray-800/40 border border-gray-700/50 flex w-full items-center justify-between gap-4 rounded-2xl p-4 font-semibold group touch-manipulation active:scale-95 transition-transform duration-150"
                       suppressHydrationWarning
                     >
                       <div className="flex items-center gap-4">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600">
                           <Heart size={20} />
                         </div>
-                        <span className="md:group-hover:gradient-text transition-all duration-200">Thể loại</span>
+                        <span className="md:group-hover:text-pink-300 transition-colors duration-200">Thể loại</span>
                       </div>
                       <ChevronDown
                         size={18}
@@ -303,9 +316,11 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                       />
                     </button>
 
-                    {/* Categories List - Collapsible */}
+                    {/* Categories List - Conditional Render */}
                     {mobileCategoriesOpen && (
-                      <div className="bg-gray-800/50 rounded-2xl p-4 max-h-60 overflow-y-auto">{categoriesGrid}</div>
+                      <div className="bg-gray-800/30 border border-gray-700/50 rounded-2xl p-4 max-h-60 overflow-y-auto">
+                        {categoriesGrid}
+                      </div>
                     )}
                   </div>
 
@@ -314,7 +329,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                     href="/yeu-thich"
                     icon={Bookmark}
                     label="Yêu thích"
-                    className="glow-pink"
+                    className="border-pink-500/30 bg-pink-500/10"
                     onClick={closeMobileMenu}
                   />
 
