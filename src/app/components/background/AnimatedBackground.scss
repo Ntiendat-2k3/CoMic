@@ -1,0 +1,202 @@
+/* Animated gradient background */
+.animated-gradient-bg {
+  background: linear-gradient(
+    45deg,
+    rgba(236, 72, 153, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 25%,
+    rgba(219, 39, 119, 0.1) 50%,
+    rgba(168, 85, 247, 0.1) 75%,
+    rgba(236, 72, 153, 0.1) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Floating orbs */
+.floating-orb {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, rgba(236, 72, 153, 0.1) 70%, transparent 100%);
+  animation: float-orb 20s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+.floating-orb:nth-child(odd) {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0.1) 70%, transparent 100%);
+}
+
+@keyframes float-orb {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(50px, -100px) scale(1.2);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-30px, -200px) scale(0.8);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(80px, -150px) scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+/* Geometric shapes */
+.geometric-shape {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(45deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+  animation: rotate-shape 25s linear infinite;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.geometric-shape:nth-child(even) {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  background: linear-gradient(45deg, rgba(219, 39, 119, 0.2), rgba(168, 85, 247, 0.2));
+}
+
+@keyframes rotate-shape {
+  0% {
+    transform: rotate(0deg) translate(0, 0);
+    opacity: 0.2;
+  }
+  25% {
+    transform: rotate(90deg) translate(100px, -50px);
+    opacity: 0.5;
+  }
+  50% {
+    transform: rotate(180deg) translate(50px, -100px);
+    opacity: 0.3;
+  }
+  75% {
+    transform: rotate(270deg) translate(-50px, -75px);
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(360deg) translate(0, 0);
+    opacity: 0.2;
+  }
+}
+
+/* Wave animation */
+.wave-container {
+  overflow: hidden;
+}
+
+.wave-svg {
+  width: 100%;
+  height: 100%;
+  animation: wave-move 8s ease-in-out infinite;
+}
+
+.wave-path {
+  fill: rgba(236, 72, 153, 0.1);
+  animation: wave-color 6s ease-in-out infinite alternate;
+}
+
+@keyframes wave-move {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-50px);
+  }
+}
+
+@keyframes wave-color {
+  0% {
+    fill: rgba(236, 72, 153, 0.1);
+  }
+  50% {
+    fill: rgba(139, 92, 246, 0.1);
+  }
+  100% {
+    fill: rgba(219, 39, 119, 0.1);
+  }
+}
+
+/* Starfield effect */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.star:nth-child(3n) {
+  width: 1px;
+  height: 1px;
+  background: rgba(236, 72, 153, 0.8);
+}
+
+.star:nth-child(5n) {
+  width: 3px;
+  height: 3px;
+  background: rgba(139, 92, 246, 0.6);
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .floating-orb {
+    width: 40px;
+    height: 40px;
+    animation-duration: 25s;
+  }
+
+  .geometric-shape {
+    width: 30px;
+    height: 30px;
+    animation-duration: 30s;
+  }
+
+  .star {
+    animation-duration: 4s;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient-bg,
+  .floating-orb,
+  .geometric-shape,
+  .wave-svg,
+  .wave-path,
+  .star {
+    animation: none !important;
+  }
+
+  .animated-gradient-bg {
+    background: rgba(236, 72, 153, 0.05);
+  }
+}

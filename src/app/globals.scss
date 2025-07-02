@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+@import "./components/background/AnimatedBackground.scss";
 
 @layer base {
   :root {
@@ -92,40 +93,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  /* 🖤 OPTIMIZED BACKGROUND - Reduced complexity for better performance */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -10;
-    background: radial-gradient(circle at 20% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(219, 39, 119, 0.06) 0%, transparent 50%),
-      linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #0f0f0f 50%, #1e1e1e 75%, #0d0d0d 100%);
-    /* Optimize for GPU */
-    will-change: transform;
-    transform: translateZ(0);
-  }
-
-  /* Simplified pattern layer - reduced animation complexity */
-  body::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -9;
-    opacity: 0.02;
-    background-image: radial-gradient(circle at 25% 25%, #ec4899 1px, transparent 1px);
-    background-size: 100px 100px;
-    /* Optimize for GPU */
-    will-change: transform;
-    transform: translateZ(0);
-  }
 }
 
 /* ⚡ PERFORMANCE OPTIMIZATIONS */
@@ -140,32 +107,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ⚡ OPTIMIZED LOGO ANIMATIONS */
-.logo-glow-pulse {
-  position: relative;
-  background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #ffffff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: logo-glow-pulse 6s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.3));
-  /* GPU optimization */
-  will-change: filter, transform;
-  transform: translateZ(0);
-}
-
-@keyframes logo-glow-pulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.3));
-    transform: translateZ(0) scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 12px rgba(236, 72, 153, 0.5));
-    transform: translateZ(0) scale(1.01);
-  }
-}
-
-/* 🌟 OPTIMIZED GLASSMORPHISM STYLES */
+/* 🌟 GLASSMORPHISM STYLES */
 .glass {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
@@ -197,12 +139,10 @@
   border: 1px solid rgba(236, 72, 153, 0.2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
-  /* GPU optimization */
   will-change: transform, background;
   transform: translateZ(0);
 }
 
-/* Desktop-only hover effects */
 @media (min-width: 768px) {
   .glass-card:hover {
     background: rgba(236, 72, 153, 0.15);
@@ -222,12 +162,10 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  /* GPU optimization */
   will-change: transform, background;
   transform: translateZ(0);
 }
 
-/* Desktop-only hover effects */
 @media (min-width: 768px) {
   .glass-button:hover {
     background: rgba(236, 72, 153, 0.2);
@@ -279,17 +217,15 @@
   background-clip: text;
 }
 
-/* 🌟 OPTIMIZED FLOATING ANIMATIONS - Reduced complexity */
+/* 🌟 FLOATING ANIMATIONS */
 .floating {
   animation: float 10s ease-in-out infinite;
-  /* GPU optimization */
   will-change: transform;
   transform: translateZ(0);
 }
 
 .floating-delayed {
   animation: float 10s ease-in-out infinite 3s;
-  /* GPU optimization */
   will-change: transform;
   transform: translateZ(0);
 }
@@ -300,6 +236,26 @@
   }
   50% {
     transform: translateZ(0) translateY(-8px);
+  }
+}
+
+/* 🎨 NEW BACKGROUND ANIMATIONS */
+@keyframes float-glow {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translate(-50%, -50%) translate(100px, -50px) scale(1.2) rotate(90deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) translate(-50px, -100px) scale(0.8) rotate(180deg);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-50%, -50%) translate(150px, 50px) scale(1.1) rotate(270deg);
+    opacity: 0.8;
   }
 }
 
@@ -317,7 +273,7 @@
   animation: shimmer 2s infinite;
 }
 
-/* Glow Effects - Optimized */
+/* Glow Effects */
 .glow-pink {
   box-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
 }
@@ -328,7 +284,6 @@
 
 .pulse-pink {
   animation: pulse-pink 4s ease-in-out infinite;
-  /* GPU optimization */
   will-change: box-shadow;
 }
 
@@ -341,7 +296,7 @@
   }
 }
 
-/* Navigation - Optimized */
+/* Navigation */
 .nav-glass {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(12px);
@@ -350,7 +305,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Custom Scrollbar - Optimized */
+/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -366,7 +321,7 @@
   border-radius: 6px;
 }
 
-/* Global Scrollbar - Optimized */
+/* Global Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -453,26 +408,19 @@
     -webkit-backdrop-filter: blur(4px);
   }
 
-  /* Reduce animations on mobile */
   .floating,
   .floating-delayed {
     animation-duration: 15s;
-  }
-
-  .logo-glow-pulse {
-    animation-duration: 8s;
   }
 
   .pulse-pink {
     animation-duration: 6s;
   }
 
-  /* Optimize scrolling */
   * {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Remove hover effects on mobile */
   .glass-button:hover,
   .glass-card:hover {
     transform: none;
@@ -507,8 +455,8 @@
 
   .floating,
   .floating-delayed,
-  .logo-glow-pulse,
-  .pulse-pink {
+  .pulse-pink,
+  .animate-shimmer {
     animation: none !important;
   }
 }
@@ -521,12 +469,5 @@
   .glass-card {
     border-width: 2px;
     border-color: #ec4899;
-  }
-}
-
-/* Dark mode optimizations */
-@media (prefers-color-scheme: dark) {
-  body::before {
-    opacity: 0.8;
   }
 }

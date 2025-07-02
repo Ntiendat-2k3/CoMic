@@ -25,7 +25,20 @@ const ROUTE_STRATEGIES = {
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(["/", "/manifest.json", "/icon-192.png", "/icon-512.png"])
+      // Only cache files that actually exist
+      return cache
+        .addAll([
+          "/",
+          // Remove manifest.json and icon files if they don't exist
+          // "/manifest.json",
+          // "/icon-192.png",
+          // "/icon-512.png"
+        ])
+        .catch((error) => {
+          console.log("Cache addAll failed:", error)
+          // Continue anyway, don't fail the install
+          return Promise.resolve()
+        })
     }),
   )
   self.skipWaiting()
