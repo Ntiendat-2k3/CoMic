@@ -37,12 +37,12 @@ interface NavbarProps {
 const Logo = memo(() => (
   <Link href="/" className="flex items-center space-x-4 group">
     <div className="relative">
-      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 will-change-transform">
+      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center md:group-hover:scale-105 transition-transform duration-200 will-change-transform">
         <Heart className="w-6 h-6 text-white fill-current" />
       </div>
-      <div className="absolute inset-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 opacity-20 blur-lg group-hover:opacity-40 transition-opacity duration-200" />
+      <div className="absolute inset-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 opacity-20 blur-lg md:group-hover:opacity-40 transition-opacity duration-200" />
     </div>
-    <span className="text-2xl md:text-3xl font-bold text-white group-hover:scale-105 transition-transform duration-200 will-change-transform logo-glow-pulse">
+    <span className="text-2xl md:text-3xl font-bold text-white md:group-hover:scale-105 transition-transform duration-200 will-change-transform logo-glow-pulse">
       TruyenHay
     </span>
   </Link>
@@ -71,8 +71,8 @@ const NavLink = memo(
       onClick={onClick}
       prefetch={false}
     >
-      <Icon size={18} className="group-hover:text-pink-400 transition-colors duration-200" />
-      <span className="group-hover:gradient-text transition-all duration-200">{label}</span>
+      <Icon size={18} className="md:group-hover:text-pink-400 transition-colors duration-200" />
+      <span className="md:group-hover:gradient-text transition-all duration-200">{label}</span>
     </Link>
   ),
 )
@@ -100,7 +100,7 @@ const MobileMenuItem = memo(
       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600">
         <Icon size={20} />
       </div>
-      <span className="group-hover:gradient-text transition-all duration-200">{label}</span>
+      <span className="md:group-hover:gradient-text transition-all duration-200">{label}</span>
     </Link>
   ),
 )
@@ -200,7 +200,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
             key={category._id}
             href={`/the-loai/${category.slug}`}
             onClick={closeMobileMenu}
-            className="glass-button p-3 rounded-xl text-center text-sm font-medium transition-all duration-200 text-glass-muted hover:text-white hover:bg-pink-500/10 touch-manipulation active:scale-95"
+            className="glass-button p-3 rounded-xl text-center text-sm font-medium transition-all duration-200 text-glass-muted md:hover:text-white md:hover:bg-pink-500/10 touch-manipulation active:scale-95"
           >
             <div className="truncate">{category.name}</div>
           </Link>
@@ -295,11 +295,11 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600">
                           <Heart size={20} />
                         </div>
-                        <span className="group-hover:gradient-text transition-all duration-200">Thể loại</span>
+                        <span className="md:group-hover:gradient-text transition-all duration-200">Thể loại</span>
                       </div>
                       <ChevronDown
                         size={18}
-                        className={`transition-transform duration-200 ${mobileCategoriesOpen ? "rotate-180" : ""} group-hover:text-pink-400`}
+                        className={`transition-transform duration-200 ${mobileCategoriesOpen ? "rotate-180" : ""} md:group-hover:text-pink-400`}
                       />
                     </button>
 

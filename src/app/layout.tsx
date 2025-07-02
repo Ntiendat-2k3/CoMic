@@ -5,6 +5,7 @@ import "./globals.scss"
 import { ClerkProvider } from "@clerk/nextjs"
 import ErrorBoundary from "./components/ErrorBoundary"
 import ProgressiveWebApp from "./components/ProgressiveWebApp"
+import PerformanceMonitor from "./components/PerformanceMonitor"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -104,8 +105,8 @@ export default function RootLayout({
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="vi" suppressHydrationWarning>
         <head>
-          {/* Preconnect to external domains */}
-          <link rel="preconnect" href="https://img.otruyenapi.com" />
+          {/* Critical resource hints */}
+          <link rel="preconnect" href="https://img.otruyenapi.com" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://otruyenapi.com" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -114,8 +115,18 @@ export default function RootLayout({
           <link rel="dns-prefetch" href="https://img.otruyenapi.com" />
           <link rel="dns-prefetch" href="https://otruyenapi.com" />
 
+          {/* Preload critical CSS */}
+          <link rel="preload" href="/globals.css" as="style" />
+
           {/* Viewport meta for better mobile experience */}
-          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover"
+          />
+
+          {/* Performance hints */}
+          <meta httpEquiv="x-dns-prefetch-control" content="on" />
+          <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
 
           {/* Theme color for mobile browsers */}
           <meta name="theme-color" content="#ec4899" />
@@ -144,12 +155,38 @@ export default function RootLayout({
               }),
             }}
           />
+
+          {/* Critical CSS inlined */}
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+              /* Critical above-the-fold styles */
+              body {
+                font-family: system-ui, -apple-system, sans-serif;
+                background: #0a0a0a;
+                color: #ffffff;
+                margin: 0;
+                overflow-x: hidden;
+              }
+              .loading-skeleton {
+                background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+                background-size: 200% 100%;
+                animation: loading 1.5s infinite;
+              }
+              @keyframes loading {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+              }
+            `,
+            }}
+          />
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${loveYaLikeASister.variable} optimize-text`}
           suppressHydrationWarning
         >
           <ErrorBoundary>
+            <PerformanceMonitor />
             {children}
             <ProgressiveWebApp />
           </ErrorBoundary>

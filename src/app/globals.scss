@@ -202,11 +202,14 @@
   transform: translateZ(0);
 }
 
-.glass-card:hover {
-  background: rgba(236, 72, 153, 0.15);
-  border-color: rgba(236, 72, 153, 0.5);
-  transform: translateZ(0) translateY(-2px) scale(1.005);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+/* Desktop-only hover effects */
+@media (min-width: 768px) {
+  .glass-card:hover {
+    background: rgba(236, 72, 153, 0.15);
+    border-color: rgba(236, 72, 153, 0.5);
+    transform: translateZ(0) translateY(-2px) scale(1.005);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
 }
 
 .glass-button {
@@ -224,11 +227,14 @@
   transform: translateZ(0);
 }
 
-.glass-button:hover {
-  background: rgba(236, 72, 153, 0.2);
-  border-color: rgba(244, 114, 182, 0.6);
-  transform: translateZ(0) translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+/* Desktop-only hover effects */
+@media (min-width: 768px) {
+  .glass-button:hover {
+    background: rgba(236, 72, 153, 0.2);
+    border-color: rgba(244, 114, 182, 0.6);
+    transform: translateZ(0) translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .glass-input {
@@ -466,10 +472,13 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Reduce motion blur on mobile */
+  /* Remove hover effects on mobile */
   .glass-button:hover,
   .glass-card:hover {
     transform: none;
+    background: inherit;
+    border-color: inherit;
+    box-shadow: inherit;
   }
 }
 

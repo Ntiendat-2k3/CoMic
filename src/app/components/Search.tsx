@@ -23,7 +23,7 @@ interface SearchProps {
 const SearchResultItem = memo(({ comic, onClick }: { comic: Comic; onClick: () => void }) => (
   <Link
     href={`/truyen-tranh/${comic.slug}`}
-    className="flex items-center gap-3 p-3 hover:bg-primary-light/10 transition-colors duration-200 border-b border-primary-light/5"
+    className="flex items-center gap-3 p-3 md:hover:bg-primary-light/10 transition-colors duration-200 border-b border-primary-light/5"
     onClick={onClick}
     prefetch={false}
   >
@@ -130,7 +130,7 @@ const Search = memo(
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-primary-accent hover:bg-primary-accent/80 transition-colors duration-200"
+              className="px-4 py-2 bg-primary-accent md:hover:bg-primary-accent/80 transition-colors duration-200"
               aria-label="Tìm kiếm"
             >
               🔍

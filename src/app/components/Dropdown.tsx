@@ -17,7 +17,7 @@ const CategoryItem = memo(({ category, onClick }: { category: Category; onClick:
     key={category._id}
     href={`/the-loai/${category.slug}`}
     onClick={onClick}
-    className="truncate rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 text-glass-muted hover:text-white hover:bg-pink-500/10 hover:border-pink-400/30 border border-transparent"
+    className="truncate rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 text-glass-muted md:hover:text-white md:hover:bg-pink-500/10 md:hover:border-pink-400/30 border border-transparent"
   >
     {category.name}
   </Link>
@@ -120,10 +120,10 @@ const Dropdown = memo(({ categories }: DropdownProps) => {
           aria-haspopup="true"
           suppressHydrationWarning
         >
-          <span className="group-hover:gradient-text transition-all duration-200">Thể loại</span>
+          <span className="md:group-hover:gradient-text transition-all duration-200">Thể loại</span>
           <ChevronDown
             size={18}
-            className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""} group-hover:text-pink-400`}
+            className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""} md:group-hover:text-pink-400`}
           />
         </button>
 
