@@ -243,7 +243,7 @@ const Search = memo(
               </div>
             ) : inputValue.trim() ? (
               <div className="p-4 text-gray-400 text-center">
-                <div className="mb-2">Không tìm thấy kết quả cho "{inputValue}"</div>
+                <div className="mb-2">Không tìm thấy kết quả cho &ldquo;{inputValue}&rdquo;</div>
                 <button
                   onClick={(e) => {
                     e.preventDefault()
@@ -260,9 +260,9 @@ const Search = memo(
               <div className="p-4 text-gray-400 text-center">
                 <div className="mb-2">💡 Gợi ý tìm kiếm:</div>
                 <div className="text-sm space-y-1">
-                  <div>• Tên truyện: "One Piece", "Naruto"</div>
-                  <div>• Tác giả: "Oda Eiichiro"</div>
-                  <div>• Thể loại: "Action", "Romance"</div>
+                  <div>• Tên truyện: &ldquo;One Piece&rdquo;, &ldquo;Naruto&rdquo;</div>
+                  <div>• Tác giả: &ldquo;Oda Eiichiro&rdquo;</div>
+                  <div>• Thể loại: &ldquo;Action&rdquo;, &ldquo;Romance&rdquo;</div>
                 </div>
               </div>
             )}

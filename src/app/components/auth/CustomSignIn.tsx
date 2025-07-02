@@ -12,6 +12,13 @@ interface CustomSignInProps {
   onSwitchToSignUp?: () => void
 }
 
+interface ClerkError {
+  errors?: Array<{
+    message: string
+    code?: string
+  }>
+}
+
 export default function CustomSignIn({ onClose, onSwitchToSignUp }: CustomSignInProps) {
   const { isLoaded, signIn, setActive } = useSignIn()
   const [email, setEmail] = useState("")
@@ -39,8 +46,9 @@ export default function CustomSignIn({ onClose, onSwitchToSignUp }: CustomSignIn
         onClose?.()
         router.refresh()
       }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Đăng nhập thất bại")
+    } catch (err) {
+      const clerkError = err as ClerkError
+      setError(clerkError.errors?.[0]?.message || "Đăng nhập thất bại")
     } finally {
       setIsLoading(false)
     }
@@ -55,8 +63,9 @@ export default function CustomSignIn({ onClose, onSwitchToSignUp }: CustomSignIn
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/",
       })
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Đăng nhập Google thất bại")
+    } catch (err) {
+      const clerkError = err as ClerkError
+      setError(clerkError.errors?.[0]?.message || "Đăng nhập Google thất bại")
     }
   }
 

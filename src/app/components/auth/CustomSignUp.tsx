@@ -12,6 +12,13 @@ interface CustomSignUpProps {
   onSwitchToSignIn?: () => void
 }
 
+interface ClerkError {
+  errors?: Array<{
+    message: string
+    code?: string
+  }>
+}
+
 export default function CustomSignUp({ onClose, onSwitchToSignIn }: CustomSignUpProps) {
   const { isLoaded, signUp, setActive } = useSignUp()
   const [email, setEmail] = useState("")
@@ -42,8 +49,9 @@ export default function CustomSignUp({ onClose, onSwitchToSignIn }: CustomSignUp
 
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
       setPendingVerification(true)
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Đăng ký thất bại")
+    } catch (err) {
+      const clerkError = err as ClerkError
+      setError(clerkError.errors?.[0]?.message || "Đăng ký thất bại")
     } finally {
       setIsLoading(false)
     }
@@ -66,8 +74,9 @@ export default function CustomSignUp({ onClose, onSwitchToSignIn }: CustomSignUp
         onClose?.()
         router.refresh()
       }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Xác thực thất bại")
+    } catch (err) {
+      const clerkError = err as ClerkError
+      setError(clerkError.errors?.[0]?.message || "Xác thực thất bại")
     } finally {
       setIsLoading(false)
     }
@@ -82,14 +91,15 @@ export default function CustomSignUp({ onClose, onSwitchToSignIn }: CustomSignUp
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/",
       })
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || "Đăng ký Google thất bại")
+    } catch (err) {
+      const clerkError = err as ClerkError
+      setError(clerkError.errors?.[0]?.message || "Đăng ký Google thất bại")
     }
   }
 
   return (
     <div
-      className="fixed inset-0 z-[99999] "
+      className="fixed inset-0 z-[99999]"
       style={{
         position: "fixed",
         top: 0,
