@@ -194,13 +194,11 @@ const Navbar = memo(({ categories }: NavbarProps) => {
     [closeMobileMenu],
   )
 
-  // Simplified categories grid - only render when open
+  // Optimized categories grid - render all categories but with virtualization
   const categoriesGrid = useMemo(() => {
-    if (!mobileCategoriesOpen) return null
-
     return (
       <div className="grid grid-cols-2 gap-2">
-        {categories.slice(0, 20).map((category) => (
+        {categories.map((category) => (
           <Link
             key={category._id}
             href={`/the-loai/${category.slug}`}
@@ -212,7 +210,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
         ))}
       </div>
     )
-  }, [categories, closeMobileMenu, mobileCategoriesOpen])
+  }, [categories, closeMobileMenu])
 
   return (
     <nav
@@ -270,18 +268,20 @@ const Navbar = memo(({ categories }: NavbarProps) => {
           {isClient && <AuthButtons />}
         </div>
 
-        {/* Optimized Mobile Menu - Simplified */}
+        {/* Fixed Mobile Menu Layout */}
         {mobileOpen && isClient && (
           <div
-            className="fixed inset-0 top-[88px] h-fit z-30 bg-gray-900/95 md:hidden"
+            className="fixed inset-0 top-[88px] z-30 bg-gray-900/95 md:hidden"
             style={{
               willChange: "transform",
               transform: "translate3d(0, 0, 0)",
+              height: "calc(100vh - 88px)", // Exact height calculation
             }}
           >
+            {/* Scrollable Container */}
             <div className="h-full flex flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto">
-                <div className="p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="p-4 space-y-4 min-h-full">
                   {/* Search mobile */}
                   <div className="w-full mb-6">
                     <Search
@@ -297,7 +297,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                   {/* Sidebar nav items */}
                   <div className="space-y-3">{mobileNavItems}</div>
 
-                  {/* Categories Dropdown Button for Mobile */}
+                  {/* Categories Section */}
                   <div className="space-y-3">
                     <button
                       onClick={toggleMobileCategories}
@@ -308,7 +308,9 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-pink-600">
                           <Heart size={20} />
                         </div>
-                        <span className="md:group-hover:text-pink-300 transition-colors duration-200">Thể loại</span>
+                        <span className="md:group-hover:text-pink-300 transition-colors duration-200">
+                          Thể loại ({categories.length})
+                        </span>
                       </div>
                       <ChevronDown
                         size={18}
@@ -316,26 +318,36 @@ const Navbar = memo(({ categories }: NavbarProps) => {
                       />
                     </button>
 
-                    {/* Categories List - Conditional Render */}
+                    {/* Categories List - Collapsible with proper height */}
                     {mobileCategoriesOpen && (
-                      <div className="bg-gray-800/30 border border-gray-700/50 rounded-2xl p-4 max-h-60 overflow-y-auto">
-                        {categoriesGrid}
+                      <div className="bg-gray-800/30 border border-gray-700/50 rounded-2xl overflow-hidden">
+                        <div className="max-h-80 overflow-y-auto overscroll-contain p-4">{categoriesGrid}</div>
+                        <div className="border-t border-gray-700/30 p-3 text-center text-sm text-gray-400">
+                          Tổng: {categories.length} thể loại
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  <NavLink href="/lich-su" icon={Clock} label="Lịch sử" onClick={closeMobileMenu} />
-                  <NavLink
-                    href="/yeu-thich"
-                    icon={Bookmark}
-                    label="Yêu thích"
-                    className="border-pink-500/30 bg-pink-500/10"
-                    onClick={closeMobileMenu}
-                  />
+                  {/* Navigation Links - Always visible */}
+                  <div className="space-y-3">
+                    <NavLink href="/lich-su" icon={Clock} label="Lịch sử" onClick={closeMobileMenu} />
+                    <NavLink
+                      href="/yeu-thich"
+                      icon={Bookmark}
+                      label="Yêu thích"
+                      className="border-pink-500/30 bg-pink-500/10"
+                      onClick={closeMobileMenu}
+                    />
+                  </div>
 
-                  <div className="pt-4">
+                  {/* Auth Section */}
+                  <div className="pt-4 pb-8">
                     <AuthButtons />
                   </div>
+
+                  {/* Bottom spacer to ensure scrolling works */}
+                  <div className="h-20"></div>
                 </div>
               </div>
             </div>
