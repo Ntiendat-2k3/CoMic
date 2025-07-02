@@ -47,7 +47,6 @@ const OptimizedComicGrid = memo(({ comics, isLoading, enableVirtualization = fal
         comic={comic}
         baseImageUrl={`https://img.otruyenapi.com/uploads/comics/${comic.thumb_url}`}
         priority={index < 4} // Prioritize first 4 images
-        index={index}
       />
     ))
   }, [comics])
