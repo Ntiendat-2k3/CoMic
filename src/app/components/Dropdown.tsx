@@ -38,7 +38,7 @@ const Dropdown = memo(({ categories }: DropdownProps) => {
 
   // Memoized filtered categories - limit results for performance
   const filteredCategories = useMemo(
-    () => categories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30),
+    () => categories.filter((cat) => cat.name.toLowerCase().includes(search.toLowerCase())).slice(0, 54),
     [categories, search],
   )
 
