@@ -15,18 +15,25 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
   const [imageLoaded, setImageLoaded] = useState(false)
   const [isCurrentlyReading, setIsCurrentlyReading] = useState(false)
   const [lastReadChapter, setLastReadChapter] = useState<string | null>(null)
+  const [savedProgress, setSavedProgress] = useState<number>(0)
 
   // Memoize random values để tránh re-calculate
   const isNew = Math.random() > 0.7
   const isHot = Math.random() > 0.8
 
-  // Check if user is currently reading this comic
+  // Check if user is currently reading this comic and load saved progress
   useEffect(() => {
     if (typeof window !== "undefined") {
       const lastRead = localStorage.getItem(`lastRead-${comic.slug}`)
+      const savedProgressValue = localStorage.getItem(`progress-${comic.slug}`)
+
       if (lastRead) {
         setIsCurrentlyReading(true)
         setLastReadChapter(lastRead)
+      }
+
+      if (savedProgressValue) {
+        setSavedProgress(Number.parseInt(savedProgressValue) || 0)
       }
     }
   }, [comic.slug])
@@ -35,18 +42,32 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
     setImageLoaded(true)
   }, [])
 
-  // Calculate total chapters
-  const totalChapters = comic.chapters?.[0]?.server_data?.length || 0
+  // Get latest chapter number (total chapters) from chaptersLatest
+  const getLatestChapterNumber = () => {
+    if (!comic.chaptersLatest?.[0]?.chapter_name) return 0
+    const chapterString = comic.chaptersLatest[0].chapter_name
+    const chapterNumber = Number.parseFloat(chapterString) || 0
+    return chapterNumber
+  }
+
+  const totalChapters = getLatestChapterNumber()
 
   // Calculate real progress based on reading status
   const calculateProgress = () => {
     if (!isCurrentlyReading || !lastReadChapter || totalChapters === 0) {
-      return 0
+      return savedProgress // Trả về progress đã lưu nếu không đang đọc
     }
 
-    const currentChapterNumber = Number.parseInt(lastReadChapter) || 0
+    const currentChapterNumber = Number.parseFloat(lastReadChapter) || 0
     const progress = Math.round((currentChapterNumber / totalChapters) * 100)
-    return Math.min(progress, 100) // Đảm bảo không vượt quá 100%
+    const finalProgress = Math.min(progress, 100) // Đảm bảo không vượt quá 100%
+
+    // Lưu progress vào localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`progress-${comic.slug}`, finalProgress.toString())
+    }
+
+    return finalProgress
   }
 
   const actualProgress = calculateProgress()
@@ -118,7 +139,9 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
               >
                 {isCurrentlyReading && lastReadChapter
                   ? `${lastReadChapter}/${totalChapters} (${actualProgress}%)`
-                  : `${totalChapters} chương`}
+                  : actualProgress > 0
+                    ? `${totalChapters} chương (${actualProgress}%)`
+                    : `${totalChapters} chương`}
               </div>
 
               {/* "Đang đọc" badge for mobile */}
@@ -135,7 +158,9 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
                 className={`h-full transition-all duration-500 ${
                   isCurrentlyReading
                     ? "bg-gradient-to-r from-green-500 to-emerald-500"
-                    : "bg-gradient-to-r from-pink-500 to-purple-500"
+                    : actualProgress > 0
+                      ? "bg-gradient-to-r from-blue-500 to-cyan-500"
+                      : "bg-gradient-to-r from-pink-500 to-purple-500"
                 }`}
                 style={{ width: `${actualProgress}%` }}
               />
@@ -149,7 +174,9 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
               className={`font-semibold text-sm sm:text-base mb-2 line-clamp-2 leading-tight transition-colors duration-300 ${
                 isCurrentlyReading
                   ? "text-green-300 md:group-hover:text-green-200"
-                  : "text-white md:group-hover:text-pink-300"
+                  : actualProgress > 0
+                    ? "text-blue-300 md:group-hover:text-blue-200"
+                    : "text-white md:group-hover:text-pink-300"
               }`}
             >
               {comic.name}
@@ -164,7 +191,9 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
                     index === 0
                       ? isCurrentlyReading
                         ? "bg-green-500/20 text-green-300 border border-green-500/30"
-                        : "bg-pink-500/20 text-pink-300 border border-pink-500/30"
+                        : actualProgress > 0
+                          ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                          : "bg-pink-500/20 text-pink-300 border border-pink-500/30"
                       : "bg-gray-700/50 text-gray-300"
                   }`}
                 >
@@ -183,7 +212,9 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-400 flex items-center gap-1">
                     <span
-                      className={`w-1 h-1 rounded-full ${isCurrentlyReading ? "bg-green-400" : "bg-green-400"}`}
+                      className={`w-1 h-1 rounded-full ${
+                        isCurrentlyReading ? "bg-green-400" : actualProgress > 0 ? "bg-blue-400" : "bg-green-400"
+                      }`}
                     ></span>
                     <span className="hidden sm:inline">Chương mới:</span>
                     <span className="sm:hidden">Ch:</span>
@@ -191,7 +222,11 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
                   <div className="flex items-center gap-2">
                     <span
                       className={`font-semibold px-2 py-1 rounded-full ${
-                        isCurrentlyReading ? "text-green-400 bg-green-400/10" : "text-blue-400 bg-blue-400/10"
+                        isCurrentlyReading
+                          ? "text-green-400 bg-green-400/10"
+                          : actualProgress > 0
+                            ? "text-blue-400 bg-blue-400/10"
+                            : "text-blue-400 bg-blue-400/10"
                       }`}
                     >
                       {comic.chaptersLatest[0].chapter_name}
@@ -217,14 +252,22 @@ const ComicCard = memo(({ comic, baseImageUrl, priority = false }: ComicCardProp
               <div className="hidden sm:block">
                 <div className="flex justify-between text-xs text-gray-400 mb-1">
                   <span>Tiến độ</span>
-                  <span className={isCurrentlyReading ? "text-green-400" : "text-pink-400"}>{actualProgress}%</span>
+                  <span
+                    className={
+                      isCurrentlyReading ? "text-green-400" : actualProgress > 0 ? "text-blue-400" : "text-pink-400"
+                    }
+                  >
+                    {actualProgress}%
+                  </span>
                 </div>
                 <div className="bg-gray-700/50 rounded-full h-1.5 overflow-hidden">
                   <div
                     className={`h-full transition-all duration-500 ${
                       isCurrentlyReading
                         ? "bg-gradient-to-r from-green-500 to-emerald-500"
-                        : "bg-gradient-to-r from-pink-500 to-purple-500"
+                        : actualProgress > 0
+                          ? "bg-gradient-to-r from-blue-500 to-cyan-500"
+                          : "bg-gradient-to-r from-pink-500 to-purple-500"
                     }`}
                     style={{ width: `${actualProgress}%` }}
                   />

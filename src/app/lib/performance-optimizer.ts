@@ -102,7 +102,7 @@ export class PerformanceOptimizer {
   // Component lazy loading
   private loadComponent(componentName: string) {
     // Dynamic import based on component name
-    import(`../components/${componentName}`)
+    import(`@/components/${componentName}`)
       .then(() => {
         console.log(`Component ${componentName} loaded`)
       })

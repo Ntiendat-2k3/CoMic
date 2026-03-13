@@ -1,10 +1,15 @@
-import LayoutMain from "@/app/layouts/LayoutMain";
-import FollowContent from "../components/favorite/FollowContent";
+import LayoutMain from "@/components/layout/LayoutMain"
+import FavoritesClient from "./FavoritesClient"
 
-export default function FollowPageWrapper() {
+export const metadata = {
+  title: "Truyện yêu thích",
+  description: "Danh sách truyện bạn đã đánh dấu yêu thích",
+}
+
+export default function FavoritesPage() {
   return (
     <LayoutMain>
-      <FollowContent />
+      <FavoritesClient />
     </LayoutMain>
-  );
+  )
 }

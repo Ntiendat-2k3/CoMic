@@ -1,85 +1,67 @@
-import ComicGrid from "@/app/components/home/ComicGrid";
-import Breadcrumb from "@/app/components/status/Breadcrumb";
-import LayoutMain from "@/app/layouts/LayoutMain";
-import OTruyenService, {
-  ComicListStatus,
-} from "@/app/services/otruyen.service";
-import Pagination from "@/app/utils/Pagination";
-import { Metadata } from "next";
+import { Metadata } from "next"
+import LayoutMain from "@/components/layout/LayoutMain"
+import OTruyenService, { ComicListStatus } from "@/services/otruyen.service"
+import ComicGrid from "@/components/comic/ComicGrid"
+import Pagination from "@/components/ui/Pagination"
+import Breadcrumb from "@/components/ui/Breadcrumb"
 
 interface PageProps {
-  params: Promise<{ type: ComicListStatus }>;
-  searchParams: Promise<{ page?: string }>;
+  params: Promise<{ type: ComicListStatus }>
+  searchParams: Promise<{ page?: string }>
 }
 
 export async function generateStaticParams() {
-  return ["truyen-moi", "sap-ra-mat", "dang-phat-hanh", "hoan-thanh"].map(
-    (type) => ({ type })
-  );
+  return ["truyen-moi", "sap-ra-mat", "dang-phat-hanh", "hoan-thanh"].map((type) => ({ type }))
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { type } = await props.params;
-  const { data } = await OTruyenService.getComicList(type);
-
+  const { type } = await props.params
+  const data = await OTruyenService.getComicList(type)
   return {
-    title: data.seoOnPage.titleHead,
-    description: data.seoOnPage.descriptionHead,
-    alternates: {
-      canonical: `/danh-sach/${type}`,
-    },
-    openGraph: {
-      images: data.seoOnPage.og_image.map(
-        (img) => `https://img.otruyenapi.com${img}`
-      ),
-      url: `https://otruyenapi.com/v1/api/danh-sach/${type}`,
-      type: "website",
-    },
-  };
+    title: data.data.seoOnPage.titleHead,
+    description: data.data.seoOnPage.descriptionHead,
+  }
 }
 
 export default async function StatusListPage(props: PageProps) {
-  const { params, searchParams } = props;
-  const { page } = await searchParams;
-  const { type } = await params;
+  const { type } = await props.params
+  const { page } = await props.searchParams
+  const currentPage = Number(page) || 1
 
-  const currentPage = Number(page) || 1;
-  const { data } = await OTruyenService.getComicList(type, currentPage);
-
+  const response = await OTruyenService.getComicList(type, currentPage)
+  const { data } = response
   const pageCount = Math.ceil(
     data.params.pagination.totalItems / data.params.pagination.totalItemsPerPage
-  );
+  )
+  const CDN = "https://img.otruyenapi.com"
 
   return (
     <LayoutMain>
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <Breadcrumb items={data.breadCrumb} />
 
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-white">{data.titlePage}</h1>
-          <div className="text-gray-400 mb-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h1 className="text-2xl font-bold text-white">{data.titlePage}</h1>
+          <span className="text-sm text-gray-400">
             {data.params.pagination.totalItems} truyện
-          </div>
+          </span>
         </div>
 
         {data.items.length > 0 ? (
           <>
-            <ComicGrid comics={data.items} />
-
+            <ComicGrid comics={data.items} cdnUrl={CDN} />
             <Pagination
               pageCount={pageCount}
               currentPage={currentPage}
               basePath={`/danh-sach/${type}`}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
             />
           </>
         ) : (
-          <div className="text-center py-12 text-gray-400">
+          <div className="py-20 text-center text-gray-400">
             Hiện chưa có truyện nào trong danh mục này
           </div>
         )}
       </div>
     </LayoutMain>
-  );
+  )
 }

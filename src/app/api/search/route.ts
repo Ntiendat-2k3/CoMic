@@ -1,4 +1,4 @@
-import OTruyenService from '@/app/services/otruyen.service'
+import OTruyenService from '@/services/otruyen.service'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic';
