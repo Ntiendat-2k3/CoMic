@@ -14,11 +14,11 @@ interface ChapterImageProps {
  */
 const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
   const [loaded, setLoaded] = useState(false);
-  const [inView, setInView] = useState(index < 3); // 3 ảnh đầu load ngay
+  const [inView, setInView] = useState(index < 5); // Load 5 ảnh đầu ngay lập tức thay vì 3
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (inView) return; // Đã trong viewport rồi
+    if (inView) return;
     const el = ref.current;
     if (!el) return;
 
@@ -29,7 +29,10 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
           observer.disconnect();
         }
       },
-      { rootMargin: "400px" } // Bắt đầu load trước 400px
+      { 
+        rootMargin: "1500px 0px", // Tăng vùng đệm lên 1500px để tải sớm hơn nhiều khi cuộn nhanh
+        threshold: 0.01 
+      }
     );
 
     observer.observe(el);
@@ -37,10 +40,10 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
   }, [inView]);
 
   return (
-    <div ref={ref} className="relative w-full">
-      {/* Skeleton giữ chỗ khi chưa load */}
+    <div ref={ref} className="relative w-full min-h-[40vh]">
+      {/* Skeleton giữ chỗ khi chưa load hoặc chưa vào view */}
       {(!inView || !loaded) && (
-        <div className="aspect-[2/3] w-full animate-pulse bg-gray-800/40 rounded" />
+        <div className="absolute inset-0 animate-pulse bg-gray-800/40 rounded shadow-inner" />
       )}
 
       {inView && (
@@ -50,12 +53,13 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
           width={800}
           height={1200}
           sizes="(max-width: 768px) 100vw, 800px"
-          priority={index < 3}
-          loading={index < 3 ? "eager" : "lazy"}
+          priority={index < 5}
+          loading={index < 5 ? "eager" : "lazy"}
           onLoad={() => setLoaded(true)}
           unoptimized
+          {...({ fetchPriority: index < 10 ? "high" : "auto" } as any)}
           className={`w-full h-auto object-contain transition-opacity duration-300
-            ${loaded ? "opacity-100" : "opacity-0 absolute inset-0"}`}
+            ${loaded ? "opacity-100" : "opacity-0 invisible"}`}
         />
       )}
     </div>
