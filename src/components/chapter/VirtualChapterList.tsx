@@ -25,6 +25,8 @@ interface RowProps {
   data: RowData;
 }
 
+import ChapterDownloadButton from "./ChapterDownloadButton";
+
 const ChapterRow = memo(({ index, style, data }: RowProps) => {
   const { chapters, comicSlug, activeChapter } = data;
   const chapter = chapters[index];
@@ -41,11 +43,16 @@ const ChapterRow = memo(({ index, style, data }: RowProps) => {
           }`}
       >
         <span>Chapter {chapter.chapter_name}</span>
-        {chapter.chapter_title && (
-          <span className="text-gray-500 text-xs truncate max-w-[60%] text-right">
-            {chapter.chapter_title}
-          </span>
-        )}
+        <div className="flex items-center gap-2 ml-auto max-w-[60%] overflow-hidden">
+          {chapter.chapter_title && (
+            <span className="text-gray-500 text-xs truncate text-right">
+              {chapter.chapter_title}
+            </span>
+          )}
+          <div onClick={(e) => e.preventDefault()}>
+            <ChapterDownloadButton comicSlug={comicSlug} chapter={chapter} />
+          </div>
+        </div>
       </Link>
     </div>
   );

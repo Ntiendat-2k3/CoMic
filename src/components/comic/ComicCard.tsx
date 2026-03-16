@@ -59,7 +59,7 @@ const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => 
           onLoad={() => setImgLoaded(true)}
           priority={priority}
           loading={priority ? "eager" : "lazy"}
-          unoptimized // Ảnh từ CDN bên ngoài - không cần Next optimize
+          quality={80} // Thêm chất lượng 80 để cân bằng nét và nhẹ
         />
 
         {/* Latest chapter badge */}

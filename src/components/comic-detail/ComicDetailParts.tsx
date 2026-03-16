@@ -39,6 +39,8 @@ interface ActionButtonsProps {
   firstChapterSlug: string;
 }
 
+import SaveToOfflineButton from "./SaveToOfflineButton";
+
 export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ActionButtonsProps) {
   const dispatch = useAppDispatch();
   const isFav = useAppSelector(selectIsFavorite(comic.slug));
@@ -77,6 +79,8 @@ export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ActionButtons
         <Heart size={16} className={isFav ? "fill-pink-400" : ""} />
         {isFav ? "Đã yêu thích" : "Yêu thích"}
       </button>
+
+      <SaveToOfflineButton comic={comic} />
     </div>
   );
 }

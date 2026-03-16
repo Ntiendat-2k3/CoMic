@@ -15,10 +15,15 @@ function loadState(): Partial<ReturnType<typeof rootReducer>> | undefined {
   try {
     if (typeof window === "undefined") return undefined;
     const serialized = localStorage.getItem("comic-store");
-    if (!serialized) return undefined;
+    if (!serialized || serialized === "undefined" || serialized.trim() === "") return undefined;
     const { reading, favorites } = JSON.parse(serialized);
     return { reading, favorites };
-  } catch {
+  } catch (error) {
+    console.error("Redux loadState parsing error:", error);
+    // If parse fails, clear the corrupted item
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("comic-store");
+    }
     return undefined;
   }
 }

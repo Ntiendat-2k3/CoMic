@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { BookOpen, CheckCircle, AlarmClock } from "lucide-react";
+import { BookOpen, CheckCircle, AlarmClock, DownloadCloud } from "lucide-react";
 
 const SIDEBAR_ITEMS = [
   { href: "/danh-sach/truyen-moi", label: "Truyện mới", icon: BookOpen },
   { href: "/danh-sach/hoan-thanh", label: "Hoàn thành", icon: CheckCircle },
   { href: "/danh-sach/sap-ra-mat", label: "Sắp ra mắt", icon: AlarmClock },
+  { href: "/offline", label: "Kho tải xuống", icon: DownloadCloud },
 ];
 
 export default function Sidebar() {

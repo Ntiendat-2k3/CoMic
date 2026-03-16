@@ -35,7 +35,6 @@ self.addEventListener("install", (event) => {
           // "/icon-512.png"
         ])
         .catch((error) => {
-          console.log("Cache addAll failed:", error)
           // Continue anyway, don't fail the install
           return Promise.resolve()
         })
@@ -151,7 +150,6 @@ self.addEventListener("sync", (event) => {
 
 async function doBackgroundSync() {
   // Handle offline actions when back online
-  console.log("Background sync triggered")
 }
 
 // Push notifications

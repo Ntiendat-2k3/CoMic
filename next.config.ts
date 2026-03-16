@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,10 +13,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'sv1.otruyencdn.com',
       },
-      
     ],
   },
-  
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'react-icons'],
+  }
 };
 
 export default nextConfig;

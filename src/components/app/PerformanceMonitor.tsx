@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import { PerformanceOptimizer, BundleAnalyzer } from "@/app/lib/performance-optimizer"
-import { AdvancedCacheManager, ServiceWorkerManager } from "@/app/lib/cache-manager"
+import { PerformanceOptimizer, BundleAnalyzer } from "@/lib/performance-optimizer"
+import { AdvancedCacheManager, ServiceWorkerManager } from "@/lib/cache-manager"
 
 export default function PerformanceMonitor() {
   useEffect(() => {

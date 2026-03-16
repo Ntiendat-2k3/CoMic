@@ -2,7 +2,7 @@
 
 import ReactPaginate from "react-paginate";
 import { useRouter, useSearchParams } from "next/navigation";
-import { PaginationProps } from "../types/common";
+import { PaginationProps } from "@/types/common";
 import { useCallback } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
