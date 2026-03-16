@@ -24,7 +24,7 @@ export default function SaveToOfflineButton({ comic }: { comic: Comic }) {
         setIsSaved(false);
       } else {
         setIsSaving(true);
-        await OfflineManager.saveComicMetadata(comic as any); // Type assertion for compatibility with response type
+        await OfflineManager.saveComicMetadata(comic as unknown as import('@/types/response').ComicDetailResponse['data']['item']); // Replace any with strict cast
         setIsSaved(true);
       }
     } catch (error) {

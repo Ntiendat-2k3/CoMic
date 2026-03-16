@@ -35,20 +35,28 @@ export default function ChapterDownloadButton({ comicSlug, chapter }: Props) {
       const savedComic = await OfflineManager.getComic(comicSlug);
       if (!savedComic) {
          const detail = await OTruyenService.getComicDetail(comicSlug);
-         await OfflineManager.saveComicMetadata(detail.data.item as any);
+         await OfflineManager.saveComicMetadata(detail.data.item);
       }
 
       // Fetch chapter images
       const res = await OTruyenService.getChapterData(chapter.chapter_api_data);
-      const raw = (res.data?.data ?? res.data) as any;
+      const raw = (res.data?.data ?? res.data) as {
+        images?: string[];
+        domain_cdn?: string;
+        item?: {
+          chapter_path: string;
+          chapter_image: { image_page: number; image_file: string }[];
+        };
+      };
+      
       let images: string[] = [];
-      if ("images" in raw) {
+      if ("images" in raw && raw.images) {
         images = raw.images;
-      } else {
+      } else if (raw.item && raw.domain_cdn) {
         const { domain_cdn, item } = raw;
         images = item.chapter_image
-          .sort((a: any, b: any) => a.image_page - b.image_page)
-          .map((img: any) => `${domain_cdn}/${item.chapter_path}/${img.image_file}`);
+          .sort((a: { image_page: number }, b: { image_page: number }) => a.image_page - b.image_page)
+          .map((img: { image_file: string }) => `${domain_cdn}/${item.chapter_path}/${img.image_file}`);
       }
 
       // Save to IDB & Cache

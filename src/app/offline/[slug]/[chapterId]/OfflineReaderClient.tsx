@@ -8,30 +8,45 @@ import { OfflineManager } from "@/lib/offline-manager";
 import ReadingProgress from "@/components/chapter/ReadingProgress";
 
 export default function OfflineReaderClient({ slug, chapterId }: { slug: string; chapterId: string }) {
-  const [comic, setComic] = useState<any>(null);
-  const [chapterData, setChapterData] = useState<any>(null);
+  interface SavedComic {
+    title: string;
+    slug: string;
+    thumb_url: string;
+    chapters: { server_name: string; server_data: import('@/types/common').Chapter[] }[];
+    savedAt: number;
+  }
+
+  interface SavedChapter {
+    id: string;
+    comicSlug: string;
+    chapterName: string;
+    images: string[];
+    savedAt: number;
+  }
+
+  const [comic, setComic] = useState<SavedComic | null>(null);
+  const [chapterData, setChapterData] = useState<SavedChapter | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const comicData = await OfflineManager.getComic(slug);
+        setComic(comicData as SavedComic);
+
+        const chapters = await OfflineManager.getSavedChapters(slug);
+        const targetChapter = chapters.find((c) => c.id === chapterId);
+        setChapterData(targetChapter as SavedChapter);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     loadData();
   }, [slug, chapterId]);
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const comicData = await OfflineManager.getComic(slug);
-      setComic(comicData);
-
-      const chapters = await OfflineManager.getSavedChapters(slug);
-      const targetChapter = chapters.find(c => c.id === chapterId);
-      setChapterData(targetChapter);
-      
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return (
