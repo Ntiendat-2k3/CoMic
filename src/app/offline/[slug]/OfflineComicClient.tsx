@@ -3,33 +3,47 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Trash2, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, CheckCircle2 } from "lucide-react";
 import { OfflineManager } from "@/lib/offline-manager";
 
+interface SavedComic {
+  slug: string;
+  title: string;
+  thumb_url: string;
+  savedAt: number;
+}
+
+interface SavedChapter {
+  id: string;
+  comicSlug: string;
+  chapterName: string;
+  images: string[];
+  savedAt: number;
+}
+
 export default function OfflineComicClient({ slug }: { slug: string }) {
-  const [comic, setComic] = useState<any>(null);
-  const [chapters, setChapters] = useState<any[]>([]);
+  const [comic, setComic] = useState<SavedComic | null>(null);
+  const [chapters, setChapters] = useState<SavedChapter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const comicData = await OfflineManager.getComic(slug);
+        setComic(comicData as SavedComic);
+
+        const savedChapters = await OfflineManager.getSavedChapters(slug);
+        setChapters(savedChapters as SavedChapter[]);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     loadData();
   }, [slug]);
-
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      const comicData = await OfflineManager.getComic(slug);
-      setComic(comicData);
-
-      const savedChapters = await OfflineManager.getSavedChapters(slug);
-      // Sort chapters by api data (using their id is simple enough usually)
-      setChapters(savedChapters);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const cdnUrl = "https://img.otruyenapi.com";
 

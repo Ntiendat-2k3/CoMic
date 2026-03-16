@@ -19,25 +19,30 @@ export default function OfflineClient() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const loadComics = async () => {
+      try {
+        setIsLoading(true);
+        const data = await OfflineManager.getSavedComics();
+        setComics(data.sort((a, b) => b.savedAt - a.savedAt));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     loadComics();
   }, []);
-
-  const loadComics = async () => {
-    try {
-      setIsLoading(true);
-      const data = await OfflineManager.getSavedComics();
-      setComics(data.sort((a, b) => b.savedAt - a.savedAt));
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleRemove = async (slug: string) => {
     if (confirm("Bạn có chắc chắn muốn xóa truyện này khỏi máy?")) {
       await OfflineManager.removeComic(slug);
-      loadComics();
+      // Inline refresh of the list after removal
+      try {
+        const data = await OfflineManager.getSavedComics();
+        setComics(data.sort((a, b) => b.savedAt - a.savedAt));
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
