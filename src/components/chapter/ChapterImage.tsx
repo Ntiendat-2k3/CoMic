@@ -29,10 +29,10 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
           observer.disconnect();
         }
       },
-      { 
+      {
         rootMargin: "1500px 0px", // Tăng vùng đệm lên 1500px để tải sớm hơn nhiều khi cuộn nhanh
-        threshold: 0.01 
-      }
+        threshold: 0.01,
+      },
     );
 
     observer.observe(el);
@@ -53,11 +53,9 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
           width={800}
           height={1200}
           sizes="(max-width: 768px) 100vw, 800px"
-          priority={index < 5}
-          loading={index < 5 ? "eager" : "lazy"}
+          priority={index < 10} // Tăng lên 10 để Next.js tự động set fetchPriority="high"
+          loading={index < 10 ? "eager" : "lazy"}
           onLoad={() => setLoaded(true)}
-          unoptimized
-          {...({ fetchPriority: index < 10 ? "high" : "auto" } as any)}
           className={`w-full h-auto object-contain transition-opacity duration-300
             ${loaded ? "opacity-100" : "opacity-0 invisible"}`}
         />
