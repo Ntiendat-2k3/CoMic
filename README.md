@@ -9,17 +9,25 @@
 
 **TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh hiện đại, hiệu suất cao và hoàn toàn responsive được xây dựng bằng Next.js 15 App Router. Ứng dụng tận dụng OTruyen API để cung cấp một thư viện phong phú các thể loại Manga, Manhwa, và Manhua cho người dùng đọc trực tuyến miễn phí.
 
-## ✨ Các tính năng nổi bật
+## 🎯 Chức năng chính dành cho người dùng
 
-- **🚀 Next.js 15 App Router**: Xây dựng với các tính năng mới nhất của Next.js giúp tối ưu hóa hiệu suất và SEO.
-- **🔐 Xác thực người dùng (Authentication)**: Đăng nhập, đăng ký và quản lý phiên làm việc an toàn thông qua [Clerk](https://clerk.com/).
-- **📱 Progressive Web App (PWA)**: Có thể cài đặt trên các thiết bị di động và máy tính (desktop). Hỗ trợ lưu trữ offline giúp trải nghiệm đọc không bị gián đoạn.
-- **📚 Thư viện truyện phong phú**: Lấy dữ liệu truyện, thể loại, và các chương mới nhất theo thời gian thực từ OTruyen API.
-- **🔍 Tìm kiếm & Lọc nâng cao**: Dễ dàng tìm kiếm truyện theo từ khóa, thể loại hoặc trạng thái (mới cập nhật, đang tiến hành, đã hoàn thành).
-- **📖 Trải nghiệm đọc tối ưu**: Đọc truyện mượt mà và tải trang nhanh chóng nhờ việc ứng dụng danh sách ảo (virtualized lists thông qua `react-window` & `react-virtualized-auto-sizer`) để hiển thị hàng ngàn hình ảnh mà không bị giật lag.
-- **💾 Lưu trữ ngoại tuyến & Local**: Tính năng theo dõi lịch sử đọc và truyện yêu thích được lưu cục bộ trên trình duyệt thông qua IndexedDB (`idb`) và Redux Toolkit.
-- **⚡ Tìm nạp & Caching dữ liệu nhanh**: Quản lý API và state hiệu quả với `@tanstack/react-query` và `lru-cache`.
-- **🎨 UI/UX Hiện đại**: Được thiết kế bắt mắt với Tailwind CSS, Sass, Headless UI, và các hiệu ứng mượt mà từ Framer Motion.
+- **📖 Đọc truyện trực tuyến mượt mà**: Giao diện đọc truyện thân thiện, tối ưu cho việc tải hàng nghìn hình ảnh cùng lúc mà không gây giật lag thiết bị.
+- **🔍 Khám phá & Tìm kiếm truyện**: 
+  - Dễ dàng duyệt các danh sách: *Truyện mới cập nhật*, *Đã hoàn thành*, *Sắp ra mắt*.
+  - Lọc truyện theo hàng chục **Thể loại** đa dạng (Action, Adventure, Romance, Manga, Manhwa...).
+  - Thanh tìm kiếm thông minh giúp tra cứu truyện nhanh chóng theo từ khóa.
+- **🕒 Lịch sử đọc truyện**: Tự động lưu lại tiến trình đọc, ghi nhớ chương đang đọc dở để bạn có thể tiếp tục ngay lập tức ở lần truy cập sau.
+- **❤️ Theo dõi / Yêu thích (Bookmark)**: Cho phép đánh dấu các bộ truyện yêu thích, tự động gom vào danh sách cá nhân riêng để dễ dàng theo dõi chương mới.
+- **🔐 Quản lý tài khoản**: Hỗ trợ người dùng đăng nhập/đăng ký tài khoản an toàn, nhanh chóng.
+- **📱 Trải nghiệm App thực thụ (PWA)**: Hỗ trợ hiển thị hoàn hảo trên mọi kích thước màn hình (Mobile, Tablet, PC). Hỗ trợ cài đặt trực tiếp vào thiết bị như một ứng dụng (PWA) để truy cập nhanh và sử dụng ngoại tuyến các dữ liệu đã lưu.
+
+## ✨ Điểm nổi bật về Công nghệ (Technical Features)
+
+- **🚀 Framework tiên tiến**: Next.js 15 App Router tối ưu SEO mạnh mẽ với SSR và SSG.
+- **🔐 Authentication an toàn**: Tích hợp luồng xác thực và quản lý user từ [Clerk](https://clerk.com/).
+- **💾 Quản lý State & Storage thông minh**: Dữ liệu lịch sử và yêu thích được lưu cục bộ an toàn qua IndexedDB (`idb`) & Redux Toolkit. Server state được quản lý & caching hiệu quả bằng `@tanstack/react-query` và `lru-cache`.
+- **⚡ Performance cực cao**: Sử dụng Virtualized Lists (`react-window`, `react-virtualized-auto-sizer`) để render nội dung chapter truyện, giúp tiết kiệm bộ nhớ trình duyệt tối đa.
+- **🎨 Giao diện ấn tượng (UI/UX)**: Kết hợp Tailwind CSS, Sass, Headless UI cùng Framer Motion cho trải nghiệm hình ảnh sắc nét, mượt mà và chuyển cảnh bắt mắt.
 
 ## 🛠️ Công nghệ sử dụng (Tech Stack)
 
