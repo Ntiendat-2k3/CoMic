@@ -1,4 +1,4 @@
-# 📖 TruyenHay (CoMic Web)
+# TruyenHay (CoMic Web)
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.3-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
@@ -9,36 +9,36 @@
 
 **TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh đa nền tảng (PWA) hiệu suất cao, được xây dựng với kiến trúc **Next.js 15 App Router**. Ứng dụng tận dụng OTruyen API để cung cấp một thư viện phong phú các thể loại Manga, Manhwa, và Manhua cho người dùng đọc trực tuyến miễn phí.
 
-## 💡 Case Study (Mô tả dự án)
+## Case Study (Mô tả dự án)
 
-- **🔴 Vấn đề (Problem):** Thiết kế một nền tảng đọc truyện tranh đa thiết bị (PWA) giúp người dùng duyệt và đọc mượt mà từ kho dữ liệu khổng lồ, theo dõi được tiến trình đọc mà không gặp trở ngại về tốc độ tải trang hay giật lag.
-- **⚠️ Thách thức (Challenge):** Xử lý render hàng chục đến hàng trăm hình ảnh chất lượng cao trong cùng một chương truyện mà không làm tràn bộ nhớ (RAM) của trình duyệt trên các thiết bị di động. Đồng thời, phải quản lý đồng bộ trạng thái lịch sử đọc và danh sách yêu thích một cách mượt mà giữa Client và Local Storage.
-- **✅ Giải pháp (Solution):** 
+- **Vấn đề (Problem):** Thiết kế một nền tảng đọc truyện tranh đa thiết bị (PWA) giúp người dùng duyệt và đọc mượt mà từ kho dữ liệu khổng lồ, theo dõi được tiến trình đọc mà không gặp trở ngại về tốc độ tải trang hay giật lag.
+- **Thách thức (Challenge):** Xử lý render hàng chục đến hàng trăm hình ảnh chất lượng cao trong cùng một chương truyện mà không làm tràn bộ nhớ (RAM) của trình duyệt trên các thiết bị di động. Đồng thời, phải quản lý đồng bộ trạng thái lịch sử đọc và danh sách yêu thích một cách mượt mà giữa Client và Local Storage.
+- **Giải pháp (Solution):** 
   - Ứng dụng kỹ thuật **Virtualized Lists** (chỉ render các hình ảnh đang hiển thị trong khung hình) để tối ưu hóa tuyệt đối bộ nhớ. 
   - Kết hợp kiến trúc **Next.js 15 (SSR/SSG)** để tối ưu tốc độ tải và SEO. 
   - Sử dụng kết hợp **Redux Toolkit, React Query và IndexedDB** để caching dữ liệu API và quản lý state nội bộ, mang lại trải nghiệm offline-ready và mượt mà như một ứng dụng Native thực thụ.
 
-## 🎯 Chức năng chính dành cho người dùng
+## Chức năng chính dành cho người dùng
 
-- **📖 Đọc truyện trực tuyến mượt mà**: Giao diện đọc truyện thân thiện, tối ưu cho việc tải hàng nghìn hình ảnh cùng lúc mà không gây giật lag thiết bị.
-- **🔍 Khám phá & Tìm kiếm truyện**: 
+- **Đọc truyện trực tuyến mượt mà**: Giao diện đọc truyện thân thiện, tối ưu cho việc tải hàng nghìn hình ảnh cùng lúc mà không gây giật lag thiết bị.
+- **Khám phá & Tìm kiếm truyện**: 
   - Dễ dàng duyệt các danh sách: *Truyện mới cập nhật*, *Đã hoàn thành*, *Sắp ra mắt*.
   - Lọc truyện theo hàng chục **Thể loại** đa dạng (Action, Adventure, Romance, Manga, Manhwa...).
   - Thanh tìm kiếm thông minh giúp tra cứu truyện nhanh chóng theo từ khóa.
-- **🕒 Lịch sử đọc truyện**: Tự động lưu lại tiến trình đọc, ghi nhớ chương đang đọc dở để bạn có thể tiếp tục ngay lập tức ở lần truy cập sau.
-- **❤️ Theo dõi / Yêu thích (Bookmark)**: Cho phép đánh dấu các bộ truyện yêu thích, tự động gom vào danh sách cá nhân riêng để dễ dàng theo dõi chương mới.
-- **🔐 Quản lý tài khoản**: Hỗ trợ người dùng đăng nhập/đăng ký tài khoản an toàn, nhanh chóng.
-- **📱 Trải nghiệm App thực thụ (PWA)**: Hỗ trợ hiển thị hoàn hảo trên mọi kích thước màn hình (Mobile, Tablet, PC). Hỗ trợ cài đặt trực tiếp vào thiết bị như một ứng dụng (PWA) để truy cập nhanh và sử dụng ngoại tuyến các dữ liệu đã lưu.
+- **Lịch sử đọc truyện**: Tự động lưu lại tiến trình đọc, ghi nhớ chương đang đọc dở để bạn có thể tiếp tục ngay lập tức ở lần truy cập sau.
+- **Theo dõi / Yêu thích (Bookmark)**: Cho phép đánh dấu các bộ truyện yêu thích, tự động gom vào danh sách cá nhân riêng để dễ dàng theo dõi chương mới.
+- **Quản lý tài khoản**: Hỗ trợ người dùng đăng nhập/đăng ký tài khoản an toàn, nhanh chóng.
+- **Trải nghiệm App thực thụ (PWA)**: Hỗ trợ hiển thị hoàn hảo trên mọi kích thước màn hình (Mobile, Tablet, PC). Hỗ trợ cài đặt trực tiếp vào thiết bị như một ứng dụng (PWA) để truy cập nhanh và sử dụng ngoại tuyến các dữ liệu đã lưu.
 
-## ✨ Điểm nổi bật về Công nghệ (Technical Features)
+## Điểm nổi bật về Công nghệ (Technical Features)
 
-- **🚀 Framework tiên tiến**: Next.js 15 App Router tối ưu SEO mạnh mẽ với SSR và SSG.
-- **🔐 Authentication an toàn**: Tích hợp luồng xác thực và quản lý user từ [Clerk](https://clerk.com/).
-- **💾 Quản lý State & Storage thông minh**: Dữ liệu lịch sử và yêu thích được lưu cục bộ an toàn qua IndexedDB (`idb`) & Redux Toolkit. Server state được quản lý & caching hiệu quả bằng `@tanstack/react-query` và `lru-cache`.
-- **⚡ Performance cực cao**: Sử dụng Virtualized Lists (`react-window`, `react-virtualized-auto-sizer`) để render nội dung chapter truyện, giúp tiết kiệm bộ nhớ trình duyệt tối đa.
-- **🎨 Giao diện ấn tượng (UI/UX)**: Kết hợp Tailwind CSS, Sass, Headless UI cùng Framer Motion cho trải nghiệm hình ảnh sắc nét, mượt mà và chuyển cảnh bắt mắt.
+- **Framework tiên tiến**: Next.js 15 App Router tối ưu SEO mạnh mẽ với SSR và SSG.
+- **Authentication an toàn**: Tích hợp luồng xác thực và quản lý user từ [Clerk](https://clerk.com/).
+- **Quản lý State & Storage thông minh**: Dữ liệu lịch sử và yêu thích được lưu cục bộ an toàn qua IndexedDB (`idb`) & Redux Toolkit. Server state được quản lý & caching hiệu quả bằng `@tanstack/react-query` và `lru-cache`.
+- **Performance cực cao**: Sử dụng Virtualized Lists (`react-window`, `react-virtualized-auto-sizer`) để render nội dung chapter truyện, giúp tiết kiệm bộ nhớ trình duyệt tối đa.
+- **Giao diện ấn tượng (UI/UX)**: Kết hợp Tailwind CSS, Sass, Headless UI cùng Framer Motion cho trải nghiệm hình ảnh sắc nét, mượt mà và chuyển cảnh bắt mắt.
 
-## 🛠️ Công nghệ sử dụng (Tech Stack)
+## Công nghệ sử dụng (Tech Stack)
 
 - **Framework**: [Next.js 15](https://nextjs.org/) (App Router, Turbopack)
 - **Ngôn ngữ**: [TypeScript](https://www.typescriptlang.org/)
@@ -52,7 +52,7 @@
 - **Icons**: `lucide-react`, `react-icons`
 - **Thành phần UI (UI Components)**: `@headlessui/react`, `notyf` (hiển thị thông báo), `react-paginate`
 
-## 📁 Cấu trúc thư mục
+## Cấu trúc thư mục
 
 ```text
 src/
@@ -66,7 +66,7 @@ src/
 └── types/             # Định nghĩa Type / Interface của TypeScript
 ```
 
-## 🚀 Hướng dẫn cài đặt
+## Hướng dẫn cài đặt
 
 ### Yêu cầu hệ thống
 
@@ -116,7 +116,7 @@ pnpm dev
 
 Mở trình duyệt và truy cập vào [http://localhost:3000](http://localhost:3000) để xem ứng dụng.
 
-## 📦 Build cho môi trường Production
+## Build cho môi trường Production
 
 Để tối ưu hóa mã nguồn và chạy ứng dụng trên môi trường thực tế (production):
 
@@ -125,7 +125,7 @@ npm run build
 npm run start
 ```
 
-## 🌍 SEO & Hiệu suất
+## SEO & Hiệu suất
 
 - Được tinh chỉnh `metadata` đầy đủ trong `layout.tsx` cho thẻ Open Graph và Twitter.
 - Tự động tạo `sitemap.ts` và `robots.ts` động.
