@@ -7,7 +7,16 @@
 ![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
 ![Clerk](https://img.shields.io/badge/Clerk_Auth-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)
 
-**TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh hiện đại, hiệu suất cao và hoàn toàn responsive được xây dựng bằng Next.js 15 App Router. Ứng dụng tận dụng OTruyen API để cung cấp một thư viện phong phú các thể loại Manga, Manhwa, và Manhua cho người dùng đọc trực tuyến miễn phí.
+**TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh đa nền tảng (PWA) hiệu suất cao, được xây dựng với kiến trúc **Next.js 15 App Router**. Ứng dụng tận dụng OTruyen API để cung cấp một thư viện phong phú các thể loại Manga, Manhwa, và Manhua cho người dùng đọc trực tuyến miễn phí.
+
+## 💡 Case Study (Mô tả dự án)
+
+- **🔴 Vấn đề (Problem):** Thiết kế một nền tảng đọc truyện tranh đa thiết bị (PWA) giúp người dùng duyệt và đọc mượt mà từ kho dữ liệu khổng lồ, theo dõi được tiến trình đọc mà không gặp trở ngại về tốc độ tải trang hay giật lag.
+- **⚠️ Thách thức (Challenge):** Xử lý render hàng chục đến hàng trăm hình ảnh chất lượng cao trong cùng một chương truyện mà không làm tràn bộ nhớ (RAM) của trình duyệt trên các thiết bị di động. Đồng thời, phải quản lý đồng bộ trạng thái lịch sử đọc và danh sách yêu thích một cách mượt mà giữa Client và Local Storage.
+- **✅ Giải pháp (Solution):** 
+  - Ứng dụng kỹ thuật **Virtualized Lists** (chỉ render các hình ảnh đang hiển thị trong khung hình) để tối ưu hóa tuyệt đối bộ nhớ. 
+  - Kết hợp kiến trúc **Next.js 15 (SSR/SSG)** để tối ưu tốc độ tải và SEO. 
+  - Sử dụng kết hợp **Redux Toolkit, React Query và IndexedDB** để caching dữ liệu API và quản lý state nội bộ, mang lại trải nghiệm offline-ready và mượt mà như một ứng dụng Native thực thụ.
 
 ## 🎯 Chức năng chính dành cho người dùng
 
