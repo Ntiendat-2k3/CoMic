@@ -4,9 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { memo, useState } from "react";
 import { BookOpen } from "lucide-react";
-import { useAppSelector } from "@/store";
-import { selectLastRead } from "@/store/slices/readingSlice";
 import type { Comic } from "@/types/comic";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
+import { useComicCardController } from "@/features/comic/hooks/useComicCardController";
+import { resolveCoverUrl } from "@/domain/comic/resolve-cover-url";
 
 interface ComicCardProps {
   comic: Comic;
@@ -16,15 +18,10 @@ interface ComicCardProps {
 
 const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => {
   const [imgLoaded, setImgLoaded] = useState(false);
-  const lastRead = useAppSelector(selectLastRead(comic.slug));
-  const isReading = Boolean(lastRead);
+  const { common, comic: copy } = useDictionary();
+  const { lastRead, isReading, progress } = useComicCardController(comic);
 
-  const totalChapters = comic.chapters?.[0]?.server_data?.length ?? 0;
-  const progress = isReading && lastRead && totalChapters > 0
-    ? Math.min(Math.round((Number(lastRead.chapterName) / totalChapters) * 100), 100)
-    : 0;
-
-  const thumbSrc = `${cdnUrl}/uploads/comics/${comic.thumb_url}`;
+  const thumbSrc = resolveCoverUrl(comic.thumb_url, cdnUrl);
 
   return (
     <Link
@@ -36,15 +33,15 @@ const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => 
           : "bg-gray-800/50 border-gray-700/50 md:hover:border-pink-500/30"
         }`}
     >
-      {/* Reading badge */}
+      {/* Nhãn đang đọc */}
       {isReading && (
         <div className="absolute top-2 left-2 z-10 flex items-center gap-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
           <BookOpen size={10} />
-          Đang đọc
+          {copy.reading}
         </div>
       )}
 
-      {/* Thumbnail */}
+      {/* Ảnh bìa */}
       <div className="relative aspect-[3/4] w-full bg-gray-700/50 overflow-hidden flex-shrink-0">
         {!imgLoaded && (
           <div className="absolute inset-0 animate-pulse bg-gray-700/40" />
@@ -62,14 +59,16 @@ const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => 
           quality={80} // Thêm chất lượng 80 để cân bằng nét và nhẹ
         />
 
-        {/* Latest chapter badge */}
+        {/* Nhãn chương mới nhất */}
         {comic.chaptersLatest?.[0]?.chapter_name && (
           <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
-            Ch.{comic.chaptersLatest[0].chapter_name}
+            {formatMessage(common.shortChapter, {
+              chapter: comic.chaptersLatest[0].chapter_name,
+            })}
           </div>
         )}
 
-        {/* Progress bar */}
+        {/* Thanh tiến độ */}
         <div className="absolute bottom-0 inset-x-0 h-1 bg-gray-800/50">
           <div
             className={`h-full transition-all duration-500
@@ -82,7 +81,7 @@ const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => 
         </div>
       </div>
 
-      {/* Info */}
+      {/* Thông tin */}
       <div className="p-3 flex flex-col gap-1 flex-1">
         <h3 className={`font-semibold text-sm leading-tight line-clamp-2 transition-colors duration-200
           ${isReading
@@ -93,7 +92,7 @@ const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => 
           {comic.name}
         </h3>
 
-        {/* Categories - desktop only */}
+        {/* Thể loại chỉ hiển thị trên màn hình lớn */}
         <div className="hidden sm:flex flex-wrap gap-1 mt-1">
           {comic.category.slice(0, 2).map((cat) => (
             <span
@@ -105,10 +104,13 @@ const ComicCard = memo(({ comic, cdnUrl, priority = false }: ComicCardProps) => 
           ))}
         </div>
 
-        {/* Progress text */}
+        {/* Nội dung tiến độ */}
         {isReading && lastRead && (
           <p className="text-[10px] text-green-400 mt-auto">
-            Đến ch.{lastRead.chapterName} · {progress}%
+            {formatMessage(copy.readingProgress, {
+              chapter: lastRead.chapterName,
+              progress,
+            })}
           </p>
         )}
       </div>

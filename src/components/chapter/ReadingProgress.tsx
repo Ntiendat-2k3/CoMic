@@ -1,21 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { useReadingProgressController } from "@/features/chapter/hooks/useReadingProgressController";
 
 export default function ReadingProgress() {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const update = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0);
-    };
-
-    window.addEventListener("scroll", update, { passive: true });
-    update();
-    return () => window.removeEventListener("scroll", update);
-  }, []);
+  const progress = useReadingProgressController();
+  const { common } = useDictionary();
 
   return (
     <>
@@ -37,7 +27,7 @@ export default function ReadingProgress() {
       {/* Badge hoàn thành */}
       {progress >= 99 && (
         <div className="fixed bottom-20 right-4 z-40 px-2.5 py-1 rounded-full bg-green-600/90 border border-green-500 text-xs text-white font-medium backdrop-blur-sm shadow-lg">
-          ✓ Xong
+          {common.done}
         </div>
       )}
     </>

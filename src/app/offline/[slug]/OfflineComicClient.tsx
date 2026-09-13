@@ -1,51 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, CheckCircle2 } from "lucide-react";
-import { OfflineManager } from "@/lib/offline-manager";
-
-interface SavedComic {
-  slug: string;
-  title: string;
-  thumb_url: string;
-  savedAt: number;
-}
-
-interface SavedChapter {
-  id: string;
-  comicSlug: string;
-  chapterName: string;
-  images: string[];
-  savedAt: number;
-}
+import { useOfflineComicController } from "@/features/offline/hooks/useOfflineComicController";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
+import { resolveCoverUrl } from "@/domain/comic/resolve-cover-url";
 
 export default function OfflineComicClient({ slug }: { slug: string }) {
-  const [comic, setComic] = useState<SavedComic | null>(null);
-  const [chapters, setChapters] = useState<SavedChapter[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const comicData = await OfflineManager.getComic(slug);
-        setComic(comicData as SavedComic);
-
-        const savedChapters = await OfflineManager.getSavedChapters(slug);
-        setChapters(savedChapters as SavedChapter[]);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [slug]);
-
-  const cdnUrl = "https://img.otruyenapi.com";
+  const { comic, chapters, isLoading } = useOfflineComicController(slug);
+  const { locale, common, offline } = useDictionary();
 
   if (isLoading) {
     return (
@@ -58,9 +23,9 @@ export default function OfflineComicClient({ slug }: { slug: string }) {
   if (!comic) {
     return (
       <div className="text-center py-20 text-gray-400">
-        <p>Truyện này không có trong kho tải xuống hoặc đã bị xóa.</p>
+        <p>{offline.missingComic}</p>
         <Link href="/offline" className="text-pink-400 hover:text-pink-300 mt-4 inline-block">
-          Quay lại kho
+          {offline.backToLibraryShort}
         </Link>
       </div>
     );
@@ -69,13 +34,13 @@ export default function OfflineComicClient({ slug }: { slug: string }) {
   return (
     <div className="max-w-4xl mx-auto py-6">
       <Link href="/offline" className="flex items-center gap-2 text-gray-400 hover:text-white mb-6">
-        <ChevronLeft size={20} /> Quay lại Kho Tải Xuống
+        <ChevronLeft size={20} /> {offline.backToLibrary}
       </Link>
 
       <div className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-6 mb-8">
         <div className="relative w-40 md:w-56 aspect-[3/4] rounded-xl overflow-hidden shrink-0 shadow-lg border border-gray-700/50">
           <Image
-            src={comic.thumb_url.includes("http") ? comic.thumb_url : `${cdnUrl}/uploads/comics/${comic.thumb_url}`}
+            src={resolveCoverUrl(comic.thumb_url, "https://img.otruyenapi.com")}
             alt={comic.title}
             fill
             className="object-cover"
@@ -85,19 +50,23 @@ export default function OfflineComicClient({ slug }: { slug: string }) {
         <div className="flex flex-col justify-center">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{comic.title}</h1>
           <p className="text-sm text-green-400 bg-green-400/10 px-3 py-1 rounded w-fit mb-4 mt-2 font-medium">
-            Đã lưu ngoại tuyến
+            {offline.savedOffline}
           </p>
           <div className="text-gray-400 text-sm space-y-2 mt-auto">
-            <p>Số chương đã tải: <strong className="text-white">{chapters.length}</strong></p>
-            <p>Lưu ngày: {new Date(comic.savedAt).toLocaleDateString("vi-VN")}</p>
+            <p>{formatMessage(offline.downloadedChapterCount, { count: chapters.length })}</p>
+            <p>{formatMessage(offline.savedDate, {
+              date: new Date(comic.savedAt).toLocaleDateString(locale),
+            })}</p>
           </div>
         </div>
       </div>
 
-      <h2 className="text-xl font-bold text-white mb-4">Các chương đã Tải ({chapters.length})</h2>
+      <h2 className="text-xl font-bold text-white mb-4">
+        {formatMessage(offline.downloadedChaptersHeading, { count: chapters.length })}
+      </h2>
       {chapters.length === 0 ? (
         <div className="text-gray-400 italic p-6 border border-dashed border-gray-700 rounded-xl text-center">
-          Bạn mới chỉ lưu thông tin truyện, chưa tải xuống chương nào.
+          {offline.noDownloadedChapters}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -108,8 +77,14 @@ export default function OfflineComicClient({ slug }: { slug: string }) {
               className="flex items-center justify-between p-4 glass-panel rounded-xl hover:border-pink-500/50 transition-colors"
             >
               <div>
-                <span className="text-white font-medium block">Chapter {chap.chapterName}</span>
-                <span className="text-xs text-gray-500 mt-1 block">Tải về: {new Date(chap.savedAt).toLocaleString("vi-VN")}</span>
+                <span className="text-white font-medium block">
+                  {formatMessage(common.chapter, { chapter: chap.chapterName })}
+                </span>
+                <span className="text-xs text-gray-500 mt-1 block">
+                  {formatMessage(offline.downloadedAt, {
+                    date: new Date(chap.savedAt).toLocaleString(locale),
+                  })}
+                </span>
               </div>
               <CheckCircle2 size={20} className="text-green-500 opacity-80" />
             </Link>

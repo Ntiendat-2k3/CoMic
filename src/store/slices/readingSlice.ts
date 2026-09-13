@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Lưu tiến độ đọc từng bộ truyện
-interface ReadingEntry {
+export interface ReadingEntry {
   slug: string;
   chapterName: string;
+  chapterSlug?: string;
   comicName: string;
   thumbUrl: string;
   readAt: number; // timestamp
@@ -27,14 +28,16 @@ const readingSlice = createSlice({
       action: PayloadAction<{
         slug: string;
         chapterName: string;
+        chapterSlug?: string;
         comicName: string;
         thumbUrl: string;
       }>
     ) {
-      const { slug, chapterName, comicName, thumbUrl } = action.payload;
+      const { slug, chapterName, chapterSlug, comicName, thumbUrl } = action.payload;
       state.history[slug] = {
         slug,
         chapterName,
+        chapterSlug,
         comicName,
         thumbUrl,
         readAt: Date.now(),
@@ -57,5 +60,8 @@ export const selectLastRead = (slug: string) => (state: { reading: ReadingState 
 
 export const selectAllHistory = (state: { reading: ReadingState }) =>
   Object.values(state.reading.history).sort((a, b) => b.readAt - a.readAt);
+
+export const selectReadingHistory = (state: { reading: ReadingState }) =>
+  state.reading.history;
 
 export default readingSlice.reducer;

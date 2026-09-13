@@ -1,44 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
-}
+import { useDictionary } from "@/i18n/I18nProvider"
+import { usePwaInstallController } from "@/features/app/hooks/usePwaInstallController"
 
 export default function ProgressiveWebApp() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false)
+  const { pwa } = useDictionary()
+  const controller = usePwaInstallController()
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
-      setShowInstallPrompt(true)
-    }
-
-    window.addEventListener("beforeinstallprompt", handler)
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler)
-    }
-  }, [])
-
-  const handleInstall = async () => {
-    if (!deferredPrompt) return
-
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-
-    if (outcome === "accepted") {
-      setShowInstallPrompt(false)
-    }
-
-    setDeferredPrompt(null)
-  }
-
-  if (!showInstallPrompt) return null
+  if (!controller.showInstallPrompt) return null
 
   return (
     <div className="fixed bottom-4 right-4 z-50 glass-pink rounded-2xl p-4 border border-pink-glow/30 max-w-sm">
@@ -47,19 +16,19 @@ export default function ProgressiveWebApp() {
           📱
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-white mb-1">Cài đặt ứng dụng</h3>
-          <p className="text-sm text-gray-300">Trải nghiệm tốt hơn trên điện thoại</p>
+          <h3 className="font-semibold text-white mb-1">{pwa.installTitle}</h3>
+          <p className="text-sm text-gray-300">{pwa.installDescription}</p>
         </div>
       </div>
       <div className="flex gap-2 mt-3">
-        <button onClick={handleInstall} className="glass-button px-4 py-2 rounded-lg text-sm font-medium flex-1">
-          Cài đặt
+        <button onClick={controller.install} className="glass-button px-4 py-2 rounded-lg text-sm font-medium flex-1">
+          {pwa.install}
         </button>
         <button
-          onClick={() => setShowInstallPrompt(false)}
+          onClick={controller.dismiss}
           className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white transition-colors"
         >
-          Bỏ qua
+          {pwa.dismiss}
         </button>
       </div>
     </div>

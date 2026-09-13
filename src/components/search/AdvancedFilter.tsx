@@ -1,65 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import OTruyenService from "@/services/otruyen.service";
-import { Category } from "@/types/common";
 import { Search } from "lucide-react";
-
-const STATUSES = [
-  { value: "", label: "Tất cả" },
-  { value: "dang-phat-hanh", label: "Đang tiến hành" },
-  { value: "hoan-thanh", label: "Đã hoàn thành" },
-  { value: "sap-ra-mat", label: "Sắp ra mắt" },
-];
+import { useAdvancedFilterController } from "@/features/search/hooks/useAdvancedFilterController";
+import { useDictionary } from "@/i18n/I18nProvider";
 
 export default function AdvancedFilter() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const controller = useAdvancedFilterController();
+  const { search } = useDictionary();
+  const statuses = [
+    { value: "", label: search.allStatuses },
+    { value: "dang-phat-hanh", label: search.ongoingStatus },
+    { value: "hoan-thanh", label: search.completedStatus },
+    { value: "tam-ngung", label: search.hiatusStatus },
+  ];
 
-  const urlCategory = searchParams.get("category") || "";
-  const urlStatus = searchParams.get("status") || "";
-  const urlKeyword = searchParams.get("keyword") || "";
-
-  // Local state until search is clicked
-  const [selectedCategory, setSelectedCategory] = useState(urlCategory);
-  const [selectedStatus, setSelectedStatus] = useState(urlStatus);
-
-  useEffect(() => {
-    // Keep local sync with external changes
-    setSelectedCategory(urlCategory);
-    setSelectedStatus(urlStatus);
-  }, [urlCategory, urlStatus]);
-
-  useEffect(() => {
-    OTruyenService.getCategories()
-      .then((data) => setCategories(data))
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  const handleApplyFilter = () => {
-    if (selectedCategory && !selectedStatus && !urlKeyword) {
-      router.push(`/the-loai/${selectedCategory}`);
-      return;
-    }
-    if (!selectedCategory && selectedStatus && !urlKeyword) {
-      router.push(`/danh-sach/${selectedStatus}`);
-      return;
-    }
-
-    const params = new URLSearchParams();
-    if (urlKeyword) params.set("keyword", urlKeyword);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedStatus) params.set("status", selectedStatus);
-    
-    const searchString = params.toString();
-    router.push(`/tim-kiem${searchString ? `?${searchString}` : ""}`);
-  };
-
-  if (isLoading) {
+  if (controller.isLoading) {
     return (
       <div className="glass-panel p-4 rounded-xl animate-pulse">
         <div className="h-6 w-32 bg-white/10 rounded mb-4"></div>
@@ -77,20 +32,20 @@ export default function AdvancedFilter() {
       <div className="absolute -inset-20 bg-gradient-to-r from-pink-500/10 to-purple-500/10 blur-[50px] -z-10 group-hover:from-pink-500/20 group-hover:to-purple-500/20 transition-all duration-500"></div>
       
       <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-        <span className="text-pink-400">⚡</span> Lọc nâng cao
+        <span className="text-pink-400">⚡</span> {search.advancedFilter}
       </h3>
       
       <div className="flex flex-col md:flex-row gap-4 items-end">
         <div className="flex-1 w-full">
-          <label className="block tracking-wide text-xs font-bold text-gray-400 uppercase mb-2">Thể loại</label>
+          <label className="block tracking-wide text-xs font-bold text-gray-400 uppercase mb-2">{search.categoryLabel}</label>
           <div className="relative">
             <select 
               className="block appearance-none w-full glass-input text-gray-200 py-3 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:border-pink-500 min-w-[200px]"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={controller.selectedCategory}
+              onChange={(e) => controller.setSelectedCategory(e.target.value)}
             >
-              <option value="" className="bg-gray-900">Tất cả thể loại</option>
-              {categories.map((cat) => (
+              <option value="" className="bg-gray-900">{search.allCategories}</option>
+              {controller.categories.map((cat) => (
                 <option key={cat._id} value={cat.slug} className="bg-gray-900">
                   {cat.name}
                 </option>
@@ -103,14 +58,14 @@ export default function AdvancedFilter() {
         </div>
 
         <div className="flex-1 w-full">
-          <label className="block tracking-wide text-xs font-bold text-gray-400 uppercase mb-2">Trạng thái</label>
+          <label className="block tracking-wide text-xs font-bold text-gray-400 uppercase mb-2">{search.statusLabel}</label>
           <div className="relative">
             <select 
               className="block appearance-none w-full glass-input text-gray-200 py-3 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:border-pink-500 min-w-[200px]"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
+              value={controller.selectedStatus}
+              onChange={(e) => controller.setSelectedStatus(e.target.value)}
             >
-              {STATUSES.map((status) => (
+              {statuses.map((status) => (
                 <option key={status.value} value={status.value} className="bg-gray-900">
                   {status.label}
                 </option>
@@ -123,11 +78,11 @@ export default function AdvancedFilter() {
         </div>
 
         <button 
-          onClick={handleApplyFilter}
+          onClick={controller.applyFilter}
           className="w-full md:w-auto mt-2 md:mt-0 flex shrink-0 items-center justify-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-pink-500/20 h-[48px]"
         >
           <Search size={18} />
-          Tìm truyện
+          {search.apply}
         </button>
       </div>
     </div>

@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Heart, Play, BookOpen, Star } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/store";
-import { toggleFavorite, selectIsFavorite } from "@/store/slices/favoritesSlice";
 import type { Comic } from "@/types/comic";
+import { useComicActionsController } from "@/features/comic/hooks/useComicActionsController";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
 
 /* ──────────────────────────────────────────────
-   Thumbnail
+   Ảnh bìa
 ────────────────────────────────────────────── */
 export function ComicThumbnail({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
@@ -31,7 +32,7 @@ export function ComicThumbnail({ src, alt }: { src: string; alt: string }) {
 }
 
 /* ──────────────────────────────────────────────
-   Action Buttons (Đọc ngay, Yêu thích)
+   Nút thao tác đọc và yêu thích
 ────────────────────────────────────────────── */
 interface ActionButtonsProps {
   comic: Comic;
@@ -42,19 +43,8 @@ interface ActionButtonsProps {
 import SaveToOfflineButton from "./SaveToOfflineButton";
 
 export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ActionButtonsProps) {
-  const dispatch = useAppDispatch();
-  const isFav = useAppSelector(selectIsFavorite(comic.slug));
-
-  const handleFavorite = () => {
-    dispatch(
-      toggleFavorite({
-        slug: comic.slug,
-        name: comic.name,
-        thumbUrl: comic.thumb_url,
-        cdnUrl,
-      })
-    );
-  };
+  const { isFavorite, toggle } = useComicActionsController(comic, cdnUrl);
+  const { comic: copy } = useDictionary();
 
   return (
     <div className="flex flex-wrap gap-3">
@@ -64,20 +54,20 @@ export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ActionButtons
           className="flex items-center gap-2 px-5 py-2.5 bg-pink-500 hover:bg-pink-400 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-pink-500/20"
         >
           <Play size={16} fill="white" />
-          Đọc từ đầu
+          {copy.readFromStart}
         </Link>
       )}
 
       <button
-        onClick={handleFavorite}
+        onClick={toggle}
         className={`flex items-center gap-2 px-5 py-2.5 font-semibold rounded-xl transition-all border ${
-          isFav
+          isFavorite
             ? "bg-pink-500/20 text-pink-300 border-pink-500/40 shadow-pink-500/10 shadow-md"
             : "bg-gray-700/60 text-gray-300 border-gray-600/50 hover:border-pink-500/30 hover:text-pink-300"
         }`}
       >
-        <Heart size={16} className={isFav ? "fill-pink-400" : ""} />
-        {isFav ? "Đã yêu thích" : "Yêu thích"}
+        <Heart size={16} className={isFavorite ? "fill-pink-400" : ""} />
+        {isFavorite ? copy.favorited : copy.favorite}
       </button>
 
       <SaveToOfflineButton comic={comic} />
@@ -86,13 +76,15 @@ export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ActionButtons
 }
 
 /* ──────────────────────────────────────────────
-   Comic Metadata (tên, tác giả, status, ...)
+   Thông tin truyện: tên, tác giả và trạng thái
 ────────────────────────────────────────────── */
 export function ComicMetadata({ comic }: { comic: Comic }) {
+  const { locale, common, comic: copy } = useDictionary();
   const statusMap: Record<string, { label: string; color: string }> = {
-    "ongoing": { label: "Đang phát hành", color: "text-green-400 bg-green-400/10 border-green-400/30" },
-    "completed": { label: "Hoàn thành", color: "text-blue-400 bg-blue-400/10 border-blue-400/30" },
-    "coming_soon": { label: "Sắp ra mắt", color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/30" },
+    "ongoing": { label: copy.ongoing, color: "text-green-400 bg-green-400/10 border-green-400/30" },
+    "completed": { label: copy.completed, color: "text-blue-400 bg-blue-400/10 border-blue-400/30" },
+    "hiatus": { label: copy.hiatus, color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/30" },
+    "cancelled": { label: copy.cancelled, color: "text-red-400 bg-red-400/10 border-red-400/30" },
   };
   const status = statusMap[comic.status] ?? { label: comic.status, color: "text-gray-400 bg-gray-400/10 border-gray-400/30" };
 
@@ -120,10 +112,17 @@ export function ComicMetadata({ comic }: { comic: Comic }) {
       <div className="flex items-center gap-4 text-sm text-gray-400">
         <span className="flex items-center gap-1">
           <BookOpen size={14} />
-          {comic.chapters?.[0]?.server_data?.length ?? 0} chương
+          {formatMessage(common.chapterCount, {
+            count: comic.chapters.reduce(
+              (total, server) => total + server.server_data.length,
+              0,
+            ),
+          })}
         </span>
         <span>
-          Cập nhật: {new Date(comic.updatedAt).toLocaleDateString("vi-VN")}
+          {formatMessage(copy.updatedAt, {
+            date: new Date(comic.updatedAt).toLocaleDateString(locale),
+          })}
         </span>
       </div>
     </div>
@@ -131,7 +130,7 @@ export function ComicMetadata({ comic }: { comic: Comic }) {
 }
 
 /* ──────────────────────────────────────────────
-   Categories list
+   Danh sách thể loại
 ────────────────────────────────────────────── */
 export function CategoriesList({ categories }: { categories: Comic["category"] }) {
   return (
@@ -150,10 +149,11 @@ export function CategoriesList({ categories }: { categories: Comic["category"] }
 }
 
 /* ──────────────────────────────────────────────
-   Description (collapsible)
+   Mô tả có thể thu gọn
 ────────────────────────────────────────────── */
 export function Description({ content }: { content: string }) {
   const [expanded, setExpanded] = useState(false);
+  const { comic } = useDictionary();
 
   const stripped = content.replace(/<[^>]+>/g, "");
 
@@ -167,7 +167,7 @@ export function Description({ content }: { content: string }) {
           onClick={() => setExpanded(!expanded)}
           className="mt-2 text-xs text-pink-400 hover:text-pink-300 font-medium transition-colors"
         >
-          {expanded ? "Thu gọn ▲" : "Xem thêm ▼"}
+          {expanded ? comic.showLess : comic.showMore}
         </button>
       )}
     </div>

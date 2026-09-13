@@ -7,7 +7,7 @@
 ![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
 ![Clerk](https://img.shields.io/badge/Clerk_Auth-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)
 
-**TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh đa nền tảng (PWA) hiệu suất cao, được xây dựng với kiến trúc **Next.js 15 App Router**. Ứng dụng tận dụng OTruyen API để cung cấp một thư viện phong phú các thể loại Manga, Manhwa, và Manhua cho người dùng đọc trực tuyến miễn phí.
+**TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh đa nền tảng (PWA) hiệu suất cao, được xây dựng với kiến trúc **Next.js 15 App Router**. Ứng dụng sử dụng MangaDex API để cung cấp Manga, Manhwa và Manhua có bản dịch tiếng Việt hoặc tiếng Anh.
 
 ## Case Study (Mô tả dự án)
 
@@ -22,7 +22,7 @@
 
 - **Đọc truyện trực tuyến mượt mà**: Giao diện đọc truyện thân thiện, tối ưu cho việc tải hàng nghìn hình ảnh cùng lúc mà không gây giật lag thiết bị.
 - **Khám phá & Tìm kiếm truyện**: 
-  - Dễ dàng duyệt các danh sách: *Truyện mới cập nhật*, *Đã hoàn thành*, *Sắp ra mắt*.
+  - Dễ dàng duyệt các danh sách: *Truyện mới cập nhật*, *Đang phát hành*, *Đã hoàn thành*, *Tạm ngưng*.
   - Lọc truyện theo hàng chục **Thể loại** đa dạng (Action, Adventure, Romance, Manga, Manhwa...).
   - Thanh tìm kiếm thông minh giúp tra cứu truyện nhanh chóng theo từ khóa.
 - **Lịch sử đọc truyện**: Tự động lưu lại tiến trình đọc, ghi nhớ chương đang đọc dở để bạn có thể tiếp tục ngay lập tức ở lần truy cập sau.
@@ -34,7 +34,7 @@
 
 - **Framework tiên tiến**: Next.js 15 App Router tối ưu SEO mạnh mẽ với SSR và SSG.
 - **Authentication an toàn**: Tích hợp luồng xác thực và quản lý user từ [Clerk](https://clerk.com/).
-- **Quản lý State & Storage thông minh**: Dữ liệu lịch sử và yêu thích được lưu cục bộ an toàn qua IndexedDB (`idb`) & Redux Toolkit. Server state được quản lý & caching hiệu quả bằng `@tanstack/react-query` và `lru-cache`.
+- **Quản lý State & Storage thông minh**: Dữ liệu lịch sử và yêu thích được lưu cục bộ an toàn qua IndexedDB (`idb`) & Redux Toolkit. Server state được quản lý và cache bằng `@tanstack/react-query` cùng cache bộ nhớ cho danh mục MangaDex.
 - **Performance cực cao**: Sử dụng Virtualized Lists (`react-window`, `react-virtualized-auto-sizer`) để render nội dung chapter truyện, giúp tiết kiệm bộ nhớ trình duyệt tối đa.
 - **Giao diện ấn tượng (UI/UX)**: Kết hợp Tailwind CSS, Sass, Headless UI cùng Framer Motion cho trải nghiệm hình ảnh sắc nét, mượt mà và chuyển cảnh bắt mắt.
 
@@ -47,7 +47,7 @@
 - **Xác thực**: [Clerk](https://clerk.com/)
 - **API Client**: [Axios](https://axios-http.com/)
 - **Hiệu ứng Animation**: [Framer Motion](https://www.framer.com/motion/)
-- **PWA**: `next-pwa`
+- **PWA**: `next-pwa`, manifest động tại `src/app/manifest.ts`
 - **Cơ sở dữ liệu / Bộ nhớ cục bộ**: IndexedDB (`idb`)
 - **Icons**: `lucide-react`, `react-icons`
 - **Thành phần UI (UI Components)**: `@headlessui/react`, `notyf` (hiển thị thông báo), `react-paginate`
@@ -56,15 +56,29 @@
 
 ```text
 src/
-├── app/               # Các trang theo cơ chế App Router của Next.js 15 (Trang chủ, Chi tiết truyện, Tìm kiếm, v.v.)
-├── components/        # Các component giao diện dùng chung (Layout, Card Truyện, Giao diện đọc Chapter, v.v.)
-├── hooks/             # Custom React hooks
-├── lib/               # Các hàm tiện ích, cấu hình gọi API và hằng số
-├── providers/         # Các Context Providers (Clerk, Redux, React Query, Giao diện/Theme)
-├── services/          # API Services (chẳng hạn như otruyen.service.ts để gọi data bên ngoài)
-├── store/             # Cấu hình Redux slices và store
-└── types/             # Định nghĩa Type / Interface của TypeScript
+├── app/               # Route, metadata và các container theo App Router
+├── components/        # Lớp presentation: component giao diện dùng chung
+├── domain/            # Quy tắc nghiệp vụ và chuẩn hóa dữ liệu thuần TypeScript
+├── features/          # Lớp application: controller hook theo từng tính năng
+├── hooks/             # Hook hạ tầng dùng chung
+├── i18n/              # Cấu hình, kiểu dữ liệu và provider đa ngôn ngữ
+├── infrastructure/    # HTTP client, kiểu JSON và mapper riêng cho MangaDex
+├── lib/               # Hạ tầng trình duyệt và cache
+├── providers/         # Context Provider của i18n, Redux và React Query
+├── services/          # Lớp truy cập nguồn dữ liệu bên ngoài
+├── store/             # Redux slices và store
+└── types/             # Kiểu dữ liệu dùng chung
+
+public/locales/
+└── vi.json            # Toàn bộ nội dung hiển thị của locale tiếng Việt
 ```
+
+### Quản lý nội dung và thêm ngôn ngữ
+
+- Chỉnh nội dung tiếng Việt tại `public/locales/vi.json`; component không chứa literal hiển thị.
+- Nội dung động dùng placeholder dạng `{name}` và được định dạng bằng `formatMessage`.
+- Server Component đọc dictionary qua `getDictionary`; Client Component đọc qua `useDictionary`.
+- Khi thêm locale mới, tạo file JSON có cùng cấu trúc, khai báo locale trong `src/i18n/config.ts` và đăng ký dictionary trong `src/i18n/dictionaries.ts`.
 
 ## Hướng dẫn cài đặt
 
@@ -99,6 +113,8 @@ CLERK_SECRET_KEY=your_clerk_secret_key
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Không bắt buộc; mặc định là https://api.mangadex.org
+NEXT_PUBLIC_MANGADEX_API_URL=https://api.mangadex.org
 ```
 *(Bạn có thể lấy key API của Clerk từ trang quản trị [Clerk Dashboard](https://dashboard.clerk.dev))*
 
@@ -130,7 +146,7 @@ npm run start
 - Được tinh chỉnh `metadata` đầy đủ trong `layout.tsx` cho thẻ Open Graph và Twitter.
 - Tự động tạo `sitemap.ts` và `robots.ts` động.
 - Sử dụng Next.js App Router hỗ trợ Server-Side Rendering (SSR) và Static Site Generation (SSG).
-- Tích hợp sẵn PWA với `manifest.json` và service worker để tự động cache các tài nguyên.
+- Tích hợp sẵn PWA với manifest động và service worker để tự động cache các tài nguyên.
 
 ## 🤝 Đóng góp
 

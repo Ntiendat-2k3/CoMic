@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, memo } from "react";
 import Image from "next/image";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
 
 interface ChapterImageProps {
   src: string;
@@ -14,8 +16,9 @@ interface ChapterImageProps {
  */
 const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
   const [loaded, setLoaded] = useState(false);
-  const [inView, setInView] = useState(index < 5); // Load 5 ảnh đầu ngay lập tức thay vì 3
+  const [inView, setInView] = useState(index === 0);
   const ref = useRef<HTMLDivElement>(null);
+  const { common } = useDictionary();
 
   useEffect(() => {
     if (inView) return;
@@ -30,7 +33,7 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
         }
       },
       {
-        rootMargin: "1500px 0px", // Tăng vùng đệm lên 1500px để tải sớm hơn nhiều khi cuộn nhanh
+        rootMargin: "600px 0px",
         threshold: 0.01,
       },
     );
@@ -49,12 +52,11 @@ const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
       {inView && (
         <Image
           src={src}
-          alt={`Trang ${index + 1}`}
+          alt={formatMessage(common.pageImageAlt, { page: index + 1 })}
           width={800}
           height={1200}
           sizes="(max-width: 768px) 100vw, 800px"
-          priority={index < 10} // Tăng lên 10 để Next.js tự động set fetchPriority="high"
-          loading={index < 10 ? "eager" : "lazy"}
+          priority={index === 0}
           onLoad={() => setLoaded(true)}
           className={`w-full h-auto object-contain transition-opacity duration-300
             ${loaded ? "opacity-100" : "opacity-0 invisible"}`}

@@ -33,7 +33,7 @@ export interface ComicSEO {
   seoSchema?: SEOSchema;
 
   cdnUrl?: string;
-  seoData: ComicSEO;
+  seoData?: ComicSEO;
 }
 
 export interface ComicDetailParams {

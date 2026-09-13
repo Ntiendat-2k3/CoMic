@@ -1,42 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Download, CheckCircle, Loader2 } from "lucide-react";
-import { OfflineManager } from "@/lib/offline-manager";
 import type { Comic } from "@/types/comic";
+import { useOfflineSaveController } from "@/features/offline/hooks/useOfflineSaveController";
+import { useDictionary } from "@/i18n/I18nProvider";
 
 export default function SaveToOfflineButton({ comic }: { comic: Comic }) {
-  const [isSaved, setIsSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    // Check if comic exists in IDB
-    OfflineManager.getComic(comic.slug).then((res) => {
-      if (res) setIsSaved(true);
-    });
-  }, [comic.slug]);
-
-  const handleToggleSave = async () => {
-    try {
-      if (isSaved) {
-        setIsSaving(true);
-        await OfflineManager.removeComic(comic.slug);
-        setIsSaved(false);
-      } else {
-        setIsSaving(true);
-        await OfflineManager.saveComicMetadata(comic as unknown as import('@/types/response').ComicDetailResponse['data']['item']); // Replace any with strict cast
-        setIsSaved(true);
-      }
-    } catch (error) {
-      console.error("Failed to toggle offline save:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const { isSaved, isSaving, toggleSave } = useOfflineSaveController(comic);
+  const { offline } = useDictionary();
 
   return (
     <button
-      onClick={handleToggleSave}
+      onClick={toggleSave}
       disabled={isSaving}
       className={`flex items-center gap-2 px-5 py-2.5 font-semibold rounded-xl transition-all border ${
         isSaved
@@ -51,7 +26,7 @@ export default function SaveToOfflineButton({ comic }: { comic: Comic }) {
       ) : (
         <Download size={16} />
       )}
-      {isSaving ? "Đang xử lý..." : isSaved ? "Đã lưu Offline" : "Lưu Offline"}
+      {isSaving ? offline.saving : isSaved ? offline.saved : offline.save}
     </button>
   );
 }

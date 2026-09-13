@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface FavoriteEntry {
+export interface FavoriteEntry {
   slug: string;
   name: string;
   thumbUrl: string;

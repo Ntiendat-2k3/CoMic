@@ -1,32 +1,28 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import LayoutMain from "@/components/layout/LayoutMain";
-import OTruyenService from "@/services/otruyen.service";
+import ComicCatalogService from "@/services/comic-catalog.service";
 import ChapterNav from "@/components/chapter/ChapterNav";
 import ChapterImage from "@/components/chapter/ChapterImage";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import ReadingProgress from "@/components/chapter/ReadingProgress";
+import { getDictionary } from "@/i18n/dictionaries";
+import { formatMessage } from "@/i18n/format-message";
+import { cache } from "react";
 
 interface PageProps {
   params: Promise<{ slug: string; chapter: string }>;
 }
 
-interface ChapterApiLegacy {
-  images: string[];
-}
-interface ChapterApiNew {
-  domain_cdn: string;
-  item: {
-    chapter_image: Array<{ image_page: number; image_file: string }>;
-    chapter_path: string;
-  };
-}
-type ChapterApiResponse = ChapterApiLegacy | ChapterApiNew;
+const getComicDetail = cache((slug: string) =>
+  ComicCatalogService.getComicDetail(slug),
+);
 
 interface ChapterMeta {
   chapter_name: string;
   chapter_api_data: string;
+  chapter_slug?: string;
 }
 function isChapterMeta(c: unknown): c is ChapterMeta {
   if (typeof c !== "object" || c === null) return false;
@@ -39,37 +35,48 @@ function isChapterMeta(c: unknown): c is ChapterMeta {
 
 async function getChapterImages(apiUrl: string): Promise<string[]> {
   try {
-    const res = await OTruyenService.getChapterData(apiUrl);
-    const raw = (res.data?.data ?? res.data) as ChapterApiResponse;
-    if ("images" in raw) return raw.images;
-    const { domain_cdn, item } = raw;
-    return item.chapter_image
-      .sort((a, b) => a.image_page - b.image_page)
-      .map((img) => `${domain_cdn}/${item.chapter_path}/${img.image_file}`);
+    return ComicCatalogService.getChapterImages(apiUrl);
   } catch {
     return [];
   }
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { chapter: copy } = getDictionary();
   try {
     const { slug, chapter } = await props.params;
-    const { data } = await OTruyenService.getComicDetail(slug);
-    return { title: `${data.item.name} – Chapter ${chapter}` };
+    const { data } = await getComicDetail(slug);
+    const selectedChapter = data.item.chapters
+      .flatMap((server) => server.server_data)
+      .find((item) => (item.chapter_slug ?? item.chapter_name) === chapter);
+    return {
+      title: formatMessage(copy.metadataTitle, {
+        comic: data.item.name,
+        chapter: selectedChapter?.chapter_name ?? chapter,
+      }),
+    };
   } catch {
-    return { title: "Chapter không tồn tại" };
+    return { title: copy.notFound };
   }
 }
 
 export default async function ChapterPage(props: PageProps) {
+  const { common, navigation, chapter: copy } = getDictionary();
   const { slug, chapter } = await props.params;
 
-  const { data } = await OTruyenService.getComicDetail(slug);
+  const { data } = await getComicDetail(slug);
   const comic = data.item;
   if (!comic) return notFound();
 
-  const serverList = comic.chapters[0]?.server_data.filter(isChapterMeta) ?? [];
-  const idx = serverList.findIndex((c) => c.chapter_name === chapter);
+  const activeServer = comic.chapters.find((server) =>
+    server.server_data.some(
+      (item) => (item.chapter_slug ?? item.chapter_name) === chapter,
+    ),
+  );
+  const serverList = activeServer?.server_data.filter(isChapterMeta) ?? [];
+  const idx = serverList.findIndex(
+    (item) => (item.chapter_slug ?? item.chapter_name) === chapter,
+  );
   if (idx < 0) return notFound();
 
   const prev = serverList[idx - 1];
@@ -77,16 +84,16 @@ export default async function ChapterPage(props: PageProps) {
   const chapterImages = await getChapterImages(
     serverList[idx].chapter_api_data,
   );
-  const chapterNames = serverList.map((c) => c.chapter_name);
+  const currentChapterName = serverList[idx].chapter_name;
 
   return (
     <LayoutMain>
       <ReadingProgress />
       <div className="max-w-4xl mx-auto lg:px-4 lg:py-6">
-        {/* Breadcrumb */}
+        {/* Đường dẫn phân cấp */}
         <nav className="text-sm text-white/60 p-4 lg:p-0 mb-2 flex items-center gap-1 flex-wrap">
           <Link href="/" className="hover:text-white transition-colors">
-            Trang chủ
+            {navigation.home}
           </Link>
           <span>/</span>
           <Link
@@ -96,31 +103,33 @@ export default async function ChapterPage(props: PageProps) {
             {comic.name}
           </Link>
           <span>/</span>
-          <span className="text-white">Chapter {chapter}</span>
+          <span className="text-white">
+            {formatMessage(common.chapter, { chapter: currentChapterName })}
+          </span>
         </nav>
 
-        {/* Top nav */}
+        {/* Điều hướng đầu chương */}
         <ChapterNav
           slug={slug}
           comicName={comic.name}
           thumbUrl={comic.thumb_url}
           cdnUrl={data.APP_DOMAIN_CDN_IMAGE}
-          chapters={chapterNames}
+          chapters={serverList}
           current={chapter}
-          prevChapter={prev?.chapter_name}
-          nextChapter={next?.chapter_name}
+          prevChapter={prev}
+          nextChapter={next}
         />
 
-        {/* Chapter images */}
+        {/* Ảnh chương */}
         {chapterImages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
-            <p className="text-lg">Không tải được ảnh chương này</p>
+            <p className="text-lg">{copy.imageLoadError}</p>
             <Link
               href={`/truyen-tranh/${slug}`}
               className="flex items-center gap-2 text-pink-400 hover:text-pink-300"
             >
               <ChevronLeft size={16} />
-              Quay lại trang truyện
+              {copy.backToComic}
             </Link>
           </div>
         ) : (
@@ -131,16 +140,16 @@ export default async function ChapterPage(props: PageProps) {
           </div>
         )}
 
-        {/* Bottom nav */}
+        {/* Điều hướng cuối chương */}
         <ChapterNav
           slug={slug}
           comicName={comic.name}
           thumbUrl={comic.thumb_url}
           cdnUrl={data.APP_DOMAIN_CDN_IMAGE}
-          chapters={chapterNames}
+          chapters={serverList}
           current={chapter}
-          prevChapter={prev?.chapter_name}
-          nextChapter={next?.chapter_name}
+          prevChapter={prev}
+          nextChapter={next}
         />
       </div>
     </LayoutMain>

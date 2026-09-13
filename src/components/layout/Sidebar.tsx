@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { BookOpen, CheckCircle, AlarmClock, DownloadCloud } from "lucide-react";
-
-const SIDEBAR_ITEMS = [
-  { href: "/danh-sach/truyen-moi", label: "Truyện mới", icon: BookOpen },
-  { href: "/danh-sach/hoan-thanh", label: "Hoàn thành", icon: CheckCircle },
-  { href: "/danh-sach/sap-ra-mat", label: "Sắp ra mắt", icon: AlarmClock },
-  { href: "/offline", label: "Kho tải xuống", icon: DownloadCloud },
-];
+import { getDictionary } from "@/i18n/dictionaries";
 
 export default function Sidebar() {
+  const { navigation } = getDictionary();
+  const items = [
+    { href: "/danh-sach/truyen-moi", label: navigation.newComics, icon: BookOpen },
+    { href: "/danh-sach/hoan-thanh", label: navigation.completed, icon: CheckCircle },
+    { href: "/danh-sach/tam-ngung", label: navigation.hiatus, icon: AlarmClock },
+    { href: "/offline", label: navigation.downloads, icon: DownloadCloud },
+  ];
+
   return (
     <aside className="fixed left-0 top-1/3 -translate-y-1/2 z-40 hidden lg:flex flex-col gap-3">
-      {SIDEBAR_ITEMS.map(({ href, label, icon: Icon }) => (
+      {items.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}

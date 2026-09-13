@@ -1,14 +1,17 @@
 "use client";
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { useDictionary } from "@/i18n/I18nProvider";
 
 export default function AuthButtons() {
+  const { auth } = useDictionary();
+
   return (
     <div className="flex items-center gap-2">
       <SignedOut>
         <SignInButton mode="modal">
           <button className="px-4 py-2 text-sm font-medium text-white bg-pink-500/80 hover:bg-pink-500 rounded-xl transition-colors border border-pink-500/40">
-            Đăng nhập
+            {auth.signIn}
           </button>
         </SignInButton>
       </SignedOut>

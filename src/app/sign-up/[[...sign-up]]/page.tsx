@@ -1,27 +1,30 @@
 import { SignUp } from '@clerk/nextjs';
 import Link from 'next/link';
+import { getDictionary } from '@/i18n/dictionaries';
 
 export default function Page() {
+  const { auth, brand } = getDictionary();
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#0a0a0f]">
-      {/* Background glow */}
+      {/* Quầng sáng nền */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-[500px] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-[400px]">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
             <h1 className="text-4xl font-black bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent hover:scale-105 transition-transform">
-              TruyenHay
+              {brand.name}
             </h1>
           </Link>
-          <p className="text-gray-400 mt-2">Tạo tài khoản mới</p>
+          <p className="text-gray-400 mt-2">{auth.signUpSubtitle}</p>
         </div>
 
         <SignUp
           appearance={{
             elements: {
               card: "bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 shadow-2xl rounded-2xl w-full",
-              header: "hidden", // Hide default header with logo
+              header: "hidden", // Ẩn tiêu đề và logo mặc định.
               socialButtonsBlockButton: "border border-gray-700/50 bg-gray-900/50 hover:bg-gray-800 text-white transition-colors h-11 rounded-xl",
               socialButtonsBlockButtonText: "text-gray-200 font-medium",
               dividerLine: "bg-gray-700/50",

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { PaginationProps } from "@/types/common";
 import { useCallback } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
 
 const Pagination = ({
   pageCount,
@@ -17,6 +19,7 @@ const Pagination = ({
 }: PaginationProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { common } = useDictionary();
 
   const handlePageClick = useCallback(
     (selectedItem: { selected: number }) => {
@@ -63,7 +66,9 @@ const Pagination = ({
       disabledClassName="opacity-50 cursor-not-allowed hover:bg-transparent"
       breakClassName="inline-flex"
       breakLinkClassName="px-3 py-1 text-gray-600"
-      ariaLabelBuilder={(page) => `Đến trang ${page}`}
+      ariaLabelBuilder={(page) =>
+        formatMessage(common.paginationAriaLabel, { page })
+      }
       {...props}
     />
   );

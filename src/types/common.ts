@@ -31,6 +31,8 @@ export interface Chapter {
   chapter_name?: string;
   chapter_title?: string;
   chapter_api_data?: string;
+  chapter_slug?: string;
+  translated_language?: string;
 }
 
 export interface ChapterServer {

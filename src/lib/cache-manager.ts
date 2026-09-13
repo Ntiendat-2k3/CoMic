@@ -1,4 +1,6 @@
-// Advanced caching system
+import { getDictionary } from "@/i18n/dictionaries"
+
+// Hệ thống cache nhiều tầng cho dữ liệu ứng dụng.
 interface CacheItem<T = unknown> {
   data: T
   timestamp: number
@@ -16,7 +18,7 @@ export class AdvancedCacheManager {
   private static instance: AdvancedCacheManager
   private memoryCache = new Map<string, CacheItem>()
   private readonly MAX_MEMORY_ITEMS = 100
-  private readonly DEFAULT_TTL = 5 * 60 * 1000 // 5 minutes
+  private readonly DEFAULT_TTL = 5 * 60 * 1000 // 5 phút
 
   static getInstance() {
     if (!this.instance) {
@@ -25,16 +27,16 @@ export class AdvancedCacheManager {
     return this.instance
   }
 
-  // Multi-layer caching: Memory -> IndexedDB -> Network
+  // Đọc lần lượt từ bộ nhớ rồi IndexedDB.
   async get<T>(key: string): Promise<T | null> {
-    // Try memory cache first
+    // Ưu tiên bộ nhớ để giảm độ trễ.
     const memoryResult = this.getFromMemory<T>(key)
     if (memoryResult) return memoryResult
 
-    // Try IndexedDB
+    // Dùng IndexedDB nếu bộ nhớ không có dữ liệu.
     const idbResult = await this.getFromIndexedDB<T>(key)
     if (idbResult) {
-      // Store back in memory for faster access
+      // Đưa kết quả trở lại bộ nhớ cho lần đọc sau.
       this.setInMemory(key, idbResult, this.DEFAULT_TTL)
       return idbResult
     }
@@ -43,10 +45,10 @@ export class AdvancedCacheManager {
   }
 
   async set<T>(key: string, data: T, ttl = this.DEFAULT_TTL) {
-    // Store in memory
+    // Lưu trong bộ nhớ.
     this.setInMemory(key, data, ttl)
 
-    // Store in IndexedDB for persistence
+    // Lưu bền vững trong IndexedDB.
     await this.setInIndexedDB(key, data, ttl)
   }
 
@@ -63,7 +65,7 @@ export class AdvancedCacheManager {
   }
 
   private setInMemory<T>(key: string, data: T, ttl: number) {
-    // Implement LRU eviction
+    // Loại phần tử cũ nhất khi đạt giới hạn.
     if (this.memoryCache.size >= this.MAX_MEMORY_ITEMS) {
       const firstKey = this.memoryCache.keys().next().value
       if (firstKey) {
@@ -90,7 +92,7 @@ export class AdvancedCacheManager {
       if (!result) return null
 
       if (Date.now() - result.timestamp > result.ttl) {
-        // Expired, remove it
+        // Xóa dữ liệu đã hết hạn.
         const deleteTransaction = db.transaction(["cache"], "readwrite")
         const deleteStore = deleteTransaction.objectStore("cache")
         deleteStore.delete(key)
@@ -149,9 +151,9 @@ export class AdvancedCacheManager {
     })
   }
 
-  // Cleanup expired items
+  // Dọn dữ liệu hết hạn ở cả hai tầng.
   async cleanup() {
-    // Memory cleanup
+    // Dọn bộ nhớ.
     const now = Date.now()
     for (const [key, item] of this.memoryCache.entries()) {
       if (now - item.timestamp > item.ttl) {
@@ -159,7 +161,7 @@ export class AdvancedCacheManager {
       }
     }
 
-    // IndexedDB cleanup
+    // Dọn IndexedDB.
     if (typeof window === "undefined") return
 
     try {
@@ -185,7 +187,7 @@ export class AdvancedCacheManager {
   }
 }
 
-// Service Worker for background caching
+// Điều phối Service Worker chạy cache nền.
 export const ServiceWorkerManager = {
   async register() {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return
@@ -194,13 +196,13 @@ export const ServiceWorkerManager = {
       const registration = await navigator.serviceWorker.register("/sw.js")
       console.log("Service Worker registered:", registration)
 
-      // Update on new version
+      // Thông báo khi Service Worker mới đã cài đặt.
       registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing
         if (newWorker) {
           newWorker.addEventListener("statechange", () => {
             if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              // New version available
+              // Phiên bản mới đã sẵn sàng.
               this.showUpdateNotification()
             }
           })
@@ -212,10 +214,10 @@ export const ServiceWorkerManager = {
   },
 
   showUpdateNotification() {
-    // Show user notification about update
+    const { pwa } = getDictionary()
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Cập nhật mới có sẵn", {
-        body: "Tải lại trang để sử dụng phiên bản mới nhất",
+      new Notification(pwa.updateTitle, {
+        body: pwa.updateDescription,
         icon: "/icon-192.png",
       })
     }

@@ -1,13 +1,16 @@
 import LayoutMain from "@/components/layout/LayoutMain";
 import OfflineComicClient from "./OfflineComicClient";
+import { getDictionary } from "@/i18n/dictionaries";
+
+const dictionary = getDictionary();
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export const metadata = {
-  title: "Chi tiết truyện Offline",
-  description: "Trang chi tiết truyện đã tải xuống",
+  title: dictionary.offline.detailMetadataTitle,
+  description: dictionary.offline.detailMetadataDescription,
 };
 
 export default async function OfflineComicPage(props: Props) {

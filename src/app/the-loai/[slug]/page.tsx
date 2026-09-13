@@ -1,10 +1,12 @@
 import { Metadata } from "next"
 import { unstable_cache } from "next/cache"
 import LayoutMain from "@/components/layout/LayoutMain"
-import OTruyenService from "@/services/otruyen.service"
+import ComicCatalogService from "@/services/comic-catalog.service"
 import ComicGrid from "@/components/comic/ComicGrid"
 import Pagination from "@/components/ui/Pagination"
 import Breadcrumb from "@/components/ui/Breadcrumb"
+import { getDictionary } from "@/i18n/dictionaries"
+import { formatMessage } from "@/i18n/format-message"
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -13,7 +15,7 @@ interface PageProps {
 
 const getCachedData = unstable_cache(
   async (slug: string, page: number) => {
-    const { data } = await OTruyenService.getComicsByCategory(slug, page)
+    const { data } = await ComicCatalogService.getComicsByCategory(slug, page)
     return data
   },
   ["category-data"],
@@ -21,20 +23,21 @@ const getCachedData = unstable_cache(
 )
 
 export async function generateStaticParams() {
-  const popularCategories = ["action", "romance", "comedy", "drama"]
-  return popularCategories.map((slug) => ({ slug }))
+  return []
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { listing } = getDictionary()
   const { slug } = await props.params
   const data = await getCachedData(slug, 1)
   return {
-    title: `Thể loại: ${data.titlePage}`,
-    description: `Danh sách truyện thể loại ${slug}`,
+    title: formatMessage(listing.categoryMetaTitle, { title: data.titlePage }),
+    description: formatMessage(listing.categoryMetaDescription, { category: slug }),
   }
 }
 
 export default async function CategoryPage(props: PageProps) {
+  const { listing } = getDictionary()
   const { slug } = await props.params
   const { page } = await props.searchParams
   const currentPage = Number(page) || 1
@@ -47,24 +50,28 @@ export default async function CategoryPage(props: PageProps) {
   return (
     <LayoutMain>
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        {/* Breadcrumb */}
+        {/* Đường dẫn phân cấp */}
         <Breadcrumb items={data.breadCrumb} />
 
-        {/* Header */}
+        {/* Tiêu đề danh mục */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-2xl font-bold text-white">{data.titlePage}</h1>
           <span className="text-sm text-gray-400">
-            {data.params.pagination.totalItems} truyện · Trang {currentPage}/{pageCount}
+            {formatMessage(listing.categorySummary, {
+              comics: data.params.pagination.totalItems,
+              current: currentPage,
+              total: pageCount,
+            })}
           </span>
         </div>
 
-        {/* Grid */}
+        {/* Danh sách truyện */}
         <ComicGrid
           comics={data.items}
           cdnUrl={data.APP_DOMAIN_CDN_IMAGE}
         />
 
-        {/* Pagination */}
+        {/* Phân trang */}
         <Pagination
           pageCount={pageCount}
           currentPage={currentPage}

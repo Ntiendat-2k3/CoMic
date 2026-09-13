@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useAppDispatch } from "@/store";
-import { saveProgress } from "@/store/slices/readingSlice";
+import { useChapterNavigationController } from "@/features/chapter/hooks/useChapterNavigationController";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
+import type { Chapter } from "@/types/common";
 
 interface ChapterNavProps {
   slug: string;
   comicName: string;
   thumbUrl: string;
   cdnUrl: string;
-  chapters: string[];
+  chapters: Chapter[];
   current: string;
-  prevChapter?: string;
-  nextChapter?: string;
+  prevChapter?: Chapter;
+  nextChapter?: Chapter;
 }
 
 export default function ChapterNav({
@@ -27,35 +28,25 @@ export default function ChapterNav({
   prevChapter,
   nextChapter,
 }: ChapterNavProps) {
-  const router = useRouter();
-  const dispatch = useAppDispatch();
-  // Lọc bỏ trùng trước khi render
-  const uniqueChapters = chapters.filter(
-    (name, idx, arr) => arr.indexOf(name) === idx,
-  );
-
-  const saveAndNavigate = (chapter: string) => {
-    dispatch(
-      saveProgress({
-        slug,
-        chapterName: chapter,
-        comicName,
-        thumbUrl: `${cdnUrl}/uploads/comics/${thumbUrl}`,
-      }),
-    );
-    router.push(`/truyen-tranh/${slug}/${chapter}`);
-  };
+  const { uniqueChapters, navigate } = useChapterNavigationController({
+    slug,
+    comicName,
+    thumbUrl,
+    cdnUrl,
+    chapters,
+  });
+  const { common } = useDictionary();
 
   return (
     <div className="flex items-center justify-between gap-3 flex-wrap my-4 px-4 py-3 bg-gray-800/60 rounded-xl border border-gray-700/50">
-      {/* Prev */}
+      {/* Chương trước */}
       {prevChapter ? (
         <button
-          onClick={() => saveAndNavigate(prevChapter)}
+          onClick={() => navigate(prevChapter.chapter_slug ?? prevChapter.chapter_name ?? "")}
           className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-700 text-sm text-white hover:bg-gray-600 transition-colors"
         >
           <ChevronLeft size={16} />
-          Ch.{prevChapter}
+          {formatMessage(common.shortChapter, { chapter: prevChapter.chapter_name ?? common.unknown })}
         </button>
       ) : (
         <Link
@@ -63,35 +54,38 @@ export default function ChapterNav({
           className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-700/50 text-sm text-gray-400 hover:bg-gray-700 transition-colors"
         >
           <ChevronLeft size={16} />
-          Chi tiết
+          {common.details}
         </Link>
       )}
 
-      {/* Chapter select */}
+      {/* Chọn chương */}
       <select
         value={current}
-        onChange={(e) => saveAndNavigate(e.target.value)}
+        onChange={(e) => navigate(e.target.value)}
         className="flex-1 min-w-0 max-w-xs rounded-lg bg-gray-800 border border-gray-600 px-3 py-2 text-sm text-white hover:border-gray-500 focus:outline-none focus:border-pink-500 transition-colors"
       >
-        {uniqueChapters.map((name, idx) => (
-          <option key={`chapter-opt-${idx}`} value={name}>
-            Chapter {name}
+        {uniqueChapters.map((chapter, idx) => (
+          <option
+            key={chapter.chapter_slug ?? `chapter-opt-${idx}`}
+            value={chapter.chapter_slug ?? chapter.chapter_name}
+          >
+            {formatMessage(common.chapter, { chapter: chapter.chapter_name ?? common.unknown })}
           </option>
         ))}
       </select>
 
-      {/* Next */}
+      {/* Chương sau */}
       {nextChapter ? (
         <button
-          onClick={() => saveAndNavigate(nextChapter)}
+          onClick={() => navigate(nextChapter.chapter_slug ?? nextChapter.chapter_name ?? "")}
           className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-700 text-sm text-white hover:bg-gray-600 transition-colors"
         >
-          Ch.{nextChapter}
+          {formatMessage(common.shortChapter, { chapter: nextChapter.chapter_name ?? common.unknown })}
           <ChevronRight size={16} />
         </button>
       ) : (
         <span className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-700/50 text-sm text-gray-500">
-          Hết
+          {common.end}
           <ChevronRight size={16} />
         </span>
       )}

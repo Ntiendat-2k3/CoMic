@@ -1,6 +1,7 @@
 "use client"
 import Image, { type ImageProps } from "next/image"
 import { useState, useCallback } from "react"
+import { useDictionary } from "@/i18n/I18nProvider"
 
 interface ImageFallbackProps extends ImageProps {
   alt: string
@@ -10,6 +11,7 @@ interface ImageFallbackProps extends ImageProps {
 const ImageFallback = ({ src, alt, onLoad, ...props }: ImageFallbackProps) => {
   const [error, setError] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const { common } = useDictionary()
 
   const handleLoad = useCallback(() => {
     setLoaded(true)
@@ -23,7 +25,7 @@ const ImageFallback = ({ src, alt, onLoad, ...props }: ImageFallbackProps) => {
   if (error) {
     return (
       <div className="w-full h-full bg-gray-700/30 rounded-sm flex items-center justify-center">
-        <span className="text-xs text-gray-400 text-center">No Image</span>
+        <span className="text-xs text-gray-400 text-center">{common.noImage}</span>
       </div>
     )
   }

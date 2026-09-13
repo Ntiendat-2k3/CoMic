@@ -1,52 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Trash2, LibraryIcon } from "lucide-react";
-import { OfflineManager } from "@/lib/offline-manager";
-
-// Simplified type based on what we store
-interface OfflineComic {
-  slug: string;
-  title: string;
-  thumb_url: string;
-  savedAt: number;
-}
+import { useOfflineLibraryController } from "@/features/offline/hooks/useOfflineLibraryController";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { resolveCoverUrl } from "@/domain/comic/resolve-cover-url";
 
 export default function OfflineClient() {
-  const [comics, setComics] = useState<OfflineComic[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadComics = async () => {
-      try {
-        setIsLoading(true);
-        const data = await OfflineManager.getSavedComics();
-        setComics(data.sort((a, b) => b.savedAt - a.savedAt));
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadComics();
-  }, []);
-
-  const handleRemove = async (slug: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa truyện này khỏi máy?")) {
-      await OfflineManager.removeComic(slug);
-      // Inline refresh of the list after removal
-      try {
-        const data = await OfflineManager.getSavedComics();
-        setComics(data.sort((a, b) => b.savedAt - a.savedAt));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
-  const cdnUrl = "https://img.otruyenapi.com";
+  const { offline } = useDictionary();
+  const { comics, isLoading, removeComic } = useOfflineLibraryController(
+    offline.removeConfirm,
+  );
 
   if (isLoading) {
     return (
@@ -60,15 +25,15 @@ export default function OfflineClient() {
     return (
       <div className="text-center py-20 px-4 glass-panel rounded-2xl">
         <LibraryIcon size={64} className="mx-auto mb-6 text-gray-600" />
-        <h3 className="text-xl font-bold text-gray-300 mb-2">Kho lưu trữ trống</h3>
+        <h3 className="text-xl font-bold text-gray-300 mb-2">{offline.emptyTitle}</h3>
         <p className="text-gray-500 max-w-md mx-auto mb-6">
-          Bạn chưa tải xuống truyện nào. Hãy khám phá và tải truyện về máy để đọc mượt mà không cần mạng nhé!
+          {offline.emptyDescription}
         </p>
         <Link
           href="/"
           className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-400 text-white font-medium rounded-xl transition-colors"
         >
-          Khám phá ngay
+          {offline.explore}
         </Link>
       </div>
     );
@@ -85,7 +50,7 @@ export default function OfflineClient() {
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent z-10" />
             
             <Image
-              src={comic.thumb_url.includes("http") ? comic.thumb_url : `${cdnUrl}/uploads/comics/${comic.thumb_url}`}
+              src={resolveCoverUrl(comic.thumb_url, "https://img.otruyenapi.com")}
               alt={comic.title}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
@@ -93,26 +58,23 @@ export default function OfflineClient() {
               unoptimized
             />
 
-            {/* Badges */}
             <div className="absolute top-2 left-2 z-20">
               <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white bg-pink-500/90 rounded-md shadow-sm backdrop-blur-md">
-                Đã Lưu
+                {offline.savedBadge}
               </span>
             </div>
             
-            {/* Delete button overlay */}
             <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
               <button 
-                onClick={(e) => { e.preventDefault(); handleRemove(comic.slug); }}
+                onClick={(e) => { e.preventDefault(); removeComic(comic.slug); }}
                 className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full backdrop-blur hover:scale-110 transition-all"
-                title="Xóa khỏi máy"
+                title={offline.removeTitle}
               >
                 <Trash2 size={14} />
               </button>
             </div>
           </Link>
 
-          {/* Info */}
           <Link href={`/offline/${comic.slug}`} className="p-3 flex flex-col flex-1 justify-between z-20">
             <div>
               <h3 className="text-sm font-bold text-gray-200 line-clamp-2 group-hover:text-pink-400 transition-colors mb-1" title={comic.title}>
@@ -122,7 +84,7 @@ export default function OfflineClient() {
 
             <div className="flex items-center gap-3 mt-3 justify-between">
               <span className="flex items-center gap-1.5 text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-md">
-                <BookOpen size={12} /> Sẵn sàng đọc
+                <BookOpen size={12} /> {offline.ready}
               </span>
             </div>
           </Link>

@@ -7,19 +7,27 @@ import ErrorBoundary from "@/components/app/ErrorBoundary"
 import ProgressiveWebApp from "@/components/app/ProgressiveWebApp"
 import PerformanceMonitor from "@/components/app/PerformanceMonitor"
 import AppProviders from "@/providers/AppProviders"
+import { getDictionary } from "@/i18n/dictionaries"
+import {
+  MANGADEX_API_URL,
+  MANGADEX_COVER_BASE_URL,
+} from "@/infrastructure/mangadex/mangadex.config"
+
+const dictionary = getDictionary()
+const mangaDexApiOrigin = new URL(MANGADEX_API_URL).origin
+const mangaDexCoverOrigin = new URL(MANGADEX_COVER_BASE_URL).origin
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: {
-    default: "TruyenHay - Đọc truyện tranh online miễn phí",
-    template: "%s | TruyenHay",
+    default: dictionary.brand.defaultTitle,
+    template: dictionary.brand.titleTemplate,
   },
-  description:
-    "Đọc truyện tranh online miễn phí với kho truyện phong phú. Manga, Manhwa, Manhua được cập nhật liên tục.",
-  keywords: ["truyện tranh", "manga", "manhwa", "manhua", "đọc truyện online", "truyện miễn phí", "truyện tranh hay", "comic việt", "đọc manga"],
-  authors: [{ name: "TruyenHay Team" }],
-  creator: "TruyenHay",
-  publisher: "TruyenHay",
+  description: dictionary.brand.description,
+  keywords: dictionary.brand.keywords,
+  authors: [{ name: dictionary.brand.team }],
+  creator: dictionary.brand.name,
+  publisher: dictionary.brand.name,
   formatDetection: {
     email: false,
     address: false,
@@ -34,20 +42,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "vi_VN",
-    siteName: "TruyenHay",
-    title: "TruyenHay - Đọc truyện tranh online miễn phí",
-    description: "Đọc truyện tranh online miễn phí với kho truyện phong phú. Manga, Manhwa, Manhua được cập nhật liên tục.",
+    siteName: dictionary.brand.name,
+    title: dictionary.brand.defaultTitle,
+    description: dictionary.brand.description,
     images: [{
       url: '/icons/icon-512x512.png',
       width: 512,
       height: 512,
-      alt: 'TruyenHay - Đọc truyện tranh online miễn phí'
+      alt: dictionary.brand.defaultTitle
     }]
   },
   twitter: {
     card: "summary_large_image",
-    title: "TruyenHay - Đọc truyện tranh online miễn phí",
-    description: "Đọc truyện tranh online miễn phí với kho truyện phong phú. Manga, Manhwa, Manhua được cập nhật liên tục.",
+    title: dictionary.brand.defaultTitle,
+    description: dictionary.brand.description,
     images: ['/icons/icon-512x512.png'],
   },
   robots: {
@@ -55,7 +63,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
   },
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   other: {
     "geo.region": "VN",
     "geo.placename": "Vietnam",
@@ -71,16 +79,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: "#ec4899", // pink-500 from Tailwind
-          colorBackground: "#0a0a0f", // Very dark background matching the site
+          colorPrimary: "#ec4899",
+          colorBackground: "#0a0a0f",
           colorText: "white",
           colorInputText: "white",
         },
         elements: {
           card: "border border-pink-500/20 shadow-2xl shadow-pink-500/10",
-          headerTitle: "hidden", // Hide "Sign in to comic_website"
-          headerSubtitle: "hidden", // Hide "Welcome back..."
-          logoImage: "hidden", // Hide default Clerk logo
+          headerTitle: "hidden",
+          headerSubtitle: "hidden",
+          logoImage: "hidden",
           socialButtonsBlockButton: "border border-gray-700/50 bg-gray-900/50 hover:bg-gray-800",
           formButtonPrimary: "bg-pink-500 hover:bg-pink-600 shadow-md",
           formFieldInput: "bg-gray-900/50 border border-gray-700/50 focus:border-pink-500 focus:ring-pink-500",
@@ -90,19 +98,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }
       }}
     >
-      <html lang="vi" suppressHydrationWarning>
+      <html lang={dictionary.locale.split("-")[0]} suppressHydrationWarning>
         <head>
-          <link rel="dns-prefetch" href="https://img.otruyenapi.com" />
-          <link rel="dns-prefetch" href="https://otruyenapi.com" />
-          <link rel="preconnect" href="https://img.otruyenapi.com" crossOrigin="anonymous" />
-          <link rel="preconnect" href="https://otruyenapi.com" />
+          <link rel="dns-prefetch" href={mangaDexCoverOrigin} />
+          <link rel="dns-prefetch" href={mangaDexApiOrigin} />
+          <link rel="preconnect" href={mangaDexCoverOrigin} crossOrigin="anonymous" />
+          <link rel="preconnect" href={mangaDexApiOrigin} />
           <meta name="theme-color" content="#ec4899" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-title" content="TruyenHay" />
+          <meta name="apple-mobile-web-app-title" content={dictionary.brand.name} />
         </head>
         <body suppressHydrationWarning>
-          <AppProviders>
-            <ErrorBoundary>
+          <AppProviders dictionary={dictionary}>
+            <ErrorBoundary copy={dictionary.errors}>
               <PerformanceMonitor />
               {children}
               <ProgressiveWebApp />

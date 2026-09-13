@@ -4,6 +4,8 @@ import { memo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { FixedSizeList as List } from "react-window";
 import type { Chapter } from "@/types/common";
+import { useDictionary } from "@/i18n/I18nProvider";
+import { formatMessage } from "@/i18n/format-message";
 
 interface VirtualChapterListProps {
   chapters: Chapter[];
@@ -30,19 +32,23 @@ import ChapterDownloadButton from "./ChapterDownloadButton";
 const ChapterRow = memo(({ index, style, data }: RowProps) => {
   const { chapters, comicSlug, activeChapter } = data;
   const chapter = chapters[index];
-  const isActive = chapter.chapter_name === activeChapter;
+  const chapterSlug = chapter.chapter_slug ?? chapter.chapter_name;
+  const isActive = chapterSlug === activeChapter;
+  const { common } = useDictionary();
 
   return (
     <div style={style} className="px-2">
       <Link
-        href={`/truyen-tranh/${comicSlug}/${chapter.chapter_name}`}
+        href={`/truyen-tranh/${comicSlug}/${chapterSlug}`}
         className={`flex items-center justify-between px-4 h-10 rounded-lg text-sm transition-colors duration-150
           ${isActive
             ? "bg-pink-500/20 text-pink-300 border border-pink-500/40 font-semibold"
             : "text-gray-300 hover:bg-gray-700/50 hover:text-white"
           }`}
       >
-        <span>Chapter {chapter.chapter_name}</span>
+        <span>{formatMessage(common.chapter, {
+          chapter: chapter.chapter_name ?? common.unknown,
+        })}</span>
         <div className="flex items-center gap-2 ml-auto max-w-[60%] overflow-hidden">
           {chapter.chapter_title && (
             <span className="text-gray-500 text-xs truncate text-right">
@@ -99,7 +105,7 @@ const VirtualChapterList = memo(({
       <div className="space-y-0.5">
         {chapters.map((chapter, index) => (
           <ChapterRow
-            key={chapter.chapter_name}
+            key={chapter.chapter_slug ?? chapter.chapter_name}
             index={index}
             style={{}}
             data={itemData}
