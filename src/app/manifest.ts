@@ -16,16 +16,10 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     icons: [
       {
-        src: "/icon-192.png",
-        sizes: "192x192",
+        src: "/assets/logo.png",
+        sizes: "500x500",
         type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
+        purpose: "any",
       },
     ],
     categories: ["entertainment", "books"],

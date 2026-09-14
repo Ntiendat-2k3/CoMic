@@ -9,7 +9,10 @@ import {
 import type { Comic } from "@/types/comic";
 
 /** Đóng gói thao tác yêu thích để component nút chỉ xử lý hiển thị. */
-export function useComicActionsController(comic: Comic, cdnUrl: string) {
+export function useComicActionsController(
+  comic: Pick<Comic, "slug" | "name" | "thumb_url">,
+  cdnUrl: string,
+) {
   const dispatch = useAppDispatch();
   const isFavorite = useAppSelector(selectIsFavorite(comic.slug));
   const toggle = useCallback(() => {

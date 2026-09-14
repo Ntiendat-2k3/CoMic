@@ -150,6 +150,7 @@ async function ChapterNavigationData({
       current={chapter}
       prevChapter={context.previousChapter}
       nextChapter={context.nextChapter}
+      sticky={position === "top"}
     />
   );
 
@@ -180,9 +181,13 @@ async function ChapterNavigationData({
   );
 }
 
-function ChapterNavigationSkeleton() {
+function ChapterNavigationSkeleton({ sticky = false }: { sticky?: boolean }) {
   return (
-    <div className="mx-4 my-4 h-16 animate-pulse rounded-xl bg-gray-800/50 lg:mx-0" />
+    <div
+      className={`h-[104px] animate-pulse bg-gray-800/70 sm:h-[62px] sm:rounded-xl ${
+        sticky ? "sticky top-0 z-50 my-0 sm:my-4" : "mx-4 my-4 lg:mx-0"
+      }`}
+    />
   );
 }
 
@@ -253,7 +258,7 @@ export default async function ChapterPage(props: PageProps) {
     <LayoutMain>
       <ReadingProgress />
       <div className="mx-auto max-w-4xl lg:px-4 lg:py-6">
-        <Suspense fallback={<ChapterNavigationSkeleton />}>
+        <Suspense fallback={<ChapterNavigationSkeleton sticky />}>
           <ChapterNavigationData
             slug={slug}
             chapter={chapter}

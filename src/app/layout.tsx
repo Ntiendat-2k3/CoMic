@@ -31,6 +31,11 @@ export const metadata: Metadata = {
     template: dictionary.brand.titleTemplate,
   },
   description: dictionary.brand.description,
+  icons: {
+    icon: [{ url: "/assets/logo.png", type: "image/png", sizes: "500x500" }],
+    shortcut: "/assets/logo.png",
+    apple: [{ url: "/assets/logo.png", type: "image/png", sizes: "500x500" }],
+  },
   keywords: dictionary.brand.keywords,
   authors: [{ name: dictionary.brand.team }],
   creator: dictionary.brand.name,
@@ -53,9 +58,9 @@ export const metadata: Metadata = {
     title: dictionary.brand.defaultTitle,
     description: dictionary.brand.description,
     images: [{
-      url: '/icons/icon-512x512.png',
-      width: 512,
-      height: 512,
+      url: '/assets/logo.png',
+      width: 500,
+      height: 500,
       alt: dictionary.brand.defaultTitle
     }]
   },
@@ -63,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: dictionary.brand.defaultTitle,
     description: dictionary.brand.description,
-    images: ['/icons/icon-512x512.png'],
+    images: ['/assets/logo.png'],
   },
   robots: {
     index: true,

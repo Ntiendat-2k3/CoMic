@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { memo } from "react";
-import { Heart, Menu, X, Clock, Bookmark, ChevronDown } from "lucide-react";
+import { Menu, X, Clock, Bookmark, ChevronDown } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { Category } from "@/types/common";
 import { useDictionary } from "@/i18n/I18nProvider";
@@ -41,8 +42,15 @@ const Navbar = memo(({ categories }: NavbarProps) => {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           {/* Thương hiệu */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-              <Heart size={20} className="text-white fill-white" />
+            <div className="flex size-10 items-center justify-center rounded-xl bg-gray-950 transition-transform duration-200 group-hover:scale-105">
+              <Image
+                src="/assets/logo.png"
+                alt=""
+                width={40}
+                height={40}
+                sizes="40px"
+                className="size-10 object-contain"
+              />
             </div>
             <span className="text-xl font-bold text-white group-hover:text-pink-300 transition-colors hidden sm:block">
               {brand.name}
