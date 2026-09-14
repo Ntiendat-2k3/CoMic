@@ -8,6 +8,8 @@ import Breadcrumb from "@/components/ui/Breadcrumb"
 import { getDictionary } from "@/i18n/dictionaries"
 import { formatMessage } from "@/i18n/format-message"
 
+export const dynamic = "force-dynamic"
+
 interface PageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ page?: string }>
@@ -21,10 +23,6 @@ const getCachedData = unstable_cache(
   ["category-data"],
   { revalidate: 3600, tags: ["comics", "categories"] }
 )
-
-export async function generateStaticParams() {
-  return []
-}
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { listing } = getDictionary()

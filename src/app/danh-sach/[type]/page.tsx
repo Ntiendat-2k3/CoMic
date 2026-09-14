@@ -8,6 +8,8 @@ import { getDictionary } from "@/i18n/dictionaries"
 import { formatMessage } from "@/i18n/format-message"
 import { cache } from "react"
 
+export const dynamic = "force-dynamic"
+
 interface PageProps {
   params: Promise<{ type: ComicListStatus }>
   searchParams: Promise<{ page?: string }>
@@ -16,10 +18,6 @@ interface PageProps {
 const getComicList = cache((type: ComicListStatus, page = 1) =>
   ComicCatalogService.getComicList(type, page),
 )
-
-export async function generateStaticParams() {
-  return []
-}
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { type } = await props.params

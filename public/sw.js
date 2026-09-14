@@ -66,9 +66,16 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
+  const isAtHomeMetadata = url.pathname.startsWith("/api/mangadex/at-home/")
 
-  // Để trình duyệt kết nối trực tiếp tới MangaDex@Home và các origin bên ngoài.
-  if (request.method !== "GET" || url.origin !== self.location.origin) return
+  // Metadata node ngắn hạn phải luôn qua mạng; ảnh và các origin ngoài không đi qua SW.
+  if (
+    request.method !== "GET" ||
+    url.origin !== self.location.origin ||
+    isAtHomeMetadata
+  ) {
+    return
+  }
 
   // Không giữ response RSC hoặc static chunk đã có cache HTTP theo hash.
   if (

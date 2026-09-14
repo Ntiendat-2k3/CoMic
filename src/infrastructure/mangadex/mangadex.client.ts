@@ -114,8 +114,18 @@ function createMangaQueryParams(query: MangaDexMangaQuery) {
   return params;
 }
 
+/** Lấy metadata node MangaDex@Home bằng HTTP client có retry dùng chung. */
+async function getAtHomeServer(chapterId: string) {
+  const { data } = await mangaDexHttpClient.get<MangaDexAtHomeResponse>(
+    `/at-home/server/${encodeURIComponent(chapterId)}`,
+  );
+  return data;
+}
+
 /** Gọi các endpoint đọc công khai của MangaDex và giữ JSON thô trong tầng hạ tầng. */
 export const mangaDexClient = {
+  getAtHomeServer,
+
   async getMangaList(query: MangaDexMangaQuery = {}) {
     const { data } = await mangaDexHttpClient.get<
       MangaDexCollectionResponse<MangaDexManga>
@@ -169,9 +179,7 @@ export const mangaDexClient = {
   },
 
   async getChapterImages(chapterId: string) {
-    const { data } = await mangaDexHttpClient.get<MangaDexAtHomeResponse>(
-      `/at-home/server/${encodeURIComponent(chapterId)}`,
-    );
+    const data = await getAtHomeServer(chapterId);
     const baseUrl = data.baseUrl.replace(/\/$/, "");
     return data.chapter.data.map(
       (fileName) => `${baseUrl}/data/${data.chapter.hash}/${fileName}`,

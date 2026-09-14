@@ -1,5 +1,4 @@
-/** Truy cập MangaDex@Home trực tiếp từ trình duyệt để giữ định tuyến ảnh gần người đọc. */
-import { MANGADEX_API_URL } from "./mangadex.config";
+/** Lấy metadata MangaDex@Home qua backend cùng origin; ảnh vẫn tải trực tiếp từ node CDN. */
 import type { MangaDexAtHomeResponse } from "./mangadex.types";
 
 export type ReaderQuality = "data" | "data-saver";
@@ -34,13 +33,13 @@ function isAtHomeResponse(value: unknown): value is MangaDexAtHomeResponse {
   }
 }
 
-/** Lấy node At-Home mới, không cache vì `baseUrl` chỉ có hiệu lực ngắn. */
+/** Lấy node At-Home mới qua proxy metadata để tránh CORS trên trình duyệt. */
 export async function fetchAtHomeServer(
   chapterId: string,
   signal?: AbortSignal,
 ): Promise<MangaDexAtHomeResponse> {
   const response = await fetch(
-    `${MANGADEX_API_URL}/at-home/server/${encodeURIComponent(chapterId)}`,
+    `/api/mangadex/at-home/${encodeURIComponent(chapterId)}`,
     {
       cache: "no-store",
       credentials: "omit",
