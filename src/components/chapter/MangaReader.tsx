@@ -298,7 +298,7 @@ export default function MangaReader({ chapterId, comicSlug }: MangaReaderProps) 
       <div ref={readerRef} className="w-full bg-black">
         {pages.map((src, index) => (
           <ChapterImage
-            key={src}
+            key={`${refreshVersion}-${src}`}
             src={src}
             index={index}
             onSettled={handleImageSettled}

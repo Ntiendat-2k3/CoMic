@@ -1,6 +1,15 @@
 "use client";
 
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+
+const MAX_IMAGE_RETRIES = 2;
+const IMAGE_RETRY_DELAY_MS = 500;
+
+function addRetryQuery(src: string, retryCount: number) {
+  if (retryCount === 0) return src;
+  const separator = src.includes("?") ? "&" : "?";
+  return `${src}${separator}readerRetry=${retryCount}`;
+}
 
 interface ChapterImageProps {
   src: string;
@@ -22,15 +31,45 @@ const ChapterImage = memo(({
 }: ChapterImageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const settledRef = useRef(false);
+  const retryTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (retryTimerRef.current !== null) {
+        window.clearTimeout(retryTimerRef.current);
+      }
+    };
+  }, []);
 
   const settle = (success: boolean) => {
     if (settledRef.current) return;
+    if (retryTimerRef.current !== null) {
+      window.clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     settledRef.current = true;
     setLoaded(success);
     setFailed(!success);
     onSettled(success);
   };
+
+  const retryOrFail = () => {
+    if (retryTimerRef.current !== null) return;
+
+    if (retryCount >= MAX_IMAGE_RETRIES) {
+      settle(false);
+      return;
+    }
+
+    retryTimerRef.current = window.setTimeout(() => {
+      retryTimerRef.current = null;
+      setRetryCount((current) => current + 1);
+    }, IMAGE_RETRY_DELAY_MS * 2 ** retryCount);
+  };
+
+  const imageSrc = addRetryQuery(src, retryCount);
 
   return (
     <div
@@ -51,7 +90,8 @@ const ChapterImage = memo(({
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- Ảnh chapter phải đi thẳng từ MangaDex@Home tới trình duyệt.
         <img
-          src={src}
+          key={retryCount}
+          src={imageSrc}
           alt={pageAlt}
           width={800}
           height={1200}
@@ -59,7 +99,7 @@ const ChapterImage = memo(({
           decoding="async"
           fetchPriority={index === 0 ? "high" : "auto"}
           onLoad={() => settle(true)}
-          onError={() => settle(false)}
+          onError={retryOrFail}
           className="relative block h-auto w-full object-contain"
         />
       )}
