@@ -1,65 +1,66 @@
 "use client";
 
-import { useState, useRef, useEffect, memo } from "react";
-import Image from "next/image";
-import { useDictionary } from "@/i18n/I18nProvider";
-import { formatMessage } from "@/i18n/format-message";
+import { memo, useRef, useState } from "react";
 
 interface ChapterImageProps {
   src: string;
   index: number;
+  pageAlt: string;
+  errorLabel: string;
+  onSettled: (success: boolean) => void;
 }
 
 /**
- * Render ảnh chapter với IntersectionObserver - chỉ load khi gần viewport.
- * Giữ skeleton placeholder cho đến khi ảnh tải xong để tránh layout shift.
+ * Render ảnh chapter trực tiếp từ MangaDex@Home và để trình duyệt điều phối lazy-load.
  */
-const ChapterImage = memo(({ src, index }: ChapterImageProps) => {
+const ChapterImage = memo(({
+  src,
+  index,
+  pageAlt,
+  errorLabel,
+  onSettled,
+}: ChapterImageProps) => {
   const [loaded, setLoaded] = useState(false);
-  const [inView, setInView] = useState(index === 0);
-  const ref = useRef<HTMLDivElement>(null);
-  const { common } = useDictionary();
+  const [failed, setFailed] = useState(false);
+  const settledRef = useRef(false);
 
-  useEffect(() => {
-    if (inView) return;
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: "600px 0px",
-        threshold: 0.01,
-      },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [inView]);
+  const settle = (success: boolean) => {
+    if (settledRef.current) return;
+    settledRef.current = true;
+    setLoaded(success);
+    setFailed(!success);
+    onSettled(success);
+  };
 
   return (
-    <div ref={ref} className="relative w-full min-h-[40vh]">
-      {/* Skeleton giữ chỗ khi chưa load hoặc chưa vào view */}
-      {(!inView || !loaded) && (
-        <div className="absolute inset-0 animate-pulse bg-gray-800/40 rounded shadow-inner" />
+    <div
+      data-page-index={index}
+      className="relative mx-auto min-h-[40vh] w-full max-w-4xl bg-gray-950"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 1200px" }}
+    >
+      {!loaded && !failed && (
+        <div
+          className={`absolute inset-0 bg-gray-800/40 ${index <= 1 ? "animate-pulse" : ""}`}
+        />
       )}
 
-      {inView && (
-        <Image
+      {failed ? (
+        <div className="flex min-h-[40vh] items-center justify-center text-sm text-gray-500">
+          {errorLabel}
+        </div>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element -- Ảnh chapter phải đi thẳng từ MangaDex@Home tới trình duyệt.
+        <img
           src={src}
-          alt={formatMessage(common.pageImageAlt, { page: index + 1 })}
+          alt={pageAlt}
           width={800}
           height={1200}
-          sizes="(max-width: 768px) 100vw, 800px"
-          priority={index === 0}
-          onLoad={() => setLoaded(true)}
-          className={`w-full h-auto object-contain transition-opacity duration-300
-            ${loaded ? "opacity-100" : "opacity-0 invisible"}`}
+          loading={index === 0 ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={index === 0 ? "high" : "auto"}
+          onLoad={() => settle(true)}
+          onError={() => settle(false)}
+          className="relative block h-auto w-full object-contain"
         />
       )}
     </div>

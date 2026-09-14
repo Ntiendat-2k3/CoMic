@@ -16,10 +16,6 @@ const createNextConfig = (phase: string): NextConfig => ({
         protocol: 'https',
         hostname: 'uploads.mangadex.dev',
       },
-      {
-        protocol: 'https',
-        hostname: '**.mangadex.network',
-      },
     ],
   },
   experimental: {

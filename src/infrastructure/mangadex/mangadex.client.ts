@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import type {
   MangaDexAtHomeResponse,
   MangaDexChapter,
@@ -15,12 +15,61 @@ const TRANSLATED_LANGUAGES = ["en", "vi"] as const;
 const CONTENT_RATINGS = ["safe", "suggestive", "erotica"] as const;
 const MAX_MANGA_PAGE_SIZE = 100;
 const MAX_CHAPTER_PAGE_SIZE = 500;
+const MAX_NETWORK_RETRIES = 2;
+const RETRYABLE_ERROR_CODES = new Set([
+  "ECONNABORTED",
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "EAI_AGAIN",
+  "ETIMEDOUT",
+]);
 export const MANGADEX_MAX_OFFSET = 10_000;
 
 const mangaDexHttpClient = axios.create({
   baseURL: MANGADEX_API_URL,
   timeout: 20_000,
   headers: { Accept: "application/json" },
+});
+
+interface RetryableRequestConfig extends InternalAxiosRequestConfig {
+  mangaDexRetryCount?: number;
+}
+
+function isRetryableRequest(error: AxiosError) {
+  const status = error.response?.status;
+  return (
+    error.config?.method?.toUpperCase() === "GET" &&
+    (RETRYABLE_ERROR_CODES.has(error.code ?? "") ||
+      status === 429 ||
+      (typeof status === "number" && status >= 500))
+  );
+}
+
+/** Thử lại GET khi MangaDex đóng kết nối hoặc tạm thời quá tải. */
+mangaDexHttpClient.interceptors.response.use(undefined, async (error: unknown) => {
+  if (!axios.isAxiosError(error) || !isRetryableRequest(error)) {
+    return Promise.reject(error);
+  }
+
+  const config = error.config as RetryableRequestConfig | undefined;
+  const retryCount = config?.mangaDexRetryCount ?? 0;
+  if (!config || retryCount >= MAX_NETWORK_RETRIES) {
+    return Promise.reject(error);
+  }
+
+  config.mangaDexRetryCount = retryCount + 1;
+  await new Promise((resolve) =>
+    setTimeout(resolve, 300 * 2 ** retryCount),
+  );
+
+  if (process.env.NODE_ENV === "development") {
+    console.warn(
+      `[MangaDex] Thử lại GET ${config.url} (${config.mangaDexRetryCount}/${MAX_NETWORK_RETRIES})`,
+      error.code ?? error.response?.status,
+    );
+  }
+
+  return mangaDexHttpClient.request(config);
 });
 
 export interface MangaDexMangaQuery {

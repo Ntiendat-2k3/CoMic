@@ -1,8 +1,10 @@
 // Service Worker quản lý cache nâng cao.
-const CACHE_NAME = "comic-app-v1"
-const STATIC_CACHE = "static-v1"
-const DYNAMIC_CACHE = "dynamic-v1"
-const IMAGE_CACHE = "images-v1"
+const STATIC_CACHE = "static-v2"
+const DYNAMIC_CACHE = "dynamic-v2"
+const IMAGE_CACHE = "runtime-images-v2"
+const OFFLINE_IMAGE_CACHE = "images-v1"
+const MAX_DYNAMIC_ENTRIES = 50
+const MAX_IMAGE_ENTRIES = 150
 
 // Các chiến lược cache.
 const CACHE_STRATEGIES = {
@@ -46,10 +48,10 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (
-            cacheName !== CACHE_NAME &&
             cacheName !== STATIC_CACHE &&
             cacheName !== DYNAMIC_CACHE &&
-            cacheName !== IMAGE_CACHE
+            cacheName !== IMAGE_CACHE &&
+            cacheName !== OFFLINE_IMAGE_CACHE
           ) {
             return caches.delete(cacheName)
           }
@@ -65,76 +67,113 @@ self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Bỏ qua request không phải GET.
-  if (request.method !== "GET") return
+  // Để trình duyệt kết nối trực tiếp tới MangaDex@Home và các origin bên ngoài.
+  if (request.method !== "GET" || url.origin !== self.location.origin) return
 
-  // Phân loại API, ảnh và trang HTML.
+  // Không giữ response RSC hoặc static chunk đã có cache HTTP theo hash.
+  if (
+    request.headers.has("RSC") ||
+    url.searchParams.has("_rsc") ||
+    url.pathname.startsWith("/_next/")
+  ) {
+    return
+  }
+
   if (url.pathname.includes("/api/")) {
-    event.respondWith(handleAPIRequest(request))
+    event.respondWith(handleAPIRequest(request, event))
   } else if (isImageRequest(request)) {
-    event.respondWith(handleImageRequest(request))
-  } else {
-    event.respondWith(handlePageRequest(request))
+    event.respondWith(handleImageRequest(request, event))
+  } else if (request.mode === "navigate" && shouldCachePage(url.pathname)) {
+    event.respondWith(handlePageRequest(request, event))
   }
 })
 
 // API ưu tiên mạng và dùng cache khi mất kết nối.
-async function handleAPIRequest(request) {
-  try {
-    const networkResponse = await fetch(request)
+function handleAPIRequest(request, event) {
+  const networkPromise = fetch(request)
+  event.waitUntil(
+    networkPromise
+      .then((response) =>
+        response.ok
+          ? putWithLimit(DYNAMIC_CACHE, request, response.clone(), MAX_DYNAMIC_ENTRIES)
+          : undefined,
+      )
+      .catch(() => undefined),
+  )
 
-    if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE)
-      cache.put(request, networkResponse.clone())
-    }
-
-    return networkResponse
-  } catch (error) {
+  return networkPromise.catch(async () => {
     const cachedResponse = await caches.match(request)
     return cachedResponse || new Response(null, { status: 503 })
-  }
+  })
 }
 
 // Ảnh ưu tiên cache và dùng mạng làm dự phòng.
-async function handleImageRequest(request) {
-  const cache = await caches.open(IMAGE_CACHE)
-  const cachedResponse = await cache.match(request)
+function handleImageRequest(request, event) {
+  let fetchedFromNetwork = false
+  const responsePromise = caches.open(IMAGE_CACHE).then(async (cache) => {
+    const cachedResponse = await cache.match(request)
+    if (cachedResponse) return cachedResponse
 
-  if (cachedResponse) {
-    return cachedResponse
-  }
+    fetchedFromNetwork = true
+    return fetch(request)
+  })
 
-  try {
-    const networkResponse = await fetch(request)
-    if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone())
-    }
-    return networkResponse
-  } catch (error) {
-    return new Response(null, { status: 404 })
-  }
+  event.waitUntil(
+    responsePromise
+      .then((response) =>
+        fetchedFromNetwork && response.ok
+          ? putWithLimit(IMAGE_CACHE, request, response.clone(), MAX_IMAGE_ENTRIES)
+          : undefined,
+      )
+      .catch(() => undefined),
+  )
+
+  return responsePromise.catch(() => new Response(null, { status: 404 }))
 }
 
 // Trang dùng dữ liệu cũ trong khi cập nhật cache nền.
-async function handlePageRequest(request) {
-  const cache = await caches.open(DYNAMIC_CACHE)
-  const cachedResponse = await cache.match(request)
-
+function handlePageRequest(request, event) {
   const networkPromise = fetch(request)
-    .then((response) => {
-      if (response.ok) {
-        cache.put(request, response.clone())
-      }
-      return response
-    })
-    .catch(() => null)
+  event.waitUntil(
+    networkPromise
+      .then((response) =>
+        response.ok
+          ? putWithLimit(DYNAMIC_CACHE, request, response.clone(), MAX_DYNAMIC_ENTRIES)
+          : undefined,
+      )
+      .catch(() => undefined),
+  )
 
-  return cachedResponse || (await networkPromise) || new Response(null, { status: 404 })
+  return caches.open(DYNAMIC_CACHE).then(async (cache) => {
+    const cachedResponse = await cache.match(request)
+    if (cachedResponse) return cachedResponse
+
+    return networkPromise.catch(() => new Response(null, { status: 404 }))
+  })
 }
 
 // Các hàm hỗ trợ nhận diện request.
 function isImageRequest(request) {
   return request.destination === "image" || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(new URL(request.url).pathname)
+}
+
+// URL At-Home trong chapter online hết hạn nhanh; route đăng nhập cũng không được cache dùng chung.
+function shouldCachePage(pathname) {
+  const isOnlineChapter = /^\/truyen-tranh\/[^/]+\/[^/]+\/?$/.test(pathname)
+  const isAuthPage = /^\/(sign-in|sign-up|sso-callback)(\/|$)/.test(pathname)
+  return !isOnlineChapter && !isAuthPage
+}
+
+// Giới hạn cache runtime để không làm đầy bộ nhớ của thiết bị đọc.
+async function putWithLimit(cacheName, request, response, maxEntries) {
+  const cache = await caches.open(cacheName)
+  await cache.put(request, response)
+
+  const keys = await cache.keys()
+  const overflow = keys.length - maxEntries
+  if (overflow <= 0) return
+
+  await Promise.all(keys.slice(0, overflow).map((key) => cache.delete(key)))
 }
 
 // Đồng bộ lại thao tác khi thiết bị có mạng.
