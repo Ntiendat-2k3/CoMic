@@ -2,8 +2,8 @@
 
 import { memo, useEffect, useRef, useState } from "react";
 
-const MAX_IMAGE_RETRIES = 2;
-const IMAGE_RETRY_DELAY_MS = 500;
+const MAX_DIRECT_IMAGE_RETRIES = 1;
+const IMAGE_RETRY_DELAY_MS = 350;
 
 function addRetryQuery(src: string, retryCount: number) {
   if (retryCount === 0) return src;
@@ -16,6 +16,7 @@ interface ChapterImageProps {
   index: number;
   pageAlt: string;
   errorLabel: string;
+  fallbackSrc: string;
   onSettled: (success: boolean) => void;
 }
 
@@ -27,11 +28,13 @@ const ChapterImage = memo(({
   index,
   pageAlt,
   errorLabel,
+  fallbackSrc,
   onSettled,
 }: ChapterImageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [usingFallback, setUsingFallback] = useState(false);
   const settledRef = useRef(false);
   const retryTimerRef = useRef<number | null>(null);
 
@@ -58,8 +61,13 @@ const ChapterImage = memo(({
   const retryOrFail = () => {
     if (retryTimerRef.current !== null) return;
 
-    if (retryCount >= MAX_IMAGE_RETRIES) {
+    if (usingFallback) {
       settle(false);
+      return;
+    }
+
+    if (retryCount >= MAX_DIRECT_IMAGE_RETRIES) {
+      setUsingFallback(true);
       return;
     }
 
@@ -69,7 +77,9 @@ const ChapterImage = memo(({
     }, IMAGE_RETRY_DELAY_MS * 2 ** retryCount);
   };
 
-  const imageSrc = addRetryQuery(src, retryCount);
+  const imageSrc = usingFallback
+    ? fallbackSrc
+    : addRetryQuery(src, retryCount);
 
   return (
     <div
@@ -90,7 +100,7 @@ const ChapterImage = memo(({
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- Ảnh chapter phải đi thẳng từ MangaDex@Home tới trình duyệt.
         <img
-          key={retryCount}
+          key={`${usingFallback ? "fallback" : "direct"}-${retryCount}`}
           src={imageSrc}
           alt={pageAlt}
           width={800}

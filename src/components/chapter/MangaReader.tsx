@@ -301,6 +301,7 @@ export default function MangaReader({ chapterId, comicSlug }: MangaReaderProps) 
             key={`${refreshVersion}-${src}`}
             src={src}
             index={index}
+            fallbackSrc={`/api/mangadex/image/${chapterId}/${quality}/${index}`}
             onSettled={handleImageSettled}
             pageAlt={formatMessage(common.pageImageAlt, { page: index + 1 })}
             errorLabel={common.noImage}

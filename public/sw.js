@@ -66,13 +66,15 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
-  const isAtHomeMetadata = url.pathname.startsWith("/api/mangadex/at-home/")
+  const isMangaDexReaderRequest =
+    url.pathname.startsWith("/api/mangadex/at-home/") ||
+    url.pathname.startsWith("/api/mangadex/image/")
 
   // Metadata node ngắn hạn phải luôn qua mạng; ảnh và các origin ngoài không đi qua SW.
   if (
     request.method !== "GET" ||
     url.origin !== self.location.origin ||
-    isAtHomeMetadata
+    isMangaDexReaderRequest
   ) {
     return
   }
