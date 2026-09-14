@@ -257,8 +257,8 @@ export default {
       },
       fontFamily: {
         love: ["'Love Ya Like A Sister', cursive"],
-        sans: ["Inter", "sans-serif"],
-        display: ["Poppins", "sans-serif"],
+        sans: ["var(--font-be-vietnam-pro)", "system-ui", "sans-serif"],
+        display: ["var(--font-be-vietnam-pro)", "system-ui", "sans-serif"],
       },
       container: {
         center: true,

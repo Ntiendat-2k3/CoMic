@@ -98,20 +98,33 @@ const Navbar = memo(({ categories }: NavbarProps) => {
           <button
             onClick={controller.toggleMenu}
             className="lg:hidden p-2.5 rounded-xl bg-gray-800/60 border border-gray-700/50 text-gray-300 hover:text-white transition-colors active:scale-95"
-            aria-label={navigation.menuAriaLabel}
+            aria-label={
+              controller.mobileMenuOpen
+                ? navigation.closeMenuAriaLabel
+                : navigation.openMenuAriaLabel
+            }
+            aria-controls="mobile-navigation"
+            aria-expanded={controller.mobileMenuOpen}
           >
             {controller.mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
 
-      {/* Menu thiết bị nhỏ nằm ngoài header để không bị ảnh hưởng bởi backdrop-blur. */}
+      {/* Menu thiết bị nhỏ nằm dưới header để nút đóng luôn nhận được tương tác. */}
       {controller.mobileMenuOpen && (
-        <div className="fixed inset-x-0 top-0 bottom-0 z-50 lg:hidden flex flex-col">
-          {/* Khoảng trống bằng chiều cao header */}
-          <div className="flex-shrink-0 h-[68px]" />
-          {/* Nội dung menu */}
-          <div className="flex-1 bg-gray-900 overflow-y-auto">
+        <div className="fixed inset-x-0 top-[74px] bottom-0 z-30 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60"
+            aria-label={navigation.closeMenuAriaLabel}
+            onClick={controller.closeMenu}
+          />
+          <nav
+            id="mobile-navigation"
+            className="relative max-h-full bg-gray-900 overflow-y-auto border-t border-gray-800 shadow-2xl"
+            aria-label={navigation.mobileNavigationAriaLabel}
+          >
             <div className="p-4 space-y-4">
               {/* Tìm kiếm */}
               <SearchBox />
@@ -167,7 +180,7 @@ const Navbar = memo(({ categories }: NavbarProps) => {
 
               <AuthButtons />
             </div>
-          </div>
+          </nav>
         </div>
       )}
     </>

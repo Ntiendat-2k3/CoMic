@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+import localFont from "next/font/local"
 import "./globals.scss"
 import { ClerkProvider } from "@clerk/nextjs"
 import { dark } from "@clerk/themes"
@@ -16,6 +17,14 @@ import {
 const dictionary = getDictionary()
 const mangaDexApiOrigin = new URL(MANGADEX_API_URL).origin
 const mangaDexCoverOrigin = new URL(MANGADEX_COVER_BASE_URL).origin
+const beVietnamPro = localFont({
+  src: "./fonts/BeVietnamPro-Variable.ttf",
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
+  variable: "--font-be-vietnam-pro",
+  fallback: ["system-ui", "Arial"],
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -98,7 +107,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }
       }}
     >
-      <html lang={dictionary.locale.split("-")[0]} suppressHydrationWarning>
+      <html
+        lang={dictionary.locale.split("-")[0]}
+        className={beVietnamPro.variable}
+        suppressHydrationWarning
+      >
         <head>
           <link rel="dns-prefetch" href={mangaDexCoverOrigin} />
           <link rel="dns-prefetch" href={mangaDexApiOrigin} />

@@ -47,7 +47,9 @@
     "favorites": "Yêu thích",
     "downloads": "Kho tải xuống",
     "offlineLibrary": "Kho Offline",
-    "menuAriaLabel": "Mở hoặc đóng menu chính",
+    "openMenuAriaLabel": "Mở menu chính",
+    "closeMenuAriaLabel": "Đóng menu chính",
+    "mobileNavigationAriaLabel": "Điều hướng trên thiết bị di động",
     "breadcrumbAriaLabel": "Điều hướng trang"
   },
   "footer": {
