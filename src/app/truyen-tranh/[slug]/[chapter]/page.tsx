@@ -10,6 +10,8 @@ import MangaReader from "@/components/chapter/MangaReader";
 import ReadingProgress from "@/components/chapter/ReadingProgress";
 import { getDictionary } from "@/i18n/dictionaries";
 import { formatMessage } from "@/i18n/format-message";
+import { mangaDexClient } from "@/infrastructure/mangadex/mangadex.client";
+import type { MangaDexAtHomeResponse } from "@/infrastructure/mangadex/mangadex.types";
 
 interface PageProps {
   params: Promise<{ slug: string; chapter: string }>;
@@ -99,6 +101,7 @@ const getChapterContext = cache(async (slug: string, chapter: string) => {
 });
 
 type ChapterContextPromise = ReturnType<typeof getChapterContext>;
+type AtHomePromise = Promise<MangaDexAtHomeResponse | null>;
 
 interface ChapterNavigationDataProps {
   slug: string;
@@ -183,6 +186,41 @@ function ChapterNavigationSkeleton() {
   );
 }
 
+interface ChapterReaderDataProps {
+  chapterId: string;
+  comicSlug: string;
+  atHomePromise: AtHomePromise;
+}
+
+/** Render reader ngay khi metadata At-Home sẵn sàng để trình duyệt thấy URL ảnh trước khi hydrate. */
+async function ChapterReaderData({
+  chapterId,
+  comicSlug,
+  atHomePromise,
+}: ChapterReaderDataProps) {
+  const initialAtHome = await atHomePromise;
+
+  return (
+    <MangaReader
+      key={chapterId}
+      chapterId={chapterId}
+      comicSlug={comicSlug}
+      initialAtHome={initialAtHome}
+    />
+  );
+}
+
+function ChapterReaderSkeleton() {
+  const { chapter: copy } = getDictionary();
+
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center text-gray-400">
+      <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-700 border-t-pink-500" />
+      <span className="sr-only">{copy.readerLoading}</span>
+    </div>
+  );
+}
+
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { chapter: copy } = getDictionary();
   try {
@@ -204,6 +242,12 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 export default async function ChapterPage(props: PageProps) {
   const { slug, chapter } = await props.params;
   const contextPromise = getChapterContext(slug, chapter);
+  const atHomePromise = mangaDexClient.getAtHomeServer(chapter).catch((error) => {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[MangaReader] Không thể tải trước metadata At-Home trên server:", error);
+    }
+    return null;
+  });
 
   return (
     <LayoutMain>
@@ -218,7 +262,13 @@ export default async function ChapterPage(props: PageProps) {
           />
         </Suspense>
 
-        <MangaReader chapterId={chapter} comicSlug={slug} />
+        <Suspense fallback={<ChapterReaderSkeleton />}>
+          <ChapterReaderData
+            chapterId={chapter}
+            comicSlug={slug}
+            atHomePromise={atHomePromise}
+          />
+        </Suspense>
 
         <Suspense fallback={<ChapterNavigationSkeleton />}>
           <ChapterNavigationData

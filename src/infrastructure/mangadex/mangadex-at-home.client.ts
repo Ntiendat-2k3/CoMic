@@ -7,7 +7,7 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
-function isAtHomeResponse(value: unknown): value is MangaDexAtHomeResponse {
+export function isAtHomeResponse(value: unknown): value is MangaDexAtHomeResponse {
   if (typeof value !== "object" || value === null) return false;
 
   const response = value as Partial<MangaDexAtHomeResponse>;

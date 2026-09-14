@@ -10,12 +10,10 @@ import PerformanceMonitor from "@/components/app/PerformanceMonitor"
 import AppProviders from "@/providers/AppProviders"
 import { getDictionary } from "@/i18n/dictionaries"
 import {
-  MANGADEX_API_URL,
   MANGADEX_COVER_BASE_URL,
 } from "@/infrastructure/mangadex/mangadex.config"
 
 const dictionary = getDictionary()
-const mangaDexApiOrigin = new URL(MANGADEX_API_URL).origin
 const mangaDexCoverOrigin = new URL(MANGADEX_COVER_BASE_URL).origin
 const beVietnamPro = localFont({
   src: "./fonts/BeVietnamPro-Variable.ttf",
@@ -114,9 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <head>
           <link rel="dns-prefetch" href={mangaDexCoverOrigin} />
-          <link rel="dns-prefetch" href={mangaDexApiOrigin} />
           <link rel="preconnect" href={mangaDexCoverOrigin} crossOrigin="anonymous" />
-          <link rel="preconnect" href={mangaDexApiOrigin} />
           <meta name="theme-color" content="#ec4899" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-title" content={dictionary.brand.name} />

@@ -1,55 +1,82 @@
 "use client"
 
 import { useEffect } from "react"
-import { PerformanceOptimizer, BundleAnalyzer } from "@/lib/performance-optimizer"
-import { AdvancedCacheManager, ServiceWorkerManager } from "@/lib/cache-manager"
+import { useDictionary } from "@/i18n/I18nProvider"
+
+interface IdleCallbacks {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number
+  cancelIdleCallback?: (handle: number) => void
+}
 
 export default function PerformanceMonitor() {
+  const { pwa } = useDictionary()
+
   useEffect(() => {
-    // Initialize performance optimizations
-    const optimizer = PerformanceOptimizer.getInstance()
-    const cacheManager = AdvancedCacheManager.getInstance()
+    if (!("serviceWorker" in navigator)) return
 
-    // Register service worker
-    ServiceWorkerManager.register()
+    let disposed = false
+    let idleId: number | null = null
+    let timerId: number | null = null
+    const idleCallbacks = window as unknown as IdleCallbacks
 
-    // Setup performance monitoring
-    if (process.env.NODE_ENV === "development") {
-      // Monitor memory usage in development
-      const memoryInterval = setInterval(() => {
-        BundleAnalyzer.trackMemoryUsage()
-      }, 30000) // Every 30 seconds
+    const registerServiceWorker = async () => {
+      try {
+        const registration = await navigator.serviceWorker.register("/sw.js")
+        if (disposed) return
 
-      // Cleanup on unmount
-      return () => {
-        clearInterval(memoryInterval)
-        optimizer.cleanup()
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing
+          if (!newWorker) return
+
+          newWorker.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller &&
+              "Notification" in window &&
+              Notification.permission === "granted"
+            ) {
+              new Notification(pwa.updateTitle, {
+                body: pwa.updateDescription,
+                icon: "/icon-192.png",
+              })
+            }
+          })
+        })
+      } catch (error) {
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Không thể đăng ký Service Worker:", error)
+        }
       }
     }
 
-    // Cleanup cache periodically
-    const cleanupInterval = setInterval(
-      () => {
-        cacheManager.cleanup()
-      },
-      10 * 60 * 1000,
-    ) // Every 10 minutes
+    // Service Worker không thuộc đường tải quan trọng nên chỉ đăng ký khi trang đã rảnh.
+    const scheduleRegistration = () => {
+      if (idleCallbacks.requestIdleCallback) {
+        idleId = idleCallbacks.requestIdleCallback(() => void registerServiceWorker(), {
+          timeout: 3000,
+        })
+        return
+      }
 
-    // Setup intersection observers for lazy loading
-    const lazyLoader = optimizer.createLazyLoader()
+      timerId = window.setTimeout(() => void registerServiceWorker(), 0)
+    }
 
-    // Observe all lazy-loadable elements
-    if (lazyLoader) {
-      const lazyElements = document.querySelectorAll("[data-src], [data-component]")
-      lazyElements.forEach((el) => lazyLoader.observe(el))
+    if (document.readyState === "complete") {
+      scheduleRegistration()
+    } else {
+      window.addEventListener("load", scheduleRegistration, { once: true })
     }
 
     return () => {
-      clearInterval(cleanupInterval)
-      optimizer.cleanup()
+      disposed = true
+      window.removeEventListener("load", scheduleRegistration)
+      if (idleId !== null) idleCallbacks.cancelIdleCallback?.(idleId)
+      if (timerId !== null) window.clearTimeout(timerId)
     }
-  }, [])
+  }, [pwa.updateDescription, pwa.updateTitle])
 
-  // This component doesn't render anything
   return null
 }

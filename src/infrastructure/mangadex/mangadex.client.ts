@@ -1,6 +1,5 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import type {
-  MangaDexAtHomeResponse,
   MangaDexChapter,
   MangaDexCollectionResponse,
   MangaDexEntityResponse,
@@ -8,6 +7,7 @@ import type {
   MangaDexTag,
 } from "./mangadex.types";
 import { MANGADEX_API_URL } from "./mangadex.config";
+import { isAtHomeResponse } from "./mangadex-at-home.client";
 
 export { MANGADEX_API_URL } from "./mangadex.config";
 
@@ -116,9 +116,14 @@ function createMangaQueryParams(query: MangaDexMangaQuery) {
 
 /** Lấy metadata node MangaDex@Home bằng HTTP client có retry dùng chung. */
 async function getAtHomeServer(chapterId: string) {
-  const { data } = await mangaDexHttpClient.get<MangaDexAtHomeResponse>(
+  const { data } = await mangaDexHttpClient.get<unknown>(
     `/at-home/server/${encodeURIComponent(chapterId)}`,
   );
+
+  if (!isAtHomeResponse(data)) {
+    throw new Error("Phản hồi MangaDex@Home không hợp lệ");
+  }
+
   return data;
 }
 

@@ -70,17 +70,23 @@ function writeQualityPreference(quality: ReaderQuality) {
 interface MangaReaderProps {
   chapterId: string;
   comicSlug: string;
+  initialAtHome?: MangaDexAtHomeResponse | null;
 }
 
-export default function MangaReader({ chapterId, comicSlug }: MangaReaderProps) {
+export default function MangaReader({
+  chapterId,
+  comicSlug,
+  initialAtHome = null,
+}: MangaReaderProps) {
   const { common, chapter: copy } = useDictionary();
-  const [atHome, setAtHome] = useState<MangaDexAtHomeResponse | null>(null);
+  const [atHome, setAtHome] = useState<MangaDexAtHomeResponse | null>(initialAtHome);
   const [quality, setQuality] = useState<ReaderQuality>("data-saver");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [refreshVersion, setRefreshVersion] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialAtHome);
   const [error, setError] = useState(false);
   const readerRef = useRef<HTMLDivElement>(null);
+  const skipInitialFetchRef = useRef(Boolean(initialAtHome));
   const nodeRefreshCountRef = useRef(0);
   const refreshInProgressRef = useRef(false);
   const preloadedImagesRef = useRef(new Map<string, HTMLImageElement>());
@@ -91,6 +97,11 @@ export default function MangaReader({ chapterId, comicSlug }: MangaReaderProps) 
   }, []);
 
   useEffect(() => {
+    if (skipInitialFetchRef.current && refreshVersion === 0) {
+      skipInitialFetchRef.current = false;
+      return;
+    }
+
     const controller = new AbortController();
     let active = true;
 
