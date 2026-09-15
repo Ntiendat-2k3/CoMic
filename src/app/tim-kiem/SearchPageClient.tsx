@@ -55,7 +55,7 @@ export default function SearchPageClient({ initialKeyword }: SearchPageClientPro
       </div>
 
       {showUnsupportedFilters && (
-        <div className="text-center py-6 text-yellow-500 glass-panel rounded-xl mt-4">
+        <div className="text-center py-6 text-yellow-500 glass rounded-xl mt-4">
           <p>{search.unsupportedCombinedFilters}</p>
         </div>
       )}

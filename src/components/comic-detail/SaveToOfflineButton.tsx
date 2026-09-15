@@ -13,7 +13,7 @@ export default function SaveToOfflineButton({ comic }: { comic: Comic }) {
     <button
       onClick={toggleSave}
       disabled={isSaving}
-      className={`flex items-center gap-2 px-5 py-2.5 font-semibold rounded-xl transition-all border ${
+      className={`flex min-h-12 min-w-0 items-center justify-center gap-2 rounded-2xl border px-2 text-xs font-semibold transition-colors sm:px-5 sm:text-sm ${
         isSaved
           ? "bg-green-500/20 text-green-300 border-green-500/40 shadow-green-500/10 shadow-md"
           : "bg-gray-700/60 text-gray-300 border-gray-600/50 hover:border-blue-500/30 hover:text-blue-300"
@@ -26,7 +26,9 @@ export default function SaveToOfflineButton({ comic }: { comic: Comic }) {
       ) : (
         <Download size={16} />
       )}
-      {isSaving ? offline.saving : isSaved ? offline.saved : offline.save}
+      <span className="truncate">
+        {isSaving ? offline.saving : isSaved ? offline.saved : offline.save}
+      </span>
     </button>
   );
 }

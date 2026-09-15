@@ -11,11 +11,19 @@ interface IdleCallbacks {
   cancelIdleCallback?: (handle: number) => void
 }
 
-export default function PerformanceMonitor() {
+export default function ServiceWorkerRegistration() {
   const { pwa } = useDictionary()
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return
+
+    // HMR cần luôn nhận HTML và module mới; service worker chỉ phục vụ bản production.
+    if (process.env.NODE_ENV !== "production") {
+      void navigator.serviceWorker.getRegistrations().then((registrations) =>
+        Promise.all(registrations.map((registration) => registration.unregister())),
+      )
+      return
+    }
 
     let disposed = false
     let idleId: number | null = null
@@ -24,7 +32,9 @@ export default function PerformanceMonitor() {
 
     const registerServiceWorker = async () => {
       try {
-        const registration = await navigator.serviceWorker.register("/sw.js")
+        const registration = await navigator.serviceWorker.register("/sw.js", {
+          updateViaCache: "none",
+        })
         if (disposed) return
 
         registration.addEventListener("updatefound", () => {
@@ -40,7 +50,7 @@ export default function PerformanceMonitor() {
             ) {
               new Notification(pwa.updateTitle, {
                 body: pwa.updateDescription,
-                icon: "/icon-192.png",
+                icon: "/assets/logo.png",
               })
             }
           })
@@ -55,9 +65,10 @@ export default function PerformanceMonitor() {
     // Service Worker không thuộc đường tải quan trọng nên chỉ đăng ký khi trang đã rảnh.
     const scheduleRegistration = () => {
       if (idleCallbacks.requestIdleCallback) {
-        idleId = idleCallbacks.requestIdleCallback(() => void registerServiceWorker(), {
-          timeout: 3000,
-        })
+        idleId = idleCallbacks.requestIdleCallback(
+          () => void registerServiceWorker(),
+          { timeout: 3000 },
+        )
         return
       }
 

@@ -7,7 +7,7 @@ export default function Footer() {
   const { brand, footer, navigation } = getDictionary();
 
   return (
-    <footer className="border-t border-gray-800/60 bg-gray-900/50 py-10 mt-10">
+    <footer className="mt-10 hidden border-t border-gray-800/60 bg-gray-900/50 py-10 md:block">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Thương hiệu */}

@@ -4,20 +4,8 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
   }
 }
 
@@ -46,7 +34,7 @@
     color: #ffffff;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    background: #111827;
+    background: #0d0e16;
   }
 }
 
@@ -76,24 +64,6 @@
   border: 1px solid rgba(236, 72, 153, 0.4);
 }
 
-.glass-card {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(236, 72, 153, 0.2);
-  transition: all 0.2s ease;
-  transform: translateZ(0);
-}
-
-@media (min-width: 768px) {
-  .glass-card:hover {
-    background: rgba(236, 72, 153, 0.15);
-    border-color: rgba(236, 72, 153, 0.5);
-    transform: translateZ(0) translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-  }
-}
-
 .glass-button {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(6px);
@@ -120,82 +90,24 @@
   box-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
 }
 
-/* ── Gradient text ── */
-.gradient-text {
-  background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #ffffff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-accent {
-  background: linear-gradient(135deg, #f472b6 0%, #fbbf24 50%, #ffffff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Animations ── */
-.floating {
-  animation: float 10s ease-in-out infinite;
-  will-change: transform;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-.pulse-pink {
-  animation: pulse-pink 4s ease-in-out infinite;
-}
-
-@keyframes pulse-pink {
-  0%, 100% { box-shadow: 0 0 12px rgba(236, 72, 153, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.6); }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.animate-shimmer { animation: shimmer 2s infinite; }
-
-/* ── Utility ── */
-.glow-pink { box-shadow: 0 0 12px rgba(236, 72, 153, 0.4); }
-.text-glass-muted { color: rgba(255, 255, 255, 0.75); }
-.optimize-text {
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-}
-.gpu-accelerated { transform: translateZ(0); will-change: transform; }
-
-.border-gradient-pink {
-  position: relative;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-}
-.border-gradient-pink::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 2px;
-  background: linear-gradient(135deg, #ec4899, #f472b6, #db2777);
-  border-radius: inherit;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: xor;
-  -webkit-mask-composite: xor;
+@keyframes tab-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-  .glass, .glass-card, .glass-pink {
+  .glass, .glass-pink {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  .glass-button:hover,
-  .glass-card:hover {
+  .glass-button:hover {
     transform: none;
     background: inherit;
   }

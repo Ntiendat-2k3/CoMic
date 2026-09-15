@@ -23,7 +23,7 @@ export default function OfflineClient() {
 
   if (comics.length === 0) {
     return (
-      <div className="text-center py-20 px-4 glass-panel rounded-2xl">
+      <div className="text-center py-20 px-4 glass rounded-2xl">
         <LibraryIcon size={64} className="mx-auto mb-6 text-gray-600" />
         <h3 className="text-xl font-bold text-gray-300 mb-2">{offline.emptyTitle}</h3>
         <p className="text-gray-500 max-w-md mx-auto mb-6">

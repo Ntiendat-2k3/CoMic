@@ -1,12 +1,20 @@
-import { MetadataRoute } from 'next'
+import { MetadataRoute } from "next"
  
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   return {
     rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', '/sign-in/', '/sign-up/', '/sso-callback/'],
+      userAgent: "*",
+      allow: "/",
+      disallow: [
+        "/api/",
+        "/auth/",
+        "/forgot-password/",
+        "/sign-in/",
+        "/sign-up/",
+        "/sso-callback/",
+        "/update-password/",
+      ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   }

@@ -10,7 +10,7 @@ export default function ProgressiveWebApp() {
   if (!controller.showInstallPrompt) return null
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 glass-pink rounded-2xl p-4 border border-pink-glow/30 max-w-sm">
+    <div className="fixed bottom-4 right-4 z-50 glass-pink rounded-2xl p-4 border border-pink-500/30 max-w-sm">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
           📱

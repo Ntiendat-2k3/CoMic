@@ -70,17 +70,44 @@ function createSeo(title: string, description: string, images: string[] = []) {
 }
 
 function createBreadcrumb(title: string) {
-  const { navigation } = getDictionary();
   return [
-    { name: navigation.home, slug: "/", isCurrent: false, position: 1 },
-    { name: title, isCurrent: true, position: 2 },
+    { name: title, isCurrent: true, position: 1 },
   ];
 }
 
-function mapMangaPage(
+async function mapMangaPage(
   response: Awaited<ReturnType<typeof mangaDexClient.getMangaList>>,
 ) {
-  return response.data.map((manga) => mapMangaDexManga(manga));
+  const mangaIds = response.data.map((manga) => manga.id);
+  const latestChapterIds = response.data.flatMap((manga) =>
+    manga.attributes.latestUploadedChapter
+      ? [manga.attributes.latestUploadedChapter]
+      : [],
+  );
+  const [statistics, latestChapters] = await Promise.all([
+    mangaDexClient.getMangaStatistics(mangaIds).catch(
+      (): Awaited<ReturnType<typeof mangaDexClient.getMangaStatistics>> => ({}),
+    ),
+    mangaDexClient.getChaptersByIds(latestChapterIds).catch(() => []),
+  ]);
+  const latestChapterByMangaId = new Map(
+    latestChapters.flatMap((chapter) => {
+      const mangaId = chapter.relationships.find(
+        (relationship) => relationship.type === "manga",
+      )?.id;
+      const chapterNumber = chapter.attributes.chapter;
+      return mangaId && chapterNumber ? [[mangaId, chapterNumber] as const] : [];
+    }),
+  );
+
+  return response.data.map((manga) =>
+    mapMangaDexManga(
+      manga,
+      [],
+      statistics[manga.id],
+      latestChapterByMangaId.get(manga.id),
+    ),
+  );
 }
 
 /** Điều phối use case catalog và không để contract MangaDex rò rỉ sang UI. */
@@ -88,7 +115,7 @@ const ComicCatalogService = {
   async getHomeData(page = 1, limit = 15): Promise<HomeResponse> {
     const { home } = getDictionary();
     const response = await mangaDexClient.getMangaList({ page, limit });
-    const items = mapMangaPage(response);
+    const items = await mapMangaPage(response);
     const pagination = createPagination(
       response.total,
       response.limit,
@@ -133,7 +160,7 @@ const ComicCatalogService = {
         seoOnPage: createSeo(title, description),
         breadCrumb: createBreadcrumb(title),
         titlePage: title,
-        items: mapMangaPage(response),
+        items: await mapMangaPage(response),
         params: {
           pagination: createPagination(
             response.total,
@@ -185,7 +212,7 @@ const ComicCatalogService = {
         seoOnPage: createSeo(categoryName, description),
         breadCrumb: createBreadcrumb(categoryName),
         titlePage: categoryName,
-        items: mapMangaPage(response),
+        items: await mapMangaPage(response),
         params: {
           type_slug: "the-loai",
           slug: categoryId,
@@ -205,12 +232,40 @@ const ComicCatalogService = {
     };
   },
 
-  async getComicDetail(id: string): Promise<ComicDetailResponse> {
-    const [manga, chapters] = await Promise.all([
-      mangaDexClient.getManga(id),
+  /** Chỉ tải truyện liên quan ở trang đích; trình đọc chương không chịu thêm request này. */
+  async getComicDetail(
+    id: string,
+    options: { includeRelated?: boolean } = {},
+  ): Promise<ComicDetailResponse> {
+    const mangaPromise = mangaDexClient.getManga(id);
+    const relatedItemsPromise = options.includeRelated
+      ? mangaPromise.then(async (manga) => {
+          const primaryTag =
+            manga.attributes.tags.find((tag) => tag.attributes.group === "genre") ??
+            manga.attributes.tags[0];
+          if (!primaryTag) return [];
+
+          const response = await mangaDexClient.getMangaList({
+            includedTag: primaryTag.id,
+            limit: 7,
+          });
+
+          return response.data
+            .filter((relatedManga) => relatedManga.id !== id)
+            .slice(0, 6)
+            .map((relatedManga) => mapMangaDexManga(relatedManga));
+        }).catch(() => [])
+      : Promise.resolve([]);
+
+    const [manga, chapters, statistics, relatedItems] = await Promise.all([
+      mangaPromise,
       mangaDexClient.getMangaChapters(id),
+      mangaDexClient.getMangaStatistics([id]).catch(
+        (): Awaited<ReturnType<typeof mangaDexClient.getMangaStatistics>> => ({}),
+      ),
+      relatedItemsPromise,
     ]);
-    const comic = mapMangaDexManga(manga, chapters);
+    const comic = mapMangaDexManga(manga, chapters, statistics[id]);
 
     return {
       status: "success",
@@ -219,6 +274,7 @@ const ComicCatalogService = {
         seoOnPage: createSeo(comic.name, comic.content, [comic.thumb_url]),
         breadCrumb: createBreadcrumb(comic.name),
         item: comic,
+        relatedItems,
         params: { slug: id, crawl_check_url: MANGADEX_API_URL },
         APP_DOMAIN_CDN_IMAGE: MANGADEX_COVER_BASE_URL,
       },
@@ -243,7 +299,7 @@ const ComicCatalogService = {
         },
         breadCrumb: createBreadcrumb(title),
         titlePage: title,
-        items: mapMangaPage(response),
+        items: await mapMangaPage(response),
       },
     };
   },

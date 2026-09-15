@@ -7,6 +7,7 @@ import {
   toggleFavorite,
 } from "@/store/slices/favoritesSlice";
 import type { Comic } from "@/types/comic";
+import { useHydrated } from "@/hooks/useHydrated";
 
 /** Đóng gói thao tác yêu thích để component nút chỉ xử lý hiển thị. */
 export function useComicActionsController(
@@ -14,7 +15,9 @@ export function useComicActionsController(
   cdnUrl: string,
 ) {
   const dispatch = useAppDispatch();
-  const isFavorite = useAppSelector(selectIsFavorite(comic.slug));
+  const storedFavorite = useAppSelector(selectIsFavorite(comic.slug));
+  const hydrated = useHydrated();
+  const isFavorite = hydrated && storedFavorite;
   const toggle = useCallback(() => {
     dispatch(
       toggleFavorite({

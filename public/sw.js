@@ -1,27 +1,10 @@
 // Service Worker quản lý cache nâng cao.
-const STATIC_CACHE = "static-v2"
-const DYNAMIC_CACHE = "dynamic-v2"
-const IMAGE_CACHE = "runtime-images-v2"
+const STATIC_CACHE = "static-v3"
+const DYNAMIC_CACHE = "dynamic-v3"
+const IMAGE_CACHE = "runtime-images-v3"
 const OFFLINE_IMAGE_CACHE = "images-v1"
 const MAX_DYNAMIC_ENTRIES = 50
 const MAX_IMAGE_ENTRIES = 150
-
-// Các chiến lược cache.
-const CACHE_STRATEGIES = {
-  CACHE_FIRST: "cache-first",
-  NETWORK_FIRST: "network-first",
-  STALE_WHILE_REVALIDATE: "stale-while-revalidate",
-}
-
-// Ánh xạ route với chiến lược cache.
-const ROUTE_STRATEGIES = {
-  "/": CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
-  "/api/": CACHE_STRATEGIES.NETWORK_FIRST,
-  "/truyen-tranh/": CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
-  "/the-loai/": CACHE_STRATEGIES.STALE_WHILE_REVALIDATE,
-  "/static/": CACHE_STRATEGIES.CACHE_FIRST,
-  "/images/": CACHE_STRATEGIES.CACHE_FIRST,
-}
 
 // Khởi tạo cache tĩnh khi cài đặt.
 self.addEventListener("install", (event) => {
@@ -29,10 +12,9 @@ self.addEventListener("install", (event) => {
     caches.open(STATIC_CACHE).then((cache) => {
       return cache
         .addAll([
-          "/",
           "/locales/vi.json",
         ])
-        .catch((error) => {
+        .catch(() => {
           // Không làm hỏng quá trình cài đặt nếu một tài nguyên tĩnh thất bại.
           return Promise.resolve()
         })
@@ -140,25 +122,20 @@ function handleImageRequest(request, event) {
   return responsePromise.catch(() => new Response(null, { status: 404 }))
 }
 
-// Trang dùng dữ liệu cũ trong khi cập nhật cache nền.
-function handlePageRequest(request, event) {
-  const networkPromise = fetch(request)
-  event.waitUntil(
-    networkPromise
-      .then((response) =>
-        response.ok
-          ? putWithLimit(DYNAMIC_CACHE, request, response.clone(), MAX_DYNAMIC_ENTRIES)
-          : undefined,
+// HTML luôn ưu tiên bản mới để không ghép markup cũ với JavaScript của bản phát hành mới.
+async function handlePageRequest(request, event) {
+  try {
+    const response = await fetch(request)
+    if (response.ok) {
+      event.waitUntil(
+        putWithLimit(DYNAMIC_CACHE, request, response.clone(), MAX_DYNAMIC_ENTRIES),
       )
-      .catch(() => undefined),
-  )
-
-  return caches.open(DYNAMIC_CACHE).then(async (cache) => {
-    const cachedResponse = await cache.match(request)
-    if (cachedResponse) return cachedResponse
-
-    return networkPromise.catch(() => new Response(null, { status: 404 }))
-  })
+    }
+    return response
+  } catch {
+    const cachedResponse = await caches.match(request)
+    return cachedResponse || new Response(null, { status: 404 })
+  }
 }
 
 // Các hàm hỗ trợ nhận diện request.
@@ -209,8 +186,8 @@ self.addEventListener("push", (event) => {
     const dictionary = await loadDictionary()
     const options = {
       body: event.data ? event.data.text() : dictionary.pwa.pushDefault,
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
+      icon: "/assets/logo.png",
+      badge: "/assets/logo.png",
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),

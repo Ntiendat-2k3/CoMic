@@ -37,7 +37,7 @@ export default function OfflineComicClient({ slug }: { slug: string }) {
         <ChevronLeft size={20} /> {offline.backToLibrary}
       </Link>
 
-      <div className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-6 mb-8">
+      <div className="glass p-6 rounded-2xl flex flex-col md:flex-row gap-6 mb-8">
         <div className="relative w-40 md:w-56 aspect-[3/4] rounded-xl overflow-hidden shrink-0 shadow-lg border border-gray-700/50">
           <Image
             src={resolveCoverUrl(comic.thumb_url, "https://img.otruyenapi.com")}
@@ -74,7 +74,7 @@ export default function OfflineComicClient({ slug }: { slug: string }) {
             <Link
               key={chap.id}
               href={`/offline/${slug}/${chap.id}`}
-              className="flex items-center justify-between p-4 glass-panel rounded-xl hover:border-pink-500/50 transition-colors"
+              className="flex items-center justify-between p-4 glass rounded-xl hover:border-pink-500/50 transition-colors"
             >
               <div>
                 <span className="text-white font-medium block">

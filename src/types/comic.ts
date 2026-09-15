@@ -1,4 +1,4 @@
-import { Category, Chapter, ChapterServer } from "./common";
+import { Category, ChapterServer } from "./common";
 
 export interface Comic {
   _id: string;
@@ -8,12 +8,20 @@ export interface Comic {
   content: string;
   status: string;
   thumb_url: string;
-  sub_docquyen: boolean;
   author: string[];
   category: Category[];
   chapters: ChapterServer[];
-  chaptersLatest: Chapter[];
   updatedAt: string;
+  year?: number;
+  originalLanguage?: string;
+  publicationDemographic?: string | null;
+  contentRating?: string;
+  latestChapter?: string;
+  statistics?: {
+    rating?: number;
+    follows?: number;
+    comments?: number;
+  };
 }
 export interface SEOSchema {
   "@context": string;

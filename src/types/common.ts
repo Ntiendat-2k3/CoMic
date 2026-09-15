@@ -10,16 +10,6 @@ export interface Pagination {
   pageRanges: number;
 }
 
-export interface PaginationProps {
-  pageCount: number;
-  currentPage: number;
-  onPageChange?: (selectedPage: number) => void;
-  basePath?: string;
-  marginPagesDisplayed?: number;
-  pageRangeDisplayed?: number;
-  className?: string;
-}
-
 export interface Category {
   _id: string;
   slug: string;
@@ -33,6 +23,7 @@ export interface Chapter {
   chapter_api_data?: string;
   chapter_slug?: string;
   translated_language?: string;
+  published_at?: string;
 }
 
 export interface ChapterServer {

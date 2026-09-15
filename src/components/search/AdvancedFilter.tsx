@@ -16,7 +16,7 @@ export default function AdvancedFilter() {
 
   if (controller.isLoading) {
     return (
-      <div className="glass-panel p-4 rounded-xl animate-pulse">
+      <div className="glass p-4 rounded-xl animate-pulse">
         <div className="h-6 w-32 bg-white/10 rounded mb-4"></div>
         <div className="flex gap-4">
           <div className="h-10 flex-1 bg-white/10 rounded-lg"></div>
@@ -28,7 +28,7 @@ export default function AdvancedFilter() {
   }
 
   return (
-    <div className="glass-panel p-5 rounded-2xl border border-white/10 relative overflow-hidden group mb-8">
+    <div className="glass p-5 rounded-2xl border border-white/10 relative overflow-hidden group mb-8">
       <div className="absolute -inset-20 bg-gradient-to-r from-pink-500/10 to-purple-500/10 blur-[50px] -z-10 group-hover:from-pink-500/20 group-hover:to-purple-500/20 transition-all duration-500"></div>
       
       <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">

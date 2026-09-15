@@ -42,6 +42,7 @@ export interface ComicDetailResponse extends BaseResponse {
     seoOnPage: ComicSEO;
     breadCrumb: BreadCrumb[];
     item: Comic;
+    relatedItems: Comic[];
     params: ComicDetailParams;
     APP_DOMAIN_CDN_IMAGE: string;
   };

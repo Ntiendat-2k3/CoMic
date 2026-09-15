@@ -1,11 +1,13 @@
 "use client";
 
-import { memo, useRef, useState, useEffect } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Play } from "lucide-react";
 import { FixedSizeList as List } from "react-window";
 import type { Chapter } from "@/types/common";
 import { useDictionary } from "@/i18n/I18nProvider";
 import { formatMessage } from "@/i18n/format-message";
+import ChapterDownloadButton from "./ChapterDownloadButton";
 
 interface VirtualChapterListProps {
   chapters: Chapter[];
@@ -13,7 +15,7 @@ interface VirtualChapterListProps {
   activeChapter?: string;
 }
 
-const ITEM_HEIGHT = 44;
+const ITEM_HEIGHT = 68;
 
 interface RowData {
   chapters: Chapter[];
@@ -27,63 +29,74 @@ interface RowProps {
   data: RowData;
 }
 
-import ChapterDownloadButton from "./ChapterDownloadButton";
-
 const ChapterRow = memo(({ index, style, data }: RowProps) => {
   const { chapters, comicSlug, activeChapter } = data;
   const chapter = chapters[index];
   const chapterSlug = chapter.chapter_slug ?? chapter.chapter_name;
   const isActive = chapterSlug === activeChapter;
-  const { common } = useDictionary();
+  const { common, comic, locale } = useDictionary();
+  const publishedAt = chapter.published_at
+    ? new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(chapter.published_at))
+    : null;
+  const href = `/truyen-tranh/${comicSlug}/${chapterSlug}`;
 
   return (
-    <div style={style} className="px-2">
-      <Link
-        href={`/truyen-tranh/${comicSlug}/${chapterSlug}`}
-        className={`flex items-center justify-between px-4 h-10 rounded-lg text-sm transition-colors duration-150
-          ${isActive
-            ? "bg-pink-500/20 text-pink-300 border border-pink-500/40 font-semibold"
-            : "text-gray-300 hover:bg-gray-700/50 hover:text-white"
+    <div style={style} className="px-1 py-1">
+      <div className={`flex h-[60px] items-center gap-2 overflow-hidden rounded-2xl border px-3 transition-colors ${
+        isActive
+          ? "border-pink-400/70 bg-pink-500/12 shadow-[inset_0_0_24px_rgba(236,72,153,.08)]"
+          : "border-white/[0.07] bg-[#151924]/78 hover:border-pink-400/25"
+      }`}>
+        <Link href={href} className="min-w-0 flex-1">
+          <span className="flex min-w-0 items-center gap-2">
+            <strong className="truncate text-sm text-gray-100">
+              {formatMessage(common.chapter, {
+                chapter: chapter.chapter_name ?? common.unknown,
+              })}
+            </strong>
+            {index === 0 ? (
+              <span className="flex-none rounded-full bg-pink-500 px-2 py-0.5 text-[9px] font-bold text-white">
+                {comic.newBadge}
+              </span>
+            ) : null}
+          </span>
+          <span className="mt-1 flex min-w-0 items-center gap-2 text-[10px] text-gray-500">
+            {chapter.chapter_title ? <span className="truncate">{chapter.chapter_title}</span> : null}
+            {publishedAt ? <time className="ml-auto flex-none">{publishedAt}</time> : null}
+          </span>
+        </Link>
+
+        <ChapterDownloadButton comicSlug={comicSlug} chapter={chapter} />
+        <Link
+          href={href}
+          className={`grid size-9 flex-none place-items-center rounded-full ${
+            isActive ? "bg-pink-500 text-white" : "bg-white/[0.05] text-gray-200 hover:bg-pink-500 hover:text-white"
           }`}
-      >
-        <span>{formatMessage(common.chapter, {
-          chapter: chapter.chapter_name ?? common.unknown,
-        })}</span>
-        <div className="flex items-center gap-2 ml-auto max-w-[60%] overflow-hidden">
-          {chapter.chapter_title && (
-            <span className="text-gray-500 text-xs truncate text-right">
-              {chapter.chapter_title}
-            </span>
-          )}
-          <div onClick={(e) => e.preventDefault()}>
-            <ChapterDownloadButton comicSlug={comicSlug} chapter={chapter} />
-          </div>
-        </div>
-      </Link>
+          aria-label={formatMessage(comic.readChapterAriaLabel, {
+            chapter: chapter.chapter_name ?? common.unknown,
+          })}
+        >
+          <Play size={14} fill="currentColor" aria-hidden="true" />
+        </Link>
+      </div>
     </div>
   );
 });
 
 ChapterRow.displayName = "ChapterRow";
 
-/**
- * Dùng ResizeObserver để đo width container thay vì AutoSizer
- * (tránh phụ thuộc vào API deprecated)
- */
 function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(300);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const element = ref.current;
+    if (!element) return;
 
-    // Lấy width ban đầu
-    setWidth(el.offsetWidth);
-
+    setWidth(element.offsetWidth);
     const observer = new ResizeObserver(([entry]) => {
       setWidth(entry.contentRect.width);
     });
-    observer.observe(el);
+    observer.observe(element);
     return () => observer.disconnect();
   }, [ref]);
 
@@ -99,10 +112,9 @@ const VirtualChapterList = memo(({
   const containerWidth = useContainerWidth(containerRef);
   const itemData: RowData = { chapters, comicSlug, activeChapter };
 
-  // Dưới 20 chapter → render thường, không cần virtual scroll
   if (chapters.length < 20) {
     return (
-      <div className="space-y-0.5">
+      <div>
         {chapters.map((chapter, index) => (
           <ChapterRow
             key={chapter.chapter_slug ?? chapter.chapter_name}
@@ -115,8 +127,7 @@ const VirtualChapterList = memo(({
     );
   }
 
-  // Virtual scroll cho danh sách >= 20 chapters
-  const listHeight = Math.min(chapters.length * ITEM_HEIGHT, 480);
+  const listHeight = Math.min(chapters.length * ITEM_HEIGHT, 520);
 
   return (
     <div ref={containerRef} style={{ height: listHeight }}>

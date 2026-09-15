@@ -4,6 +4,7 @@ import type {
   MangaDexCollectionResponse,
   MangaDexEntityResponse,
   MangaDexManga,
+  MangaDexStatisticsResponse,
   MangaDexTag,
 } from "./mangadex.types";
 import { MANGADEX_API_URL } from "./mangadex.config";
@@ -151,6 +152,36 @@ export const mangaDexClient = {
     const { data } = await mangaDexHttpClient.get<
       MangaDexEntityResponse<MangaDexManga>
     >(`/manga/${encodeURIComponent(id)}`, { params });
+    return data.data;
+  },
+
+  async getMangaStatistics(ids: string[]) {
+    if (ids.length === 0) return {};
+
+    const params = new URLSearchParams();
+    appendMany(params, "manga", ids.slice(0, MAX_MANGA_PAGE_SIZE));
+    const { data } = await mangaDexHttpClient.get<MangaDexStatisticsResponse>(
+      "/statistics/manga",
+      {
+        params,
+        timeout: 5_000,
+        // Statistics chỉ làm giàu UI, không để retry làm chậm nội dung chính.
+        mangaDexRetryCount: MAX_NETWORK_RETRIES,
+      } as RetryableRequestConfig,
+    );
+    return data.statistics;
+  },
+
+  async getChaptersByIds(ids: string[]) {
+    if (ids.length === 0) return [];
+
+    const chapterIds = [...new Set(ids)].slice(0, MAX_MANGA_PAGE_SIZE);
+    const params = new URLSearchParams({ limit: String(chapterIds.length) });
+    appendMany(params, "ids", chapterIds);
+
+    const { data } = await mangaDexHttpClient.get<
+      MangaDexCollectionResponse<MangaDexChapter>
+    >("/chapter", { params });
     return data.data;
   },
 

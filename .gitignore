@@ -35,13 +35,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
 
+# local tool state
+/.clerk/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# clerk configuration (can include secrets)
-/.clerk/

@@ -32,7 +32,7 @@ async function HomeContent() {
 export default function HomePage() {
   return (
     <LayoutMain>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 py-4 sm:px-4 sm:py-8">
         <Suspense fallback={<GridSkeleton />}>
           <HomeContent />
         </Suspense>

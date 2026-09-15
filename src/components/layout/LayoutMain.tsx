@@ -6,20 +6,21 @@ import Sidebar from "@/components/layout/Sidebar";
 
 interface LayoutMainProps {
   children: ReactNode;
+  hideMobileNavigation?: boolean;
 }
 
-async function NavbarData() {
+async function NavbarData({ hideMobileNavigation }: Pick<LayoutMainProps, "hideMobileNavigation">) {
   const categories = await ComicCatalogService.getCategories().catch(() => []);
-  return <Navbar categories={categories} />;
+  return <Navbar categories={categories} hideMobileNavigation={hideMobileNavigation} />;
 }
 
-const LayoutMain = ({ children }: LayoutMainProps) => {
+const LayoutMain = ({ children, hideMobileNavigation = false }: LayoutMainProps) => {
   return (
     <>
       <Sidebar />
-      <div className="flex flex-col min-h-screen bg-gray-900">
-        <Suspense fallback={<Navbar categories={[]} />}>
-          <NavbarData />
+      <div className={`flex min-h-screen flex-col bg-[#0d0e16] ${hideMobileNavigation ? "pb-0" : "pb-[4.75rem] md:pb-0"}`}>
+        <Suspense fallback={<Navbar categories={[]} hideMobileNavigation={hideMobileNavigation} />}>
+          <NavbarData hideMobileNavigation={hideMobileNavigation} />
         </Suspense>
         <main className="flex-1">{children}</main>
         <Footer />

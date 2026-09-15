@@ -5,7 +5,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-764ABC?style=for-the-badge&logo=redux&logoColor=white)
 ![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
-![Clerk](https://img.shields.io/badge/Clerk_Auth-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase_Auth-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
 
 **TruyenHay** (Tên dự án: `CoMic`) là một ứng dụng web đọc truyện tranh đa nền tảng (PWA) hiệu suất cao, được xây dựng với kiến trúc **Next.js 15 App Router**. Ứng dụng sử dụng MangaDex API để cung cấp Manga, Manhwa và Manhua có bản dịch tiếng Việt hoặc tiếng Anh.
 
@@ -33,10 +33,10 @@
 ## Điểm nổi bật về Công nghệ (Technical Features)
 
 - **Framework tiên tiến**: Next.js 15 App Router tối ưu SEO mạnh mẽ với SSR và SSG.
-- **Authentication an toàn**: Tích hợp luồng xác thực và quản lý user từ [Clerk](https://clerk.com/).
+- **Authentication an toàn**: Tích hợp email/mật khẩu, khôi phục tài khoản và OAuth bằng [Supabase Auth](https://supabase.com/docs/guides/auth).
 - **Quản lý State & Storage thông minh**: Dữ liệu lịch sử và yêu thích được lưu cục bộ an toàn qua IndexedDB (`idb`) & Redux Toolkit. Server state được quản lý và cache bằng `@tanstack/react-query` cùng cache bộ nhớ cho danh mục MangaDex.
-- **Performance cực cao**: Sử dụng Virtualized Lists (`react-window`, `react-virtualized-auto-sizer`) để render nội dung chapter truyện, giúp tiết kiệm bộ nhớ trình duyệt tối đa.
-- **Giao diện ấn tượng (UI/UX)**: Kết hợp Tailwind CSS, Sass, Headless UI cùng Framer Motion cho trải nghiệm hình ảnh sắc nét, mượt mà và chuyển cảnh bắt mắt.
+- **Performance cực cao**: Sử dụng Virtualized Lists (`react-window`) kết hợp `ResizeObserver` để render nội dung chapter truyện, giúp tiết kiệm bộ nhớ trình duyệt tối đa.
+- **Giao diện ấn tượng (UI/UX)**: Kết hợp Tailwind CSS, Sass và CSS transition để tạo trải nghiệm hình ảnh sắc nét, mượt mà.
 
 ## Công nghệ sử dụng (Tech Stack)
 
@@ -44,13 +44,12 @@
 - **Ngôn ngữ**: [TypeScript](https://www.typescriptlang.org/)
 - **CSS / Styling**: [Tailwind CSS](https://tailwindcss.com/), [Sass](https://sass-lang.com/)
 - **Quản lý State (State Management)**: [Redux Toolkit](https://redux-toolkit.js.org/), [React Query](https://tanstack.com/query/latest)
-- **Xác thực**: [Clerk](https://clerk.com/)
+- **Xác thực**: [Supabase Auth](https://supabase.com/docs/guides/auth) với phiên cookie SSR
 - **API Client**: [Axios](https://axios-http.com/)
-- **Hiệu ứng Animation**: [Framer Motion](https://www.framer.com/motion/)
-- **PWA**: `next-pwa`, manifest động tại `src/app/manifest.ts`
+- **PWA**: manifest động tại `src/app/manifest.ts` và Service Worker tùy chỉnh
 - **Cơ sở dữ liệu / Bộ nhớ cục bộ**: IndexedDB (`idb`)
 - **Icons**: `lucide-react`, `react-icons`
-- **Thành phần UI (UI Components)**: `@headlessui/react`, `notyf` (hiển thị thông báo), `react-paginate`
+- **Thành phần UI (UI Components)**: `react-paginate`
 
 ## Cấu trúc thư mục
 
@@ -105,18 +104,20 @@ pnpm install
 
 ### 3. Cấu hình biến môi trường
 
-Tạo một tệp `.env.local` ở thư mục gốc của dự án và thêm vào các biến môi trường sau (chủ yếu là cấu hình cho Clerk Auth):
+Sao chép `.env.example` thành `.env.local`, sau đó điền URL và publishable key từ phần **Project Settings → API** của Supabase:
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+# Chỉ dùng trên server, tuyệt đối không thêm tiền tố NEXT_PUBLIC_
+SUPABASE_SECRET_KEY=sb_secret_your_secret_key
 # Không bắt buộc; mặc định là https://api.mangadex.org
 NEXT_PUBLIC_MANGADEX_API_URL=https://api.mangadex.org
 ```
-*(Bạn có thể lấy key API của Clerk từ trang quản trị [Clerk Dashboard](https://dashboard.clerk.dev))*
+
+Chạy file migration `supabase/migrations/20260915060000_create_profiles.sql` trong **Supabase → SQL Editor**. Migration tạo bảng `profiles`, RLS, trigger đồng bộ người dùng và hàm kiểm tra username. Việc tắt **Automatically expose new tables** không ảnh hưởng vì migration đã cấp quyền cần thiết một cách tường minh.
+
+Trong **Authentication → URL Configuration**, thêm `http://localhost:3000/auth/callback` và callback tương ứng của production vào danh sách Redirect URLs. Bật Email/Password và Google trong **Authentication → Providers**. Với dự án thử nghiệm chưa có SMTP riêng, Supabase chỉ gửi email xác nhận đến thành viên của dự án; hãy cấu hình **Authentication → SMTP Settings** trước khi mở đăng ký cho người dùng khác.
 
 ### 4. Chạy dự án ở môi trường phát triển (Development)
 

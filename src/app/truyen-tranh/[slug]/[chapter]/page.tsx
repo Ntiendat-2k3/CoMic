@@ -184,7 +184,7 @@ async function ChapterNavigationData({
 function ChapterNavigationSkeleton({ sticky = false }: { sticky?: boolean }) {
   return (
     <div
-      className={`h-[104px] animate-pulse bg-gray-800/70 sm:h-[62px] sm:rounded-xl ${
+      className={`h-[46px] animate-pulse bg-gray-800/70 sm:h-[62px] sm:rounded-xl ${
         sticky ? "sticky top-0 z-50 my-0 sm:my-4" : "mx-4 my-4 lg:mx-0"
       }`}
     />

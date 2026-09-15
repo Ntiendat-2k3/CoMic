@@ -51,16 +51,16 @@ export default function ChapterNav({
   );
   const { common, navigation, comic: comicCopy, errors } = useDictionary();
   const iconButtonClass =
-    "flex size-11 shrink-0 items-center justify-center rounded-lg border border-gray-700/70 bg-gray-800 text-gray-200 transition-colors hover:border-pink-500/50 hover:bg-gray-700 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400";
+    "flex size-9 shrink-0 items-center justify-center rounded-md border border-gray-700/70 bg-gray-800 text-gray-200 transition-colors hover:border-pink-500/50 hover:bg-gray-700 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 sm:size-11 sm:rounded-lg";
 
   return (
     <nav
       aria-label={comicCopy.chapterListHeading}
-      className={`grid grid-cols-[1fr_auto] gap-2 border border-gray-700/70 bg-gray-950 p-2 shadow-xl sm:flex sm:flex-nowrap sm:items-center sm:rounded-xl ${
+      className={`flex flex-nowrap items-center gap-1 border border-gray-700/70 bg-gray-950 p-1 shadow-xl sm:gap-2 sm:p-2 sm:rounded-xl ${
         sticky ? "sticky top-0 z-50 my-0 rounded-none sm:my-4" : "my-4 rounded-xl"
       }`}
     >
-      <div className="col-start-1 row-start-1 flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         <Link
           href="/"
           className={iconButtonClass}
@@ -72,8 +72,8 @@ export default function ChapterNav({
             alt=""
             width={32}
             height={32}
-            sizes="32px"
-            className="size-8 object-contain"
+            sizes="(min-width: 640px) 32px, 24px"
+            className="size-6 object-contain sm:size-8"
           />
           <span className="sr-only">{navigation.home}</span>
         </Link>
@@ -85,12 +85,11 @@ export default function ChapterNav({
           aria-label={errors.reload}
           title={errors.reload}
         >
-          <RefreshCw size={20} aria-hidden="true" />
+          <RefreshCw className="size-[18px] sm:size-5" aria-hidden="true" />
         </button>
-
       </div>
 
-      <div className="col-span-2 row-start-2 flex min-w-0 items-center gap-2 sm:flex-1">
+      <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
         {prevChapter ? (
           <button
             type="button"
@@ -103,7 +102,7 @@ export default function ChapterNav({
               chapter: prevChapter.chapter_name ?? common.unknown,
             })}
           >
-            <ChevronLeft size={22} aria-hidden="true" />
+            <ChevronLeft className="size-5 sm:size-[22px]" aria-hidden="true" />
           </button>
         ) : (
           <Link
@@ -112,7 +111,7 @@ export default function ChapterNav({
             aria-label={common.details}
             title={common.details}
           >
-            <ChevronLeft size={22} aria-hidden="true" />
+            <ChevronLeft className="size-5 sm:size-[22px]" aria-hidden="true" />
           </Link>
         )}
 
@@ -120,7 +119,7 @@ export default function ChapterNav({
           value={current}
           onChange={(event) => navigate(event.target.value)}
           aria-label={comicCopy.chapterListHeading}
-          className="h-11 min-w-0 flex-1 rounded-lg border border-gray-600 bg-white px-3 text-sm font-medium text-gray-950 transition-colors hover:border-pink-400 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400/40"
+          className="h-9 min-w-0 flex-1 rounded-md border border-gray-600 bg-white px-2 text-xs font-medium text-gray-950 transition-colors hover:border-pink-400 focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-400/40 sm:h-11 sm:rounded-lg sm:px-3 sm:text-sm"
         >
           {uniqueChapters.map((chapter, index) => (
             <option
@@ -138,7 +137,7 @@ export default function ChapterNav({
           <button
             type="button"
             onClick={() => navigate(nextChapter.chapter_slug ?? nextChapter.chapter_name ?? "")}
-            className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-pink-500 text-white transition-colors hover:bg-pink-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-300"
+            className="flex size-9 shrink-0 items-center justify-center rounded-md bg-pink-500 text-white transition-colors hover:bg-pink-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 sm:size-11 sm:rounded-lg"
             aria-label={formatMessage(common.shortChapter, {
               chapter: nextChapter.chapter_name ?? common.unknown,
             })}
@@ -146,15 +145,15 @@ export default function ChapterNav({
               chapter: nextChapter.chapter_name ?? common.unknown,
             })}
           >
-            <ChevronRight size={22} aria-hidden="true" />
+            <ChevronRight className="size-5 sm:size-[22px]" aria-hidden="true" />
           </button>
         ) : (
           <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-gray-800/70 text-gray-600"
+            className="flex size-9 shrink-0 items-center justify-center rounded-md bg-gray-800/70 text-gray-600 sm:size-11 sm:rounded-lg"
             aria-label={common.end}
             title={common.end}
           >
-            <ChevronRight size={22} aria-hidden="true" />
+            <ChevronRight className="size-5 sm:size-[22px]" aria-hidden="true" />
           </span>
         )}
       </div>
@@ -163,18 +162,19 @@ export default function ChapterNav({
         type="button"
         onClick={toggle}
         aria-pressed={isFavorite}
-        className={`col-start-2 row-start-1 flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 ${
+        className={`flex size-9 shrink-0 items-center justify-center rounded-md border p-0 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-300 sm:h-11 sm:w-auto sm:gap-2 sm:rounded-lg sm:px-3 ${
           isFavorite
             ? "border-pink-400/60 bg-pink-500/20 text-pink-200"
             : "border-pink-400/30 bg-pink-500 text-white hover:bg-pink-400"
         }`}
       >
         <Heart
-          size={19}
-          className={isFavorite ? "fill-current" : ""}
+          className={`size-[18px] sm:size-[19px] ${isFavorite ? "fill-current" : ""}`}
           aria-hidden="true"
         />
-        <span>{isFavorite ? comicCopy.following : comicCopy.follow}</span>
+        <span className="sr-only sm:not-sr-only">
+          {isFavorite ? comicCopy.following : comicCopy.follow}
+        </span>
       </button>
     </nav>
   );

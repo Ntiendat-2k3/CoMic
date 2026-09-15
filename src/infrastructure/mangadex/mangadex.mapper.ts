@@ -4,6 +4,7 @@ import type {
   MangaDexChapter,
   MangaDexLocalizedString,
   MangaDexManga,
+  MangaDexMangaStatistics,
   MangaDexRelationship,
   MangaDexTag,
 } from "./mangadex.types";
@@ -33,7 +34,7 @@ function getCoverUrl(manga: MangaDexManga) {
     (relationship) => relationship.type === "cover_art",
   );
   const fileName = cover?.attributes?.fileName;
-  if (typeof fileName !== "string") return "/icons/icon-512x512.png";
+  if (typeof fileName !== "string") return "/assets/logo.png";
   return `${MANGADEX_COVER_BASE_URL}/${manga.id}/${fileName}.512.jpg`;
 }
 
@@ -59,6 +60,7 @@ function mapChapter(chapter: MangaDexChapter): Chapter {
     chapter_api_data: chapter.id,
     chapter_slug: chapter.id,
     translated_language: chapter.attributes.translatedLanguage,
+    published_at: chapter.attributes.publishAt,
   };
 }
 
@@ -79,6 +81,8 @@ function mapChapterServers(chapters: MangaDexChapter[]): ChapterServer[] {
 export function mapMangaDexManga(
   manga: MangaDexManga,
   chapters: MangaDexChapter[] = [],
+  statistics?: MangaDexMangaStatistics,
+  latestChapter?: string | null,
 ): Comic {
   const attributes = manga.attributes;
   const name = firstLocalizedValue(attributes.title, attributes.originalLanguage);
@@ -99,12 +103,22 @@ export function mapMangaDexManga(
     content: firstLocalizedValue(attributes.description, attributes.originalLanguage),
     status: attributes.status,
     thumb_url: getCoverUrl(manga),
-    sub_docquyen: false,
     author: authors,
     category: attributes.tags.map(mapTag),
     chapters: mapChapterServers(chapters),
-    chaptersLatest: [],
     updatedAt: attributes.updatedAt,
+    year: attributes.year ?? undefined,
+    originalLanguage: attributes.originalLanguage,
+    publicationDemographic: attributes.publicationDemographic,
+    contentRating: attributes.contentRating,
+    latestChapter: latestChapter ?? undefined,
+    statistics: statistics
+      ? {
+          rating: statistics.rating.average ?? statistics.rating.bayesian,
+          follows: statistics.follows,
+          comments: statistics.comments?.repliesCount,
+        }
+      : undefined,
   };
 }
 

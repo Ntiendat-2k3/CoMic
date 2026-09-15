@@ -8,16 +8,13 @@ export interface MangaDexRelationship<TAttributes = Record<string, unknown>> {
 
 export interface MangaDexTagAttributes {
   name: MangaDexLocalizedString;
-  description: MangaDexLocalizedString;
-  group: string;
-  version: number;
+  group?: string;
 }
 
 export interface MangaDexTag {
   id: string;
   type: "tag";
   attributes: MangaDexTagAttributes;
-  relationships: MangaDexRelationship[];
 }
 
 export interface MangaDexMangaAttributes {
@@ -25,12 +22,29 @@ export interface MangaDexMangaAttributes {
   altTitles: MangaDexLocalizedString[];
   description: MangaDexLocalizedString;
   originalLanguage: string;
+  publicationDemographic: "shounen" | "shoujo" | "josei" | "seinen" | null;
   status: "ongoing" | "completed" | "hiatus" | "cancelled";
+  year: number | null;
   contentRating: "safe" | "suggestive" | "erotica" | "pornographic";
   tags: MangaDexTag[];
-  createdAt: string;
   updatedAt: string;
-  version: number;
+  latestUploadedChapter: string | null;
+}
+
+export interface MangaDexMangaStatistics {
+  comments?: {
+    repliesCount: number;
+  } | null;
+  follows: number;
+  rating: {
+    average?: number | null;
+    bayesian: number;
+  };
+}
+
+export interface MangaDexStatisticsResponse {
+  result: "ok" | "error";
+  statistics: Record<string, MangaDexMangaStatistics>;
 }
 
 export interface MangaDexManga {
@@ -41,17 +55,11 @@ export interface MangaDexManga {
 }
 
 export interface MangaDexChapterAttributes {
-  volume: string | null;
   chapter: string | null;
   title: string | null;
   translatedLanguage: string;
   externalUrl: string | null;
-  publishAt: string;
-  readableAt: string;
-  createdAt: string;
-  updatedAt: string;
-  pages: number;
-  version: number;
+  publishAt?: string;
 }
 
 export interface MangaDexChapter {
