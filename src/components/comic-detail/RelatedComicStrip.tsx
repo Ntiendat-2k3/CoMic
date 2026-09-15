@@ -1,7 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Flame, ArrowRight } from "lucide-react";
-import { resolveCoverUrl } from "@/domain/comic/resolve-cover-url";
+import ComicGrid from "@/components/comic/ComicGrid";
 import { getDictionary } from "@/i18n/dictionaries";
 import type { Comic } from "@/types/comic";
 
@@ -28,29 +27,7 @@ export default function RelatedComicStrip({ comics, cdnUrl }: RelatedComicStripP
         </Link>
       </header>
 
-      <div className="-mx-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-3 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 lg:grid-cols-6">
-        {comics.map((comic) => (
-          <Link
-            key={comic.slug}
-            href={`/truyen-tranh/${comic.slug}`}
-            className="group w-[8.5rem] flex-none snap-start overflow-hidden rounded-2xl border border-white/[0.08] bg-[#141824] transition-colors hover:border-pink-400/35 sm:w-auto"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden">
-              <Image
-                src={resolveCoverUrl(comic.thumb_url, cdnUrl)}
-                alt={comic.name}
-                fill
-                sizes="(max-width: 639px) 136px, (max-width: 1023px) 33vw, 180px"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#10131d] to-transparent" aria-hidden="true" />
-            </div>
-            <h3 className="line-clamp-2 min-h-[2.75rem] px-2.5 py-2 text-xs font-semibold leading-5 text-gray-100">
-              {comic.name}
-            </h3>
-          </Link>
-        ))}
-      </div>
+      <ComicGrid comics={comics} cdnUrl={cdnUrl} layout="related" />
     </section>
   );
 }

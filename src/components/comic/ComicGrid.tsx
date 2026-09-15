@@ -10,17 +10,24 @@ interface ComicGridProps {
   cdnUrl?: string;
   isLoading?: boolean;
   skeletonCount?: number;
+  layout?: "catalog" | "related";
 }
+
+const layoutClasses = {
+  catalog: "grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5",
+  related: "grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6",
+};
 
 const ComicGrid = memo(({
   comics,
   cdnUrl = "",
   isLoading = false,
   skeletonCount = 15,
+  layout = "catalog",
 }: ComicGridProps) => {
   return (
     <div
-      className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5"
+      className={`grid ${layoutClasses[layout]}`}
     >
       {isLoading || !comics
         ? Array.from({ length: skeletonCount }, (_, i) => (

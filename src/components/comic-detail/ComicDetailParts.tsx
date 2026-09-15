@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -53,17 +53,17 @@ export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ComicActionPr
   const { comic: copy } = useDictionary();
 
   return (
-    <div className="grid grid-cols-3 gap-2.5">
+    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
       {firstChapterSlug ? (
         <Link
           href={`/truyen-tranh/${comic.slug}/${firstChapterSlug}`}
-          className="flex min-h-12 min-w-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-500 to-pink-300 px-2 text-xs font-extrabold text-[#240d18] shadow-[0_12px_30px_rgba(236,72,153,.28)] transition-[filter,transform] hover:brightness-110 active:scale-[.98] sm:px-5 sm:text-sm"
+          className="col-span-2 flex min-h-12 min-w-0 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-500 to-pink-300 px-2 text-xs font-extrabold text-[#240d18] shadow-[0_12px_30px_rgba(236,72,153,.28)] transition-[filter,transform] hover:brightness-110 active:scale-[.98] sm:col-span-1 sm:px-5 sm:text-sm"
         >
           <BookOpen size={18} aria-hidden="true" />
           <span className="truncate">{copy.readNow}</span>
         </Link>
       ) : (
-        <span className="flex min-h-12 items-center justify-center rounded-2xl border border-white/10 text-xs text-gray-500">
+        <span className="col-span-2 flex min-h-12 items-center justify-center rounded-2xl border border-white/10 text-xs text-gray-500 sm:col-span-1">
           {copy.noChapters}
         </span>
       )}
@@ -87,7 +87,33 @@ export function ActionButtons({ comic, cdnUrl, firstChapterSlug }: ComicActionPr
   );
 }
 
-export function ComicMetadata({ comic }: { comic: Comic }) {
+interface ComicMetadataProps {
+  comic: Comic;
+  titleId?: string;
+}
+
+interface MetadataItemProps {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  valueClassName?: string;
+}
+
+function MetadataItem({ icon, label, value, valueClassName = "text-gray-100" }: MetadataItemProps) {
+  return (
+    <div className="min-w-0 rounded-xl border border-white/[0.08] bg-black/25 p-2.5 text-left backdrop-blur-sm">
+      <dt className="flex items-center gap-1.5 text-[10px] text-gray-400">
+        {icon}
+        <span className="truncate">{label}</span>
+      </dt>
+      <dd className={`mt-1 truncate text-xs font-semibold ${valueClassName}`} title={value}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+export function ComicMetadata({ comic, titleId }: ComicMetadataProps) {
   const { locale, common, comic: copy } = useDictionary();
   const statusMap: Record<string, { label: string; color: string }> = {
     ongoing: { label: copy.ongoing, color: "text-emerald-300" },
@@ -116,8 +142,8 @@ export function ComicMetadata({ comic }: { comic: Comic }) {
 
   return (
     <div className="min-w-0">
-      <div className="flex flex-wrap items-center gap-2">
-        <h1 className="min-w-0 text-xl font-extrabold leading-tight tracking-[-0.035em] text-white sm:text-3xl lg:text-5xl">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+        <h1 id={titleId} className="min-w-0 text-center text-2xl font-extrabold leading-tight tracking-[-0.035em] text-white sm:text-left sm:text-3xl lg:text-5xl">
           {comic.name}
         </h1>
         {contentRating ? (
@@ -128,62 +154,63 @@ export function ComicMetadata({ comic }: { comic: Comic }) {
       </div>
 
       {comic.origin_name[0] ? (
-        <p className="mt-1 line-clamp-1 text-xs text-gray-400 sm:text-sm">{comic.origin_name[0]}</p>
+        <p className="mt-1 line-clamp-1 text-center text-xs text-gray-400 sm:text-left sm:text-sm">{comic.origin_name[0]}</p>
       ) : null}
       {plainDescription ? (
-        <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-400 sm:text-sm sm:leading-6">
+        <p className="mt-2 hidden line-clamp-2 text-xs leading-5 text-gray-400 sm:block sm:text-sm sm:leading-6">
           {plainDescription}
         </p>
       ) : null}
 
-      <div className="mt-3 grid grid-cols-3 divide-x divide-white/10 border-y border-white/10 py-2.5 text-center">
+      <div className="mt-4 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-black/30 px-1 py-3 text-center backdrop-blur-sm">
         <div>
           <strong className="flex items-center justify-center gap-1.5 text-sm text-white sm:text-base">
             <Star size={16} className="fill-pink-400 text-pink-400" aria-hidden="true" />
             {rating !== undefined ? rating.toFixed(1) : common.unknown}
           </strong>
-          <span className="mt-0.5 block text-[9px] text-gray-500 sm:text-[11px]">{copy.ratingLabel}</span>
+          <span className="mt-0.5 block text-[10px] text-gray-400 sm:text-[11px]">{copy.ratingLabel}</span>
         </div>
         <div>
           <strong className="flex items-center justify-center gap-1.5 text-sm text-white sm:text-base">
             <Users size={16} className="text-pink-300" aria-hidden="true" />
             {follows !== undefined ? compactNumber.format(follows) : common.unknown}
           </strong>
-          <span className="mt-0.5 block text-[9px] text-gray-500 sm:text-[11px]">{copy.followersLabel}</span>
+          <span className="mt-0.5 block text-[10px] text-gray-400 sm:text-[11px]">{copy.followersLabel}</span>
         </div>
         <div>
           <strong className="flex items-center justify-center gap-1.5 text-sm text-white sm:text-base">
             <Layers3 size={16} className="text-pink-300" aria-hidden="true" />
             {chapterCount}
           </strong>
-          <span className="mt-0.5 block text-[9px] text-gray-500 sm:text-[11px]">{copy.chaptersTab}</span>
+          <span className="mt-0.5 block text-[10px] text-gray-400 sm:text-[11px]">{copy.chaptersTab}</span>
         </div>
       </div>
 
-      <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 text-[11px] text-gray-400 min-[390px]:grid-cols-2 sm:text-xs">
+      <dl className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
         {comic.author.length > 0 ? (
-          <div className="flex min-w-0 items-center gap-2">
-            <PenLine size={14} className="flex-none text-gray-300" aria-hidden="true" />
-            <dt>{copy.authorLabel}:</dt>
-            <dd className="truncate text-gray-200">{comic.author.join(", ")}</dd>
-          </div>
+          <MetadataItem
+            icon={<PenLine size={14} className="flex-none text-gray-300" aria-hidden="true" />}
+            label={copy.authorLabel}
+            value={comic.author.join(", ")}
+          />
         ) : null}
-        <div className="flex items-center gap-2">
-          <Layers3 size={14} className="flex-none text-gray-300" aria-hidden="true" />
-          <dt>{copy.statusLabel}:</dt>
-          <dd className={status.color}>{status.label}</dd>
-        </div>
-        <div className="flex min-w-0 items-center gap-2">
-          <CalendarDays size={14} className="flex-none text-gray-300" aria-hidden="true" />
-          <dt>{copy.lastUpdatedLabel}:</dt>
-          <dd className="truncate text-gray-200">{updatedAt}</dd>
-        </div>
+        <MetadataItem
+          icon={<Layers3 size={14} className="flex-none text-gray-300" aria-hidden="true" />}
+          label={copy.statusLabel}
+          value={status.label}
+          valueClassName={status.color}
+        />
+        <MetadataItem
+          icon={<CalendarDays size={14} className="flex-none text-gray-300" aria-hidden="true" />}
+          label={copy.lastUpdatedLabel}
+          value={updatedAt}
+        />
         {comic.originalLanguage ? (
-          <div className="flex items-center gap-2">
-            <Languages size={14} className="flex-none text-gray-300" aria-hidden="true" />
-            <dt>{copy.originalLanguageLabel}:</dt>
-            <dd className="uppercase text-gray-200">{comic.originalLanguage}</dd>
-          </div>
+          <MetadataItem
+            icon={<Languages size={14} className="flex-none text-gray-300" aria-hidden="true" />}
+            label={copy.originalLanguageLabel}
+            value={comic.originalLanguage.toUpperCase()}
+          />
         ) : null}
       </dl>
     </div>
@@ -197,7 +224,7 @@ export function CategoriesList({ categories }: { categories: Comic["category"] }
         <Link
           key={category._id || category.slug}
           href={`/the-loai/${category.slug}`}
-          className="rounded-full border border-pink-400/35 bg-pink-500/10 px-2.5 py-1 text-[10px] text-pink-200 transition-colors hover:bg-pink-500/20 sm:text-xs"
+          className="inline-flex min-h-8 items-center rounded-full border border-pink-400/35 bg-pink-500/10 px-3 py-1 text-[10px] text-pink-200 transition-colors hover:bg-pink-500/20 sm:text-xs"
         >
           {category.name}
         </Link>

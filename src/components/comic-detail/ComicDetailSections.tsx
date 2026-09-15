@@ -14,6 +14,8 @@ interface ComicDetailSectionsProps {
 }
 
 const CHAPTER_PREVIEW_SIZE = 4;
+const SECTION_CLASS_NAME =
+  "rounded-[1.5rem] border border-white/[0.08] bg-[#121620]/90 p-4 shadow-[0_18px_44px_rgba(0,0,0,.2)] sm:p-6";
 
 /** Hiển thị giới thiệu và chương liên tiếp để phù hợp luồng cuộn tự nhiên trên mobile. */
 export default function ComicDetailSections({ comic, chapterCount }: ComicDetailSectionsProps) {
@@ -21,8 +23,8 @@ export default function ComicDetailSections({ comic, chapterCount }: ComicDetail
   const { comic: copy } = useDictionary();
 
   return (
-    <div className="space-y-7">
-      <section aria-labelledby="comic-description-heading">
+    <div className="space-y-5 sm:space-y-7">
+      <section className={SECTION_CLASS_NAME} aria-labelledby="comic-description-heading">
         <header className="mb-3 flex items-center gap-3">
           <span className="h-7 w-1 rounded-full bg-gradient-to-b from-pink-300 to-pink-600 shadow-[0_0_12px_rgba(236,72,153,.5)]" aria-hidden="true" />
           <BookOpen size={20} className="text-pink-400" aria-hidden="true" />
@@ -33,8 +35,8 @@ export default function ComicDetailSections({ comic, chapterCount }: ComicDetail
         <Description content={comic.content} />
       </section>
 
-      <section aria-labelledby="comic-chapters-heading">
-        <header className="mb-2 flex items-center gap-3">
+      <section className={SECTION_CLASS_NAME} aria-labelledby="comic-chapters-heading">
+        <header className="mb-3 flex flex-wrap items-center gap-3">
           <ListOrdered size={21} className="text-pink-400" aria-hidden="true" />
           <h2 id="comic-chapters-heading" className="text-lg font-extrabold text-white">
             {copy.chapterListHeading}
@@ -43,7 +45,7 @@ export default function ComicDetailSections({ comic, chapterCount }: ComicDetail
             <button
               type="button"
               onClick={() => setShowAllChapters((current) => !current)}
-              className="ml-auto text-xs font-semibold text-pink-400 transition-colors hover:text-pink-300"
+              className="ml-auto inline-flex min-h-11 items-center rounded-xl px-2 text-right text-xs font-semibold text-pink-400 transition-colors hover:bg-pink-500/10 hover:text-pink-300"
             >
               {showAllChapters
                 ? copy.showRecentChapters
